@@ -1,0 +1,32 @@
+
+model Team {
+  id               String            @id @default(cuid())
+  name             String
+  sportType        SportType
+  isRecruiting     Boolean           @default(false)
+  neededPosition   String?
+  members          TeamMembership[]
+  joinRequests     JoinRequest[]
+  reservations     Reservation[]
+  coachingSessions CoachingSession[]
+  tournamentTeams  TournamentTeam[]
+}
+
+model TeamMembership {
+  id     String   @id @default(cuid())
+  teamId String
+  team   Team     @relation(fields: [teamId], references: [id])
+  userId String
+  user   User     @relation(fields: [userId], references: [id])
+  role   TeamRole @default(MEMBER)
+}
+
+model JoinRequest {
+  id        String   @id @default(cuid())
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  status    String
+  createdAt DateTime @default(now())
+}

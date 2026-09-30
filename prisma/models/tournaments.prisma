@@ -1,0 +1,38 @@
+
+model Tournament {
+  id          String           @id @default(cuid())
+  name        String
+  hostFieldId String
+  hostField   Field            @relation(fields: [hostFieldId], references: [id])
+  organizerId String
+  organizer   User             @relation(fields: [organizerId], references: [id])
+  startDate   DateTime
+  endDate     DateTime
+  description String
+  status      TournamentStatus @default(UPCOMING)
+  teams       TournamentTeam[]
+  matches     Match[]
+}
+
+model TournamentTeam {
+  id           String     @id @default(cuid())
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  teamId       String
+  team         Team       @relation(fields: [teamId], references: [id])
+
+  @@unique([tournamentId, teamId])
+}
+
+model Match {
+  id           String      @id @default(cuid())
+  tournamentId String
+  tournament   Tournament  @relation(fields: [tournamentId], references: [id])
+  homeTeamId   String
+  awayTeamId   String
+  slotId       String?
+  homeScore    Int?
+  awayScore    Int?
+  playerStats  Json?
+  status       MatchStatus @default(SCHEDULED)
+}

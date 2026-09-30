@@ -1,0 +1,40 @@
+
+model Field {
+  id                String             @id @default(cuid())
+  ownerId           String
+  owner             User               @relation(fields: [ownerId], references: [id])
+  name              String
+  description       String
+  address           String
+  latitude          Float
+  longitude         Float
+  indoor            Boolean
+  status            FieldStatus        @default(PENDING)
+  images            FieldImage[]
+  slots             AvailabilitySlot[]
+  hostedTournaments Tournament[]
+  reviews           FieldReview[]
+  createdAt         DateTime           @default(now())
+}
+
+model FieldImage {
+  id      String @id @default(cuid())
+  fieldId String
+  field   Field  @relation(fields: [fieldId], references: [id])
+  url     String
+  order   Int
+}
+
+model AvailabilitySlot {
+  id            String       @id @default(cuid())
+  fieldId       String
+  field         Field        @relation(fields: [fieldId], references: [id])
+  date          DateTime
+  startTime     DateTime
+  endTime       DateTime
+  price         Decimal      @db.Decimal(10, 2)
+  sportType     SportType
+  status        SlotStatus   @default(OPEN)
+  reservation   Reservation?
+  holdExpiresAt DateTime?
+}

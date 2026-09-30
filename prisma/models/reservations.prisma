@@ -1,0 +1,13 @@
+model Reservation {
+  id               String            @id @default(cuid())
+  slotId           String            @unique
+  slot             AvailabilitySlot  @relation(fields: [slotId], references: [id])
+  userId           String
+  user             User              @relation(fields: [userId], references: [id])
+  teamId           String?
+  team             Team?             @relation(fields: [teamId], references: [id])
+  status           ReservationStatus @default(CONFIRMED)
+  compensationType CompensationType?
+  createdAt        DateTime          @default(now())
+  cancelledAt      DateTime?
+}

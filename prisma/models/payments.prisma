@@ -1,0 +1,31 @@
+
+model Payment {
+  id                    String        @id @default(cuid())
+  reservationId         String?
+  sessionId             String?
+  amount                Decimal       @db.Decimal(10, 2)
+  platformFee           Decimal       @db.Decimal(10, 2)
+  ownerPayout           Decimal       @db.Decimal(10, 2)
+  method                PaymentMethod
+  creditApplied         Decimal       @default(0) @db.Decimal(10, 2)
+  status                PaymentStatus @default(PENDING)
+  stripePaymentIntentId String?
+  createdAt             DateTime      @default(now())
+}
+
+model PaymentSplit {
+  id            String  @id @default(cuid())
+  reservationId String
+  userId        String
+  amount        Decimal @db.Decimal(10, 2)
+  status        String
+}
+
+model CreditTransaction {
+  id                   String       @id @default(cuid())
+  userId               String
+  amount               Decimal      @db.Decimal(10, 2)
+  type                 CreditTxType
+  relatedReservationId String?
+  createdAt            DateTime     @default(now())
+}

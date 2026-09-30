@@ -1,0 +1,2 @@
+-- CreateEnum
+CREATE TYPE "FieldStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');

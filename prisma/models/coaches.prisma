@@ -1,0 +1,36 @@
+
+model Coach {
+  id             String                  @id @default(cuid())
+  userId         String                  @unique
+  user           User                    @relation(fields: [userId], references: [id])
+  sportType      SportType
+  bio            String
+  hourlyRate     Decimal                 @db.Decimal(10, 2)
+  certifications String?
+  status         CoachStatus             @default(PENDING)
+  slots          CoachAvailabilitySlot[]
+  reviews        CoachReview[]
+}
+
+model CoachAvailabilitySlot {
+  id        String           @id @default(cuid())
+  coachId   String
+  coach     Coach            @relation(fields: [coachId], references: [id])
+  date      DateTime
+  startTime DateTime
+  endTime   DateTime
+  price     Decimal          @db.Decimal(10, 2)
+  status    CoachSlotStatus  @default(OPEN)
+  session   CoachingSession?
+}
+
+model CoachingSession {
+  id     String                @id @default(cuid())
+  slotId String                @unique
+  slot   CoachAvailabilitySlot @relation(fields: [slotId], references: [id])
+  userId String
+  user   User                  @relation(fields: [userId], references: [id])
+  teamId String?
+  team   Team?                 @relation(fields: [teamId], references: [id])
+  status SessionStatus         @default(PENDING)
+}

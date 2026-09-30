@@ -1,0 +1,36 @@
+
+model FieldReview {
+  id            String   @id @default(cuid())
+  fieldId       String
+  field         Field    @relation(fields: [fieldId], references: [id])
+  reviewerId    String
+  reviewer      User     @relation(fields: [reviewerId], references: [id])
+  reservationId String   @unique
+  rating        Int
+  comment       String?
+  createdAt     DateTime @default(now())
+}
+
+model CoachReview {
+  id         String   @id @default(cuid())
+  coachId    String
+  coach      Coach    @relation(fields: [coachId], references: [id])
+  reviewerId String
+  reviewer   User     @relation(fields: [reviewerId], references: [id])
+  sessionId  String   @unique
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+}
+
+model UserReview {
+  id         String   @id @default(cuid())
+  revieweeId String
+  reviewee   User     @relation(fields: [revieweeId], references: [id], name: "ReviewsReceived")
+  reviewerId String
+  reviewer   User     @relation(fields: [reviewerId], references: [id], name: "ReviewsGiven")
+  matchId    String
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+}
