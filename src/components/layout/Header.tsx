@@ -6,63 +6,67 @@ export interface HeaderProps {
   user: { name: string; avatarUrl?: string } | null;
 }
 
+const navLinkClass =
+  'rounded-full px-3.5 py-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground';
+
 export function Header({ user }: HeaderProps) {
   return (
     <header className="border-b-[0.5px] border-border bg-background">
-      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link className="text-foreground" href="/">
-          Sports App
-        </Link>
-
-        {/* Hidden on mobile — becomes a hamburger menu once we add
-            client-side state. Don't try to "squeeze" it in for now. */}
-        <nav className="hidden md:block">
-          <ul className="flex items-center gap-6">
-            <li>
-              <Link
-                href="/fields"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Fields
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/teams"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Teams
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/coaches"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Coaches
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        <div className="flex items-center gap-1">
+      <div className="border-b-[0.5px] border-border bg-secondary md:hidden">
+        <div className="mx-auto flex h-9 max-w-360 items-center justify-end gap-1 px-4 sm:px-6">
           <LanguageSwitcher />
           <ThemeToggle />
+        </div>
+      </div>
+
+      <div className="mx-auto flex h-16 max-w-360 items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-4 lg:gap-10">
+          <Link className="whitespace-nowrap text-foreground" href="/">
+            Sports App
+          </Link>
+
+          <nav className="hidden md:block">
+            <ul className="flex items-center gap-1 lg:gap-2">
+              <li>
+                <Link href="/fields" className={navLinkClass}>
+                  Fields
+                </Link>
+              </li>
+              <li>
+                <Link href="/teams" className={navLinkClass}>
+                  Teams
+                </Link>
+              </li>
+              <li>
+                <Link href="/coaches" className={navLinkClass}>
+                  Coaches
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+        <div className="flex items-center">
+          <div className="hidden items-center gap-1 md:flex">
+            <LanguageSwitcher />
+            <ThemeToggle />
+            <span className="mx-2 h-5 w-px bg-border" aria-hidden="true" />
+          </div>
 
           {user ? (
-            <Link href="/profile" className="ml-1">
+            <Link href="/profile">
               <span className="text-foreground">{user.name}</span>
             </Link>
           ) : (
-            <div className="ml-1 flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <Link
-                className="rounded-full border-[0.5px] border-border px-4 py-1.5 text-foreground hover:bg-secondary"
+                className="whitespace-nowrap rounded-full border-[0.5px] border-border px-4 py-1.5 text-foreground hover:bg-secondary md:border-transparent"
                 href="/login"
               >
                 Σύνδεση
               </Link>
               <Link
-                className="rounded-full bg-primary px-4 py-1.5 text-primary-foreground hover:opacity-90"
+                className="whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-primary-foreground hover:opacity-90"
                 href="/register"
               >
                 Εγγραφή

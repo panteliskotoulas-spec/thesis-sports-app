@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ThemeProvider } from 'next-themes';
 import { commissioner } from '@/lib/fonts';
 import './globals.css';
 import { TRPCReactProvider } from '@/trpc/client/client';
@@ -10,9 +11,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="el" className={`h-full antialiased ${commissioner.variable}`}>
+    <html
+      lang="el"
+      suppressHydrationWarning
+      className={`h-full antialiased ${commissioner.variable}`}
+    >
       <body className="min-h-full flex flex-col">
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
