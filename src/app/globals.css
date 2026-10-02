@@ -1,26 +1,223 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 1rem;
+
+  /* shadcn standard tokens */
+  --background: #f8ede3;
+  --foreground: #2b3129;
+  --card: #fffbf7;
+  --card-foreground: #2b3129;
+  --popover: #fffbf7;
+  --popover-foreground: #2b3129;
+  --primary: #4e5e4c;
+  --primary-foreground: #ffffff;
+  --secondary: #efe3d5;
+  --secondary-foreground: #2b3129;
+  --muted: #efe3d5;
+  --muted-foreground: #5e6b5c;
+  --accent: #dce7d6;
+  --accent-foreground: #3e4b3c;
+  --destructive: #c4322f;
+  --destructive-foreground: #ffffff;
+  --border: #ddd3c6;
+  --input: #ddd3c6;
+  --ring: #4e5e4c;
+
+  /* app-specific tokens, no shadcn equivalent */
+  --terracotta: #b4522a;
+  --terracotta-strong: #9e4522;
+  --warning: #c98a12;
+  --warning-foreground: #2b3129;
+  --sage: #bdd2b6;
+  --sage-strong: #a2b29f;
+}
+
+.dark {
+  --background: #1a1e19;
+  --foreground: #ede6dc;
+  --card: #242a23;
+  --card-foreground: #ede6dc;
+  --popover: #242a23;
+  --popover-foreground: #ede6dc;
+  --primary: #bdd2b6;
+  --primary-foreground: #1a1e19;
+  --secondary: #2a312a;
+  --secondary-foreground: #ede6dc;
+  --muted: #2a312a;
+  --muted-foreground: #a9b3a6;
+  --accent: #34402f;
+  --accent-foreground: #bdd2b6;
+  --destructive: #f07a72;
+  --destructive-foreground: #1a1e19;
+  --border: #3a4238;
+  --input: #3a4238;
+  --ring: #bdd2b6;
+
+  --terracotta: #e0875a;
+  --terracotta-strong: #e99a70;
+  --warning: #e8b04a;
+  --warning-foreground: #1a1e19;
+  --sage: #bdd2b6;
+  --sage-strong: #a9b3a6;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-strong: var(--terracotta-strong);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-sage: var(--sage);
+  --color-sage-strong: var(--sage-strong);
+
+  --font-sans: var(--font-commissioner);
+
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
+    outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-commissioner), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  h4 {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  h5 {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  h6 {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  small {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--muted-foreground);
+  }
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  li {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  strong,
+  b {
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Most lists in an app UI are layout (card grids, nav), not bulleted
+     reading content, so strip default list styling by default. */
+  ul,
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 640px) {
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+    }
+
+    h3 {
+      font-size: 1.0625rem;
+    }
+  }
 }

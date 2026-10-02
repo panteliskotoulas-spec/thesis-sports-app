@@ -1,8 +1,13 @@
-export default async function Home() {
+import { Header } from '@/components/layout/Header';
+
+const mockUser = null;
+export default function LandingPage() {
   return (
-    <div>
-      <h1>Sanity check</h1>
-      <p>Check your terminal for the query result.</p>
-    </div>
+    <>
+      <Header user={mockUser} />
+      <main>
+        <p>Test content</p>
+      </main>
+    </>
   );
 }
