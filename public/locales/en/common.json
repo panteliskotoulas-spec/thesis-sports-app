@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "fields": "Fields",
+    "teams": "Teams",
+    "coaches": "Coaches"
+  },
+  "auth": {
+    "login": "Log in",
+    "register": "Sign up"
+  },
+  "theme": {
+    "toggle": "Toggle theme"
+  },
+  "language": {
+    "switch": "Switch language"
+  },
+  "login": {
+    "pageTitle": "Log in",
+    "title": "Welcome back",
+    "subtitle": "Log in to book a field or find a team.",
+    "email": "Email",
+    "password": "Password",
+    "forgot": "Forgot your password?",
+    "submit": "Log in",
+    "noAccount": "Don't have an account?",
+    "register": "Sign up"
+  },
+  "register": {
+    "pageTitle": "Sign up",
+    "title": "Create your account",
+    "subtitle": "Book fields, join teams and play more.",
+    "name": "Full name",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least 8 characters.",
+    "submit": "Create account",
+    "haveAccount": "Already have an account?",
+    "login": "Log in"
+  }
+}

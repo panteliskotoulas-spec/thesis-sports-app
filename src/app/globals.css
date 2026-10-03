@@ -184,8 +184,6 @@
     text-decoration: none;
   }
 
-  /* Most lists in an app UI are layout (card grids, nav), not bulleted
-     reading content, so strip default list styling by default. */
   ul,
   ol {
     list-style: none;

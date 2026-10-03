@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { lng as routeLanguage } from 'next/root-params';
+import { getT } from '@/i18n.server';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 
@@ -9,7 +11,16 @@ export interface HeaderProps {
 const navLinkClass =
   'rounded-full px-3.5 py-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground';
 
-export function Header({ user }: HeaderProps) {
+export async function Header({ user }: HeaderProps) {
+  const { t } = await getT('common');
+  const lng = await routeLanguage();
+
+  const navItems = [
+    { slug: 'fields', label: t('nav.fields') },
+    { slug: 'teams', label: t('nav.teams') },
+    { slug: 'coaches', label: t('nav.coaches') },
+  ];
+
   return (
     <header className="border-b-[0.5px] border-border bg-background">
       <div className="border-b-[0.5px] border-border bg-secondary md:hidden">
@@ -21,27 +32,19 @@ export function Header({ user }: HeaderProps) {
 
       <div className="mx-auto flex h-16 max-w-360 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4 lg:gap-10">
-          <Link className="whitespace-nowrap text-foreground" href="/">
+          <Link className="whitespace-nowrap text-foreground" href={`/${lng}`}>
             Sports App
           </Link>
 
           <nav className="hidden md:block">
             <ul className="flex items-center gap-1 lg:gap-2">
-              <li>
-                <Link href="/fields" className={navLinkClass}>
-                  Fields
-                </Link>
-              </li>
-              <li>
-                <Link href="/teams" className={navLinkClass}>
-                  Teams
-                </Link>
-              </li>
-              <li>
-                <Link href="/coaches" className={navLinkClass}>
-                  Coaches
-                </Link>
-              </li>
+              {navItems.map((item) => (
+                <li key={item.slug}>
+                  <Link href={`/${lng}/${item.slug}`} className={navLinkClass}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
@@ -54,22 +57,22 @@ export function Header({ user }: HeaderProps) {
           </div>
 
           {user ? (
-            <Link href="/profile">
+            <Link href={`/${lng}/profile`}>
               <span className="text-foreground">{user.name}</span>
             </Link>
           ) : (
             <div className="flex items-center gap-2">
               <Link
                 className="whitespace-nowrap rounded-full border-[0.5px] border-border px-4 py-1.5 text-foreground hover:bg-secondary md:border-transparent"
-                href="/login"
+                href={`/${lng}/login`}
               >
-                Σύνδεση
+                {t('auth.login')}
               </Link>
               <Link
                 className="whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-primary-foreground hover:opacity-90"
-                href="/register"
+                href={`/${lng}/register`}
               >
-                Εγγραφή
+                {t('auth.register')}
               </Link>
             </div>
           )}
