@@ -41,6 +41,10 @@
     "business": "Business",
     "nameBusiness": "Contact person's full name",
     "businessName": "Business name",
-    "taxId": "Tax ID (AFM)"
+    "taxId": "Tax ID (AFM)",
+    "taxIdHint": "9 digits.",
+    "submitting": "Creating account…",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "errorEmailTaken": "An account with this email already exists."
   }
 }

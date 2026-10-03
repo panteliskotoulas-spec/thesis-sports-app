@@ -31,6 +31,7 @@ export default async function RegisterPage() {
       }
     >
       <RegisterForm
+        lng={lng}
         labels={{
           accountType: t('register.accountType'),
           individual: t('register.individual'),
@@ -39,10 +40,14 @@ export default async function RegisterPage() {
           nameBusiness: t('register.nameBusiness'),
           businessName: t('register.businessName'),
           taxId: t('register.taxId'),
+          taxIdHint: t('register.taxIdHint'),
           email: t('register.email'),
           password: t('register.password'),
           passwordHint: t('register.passwordHint'),
           submit: t('register.submit'),
+          submitting: t('register.submitting'),
+          errorGeneric: t('register.errorGeneric'),
+          errorEmailTaken: t('register.errorEmailTaken'),
         }}
       />
     </AuthCard>

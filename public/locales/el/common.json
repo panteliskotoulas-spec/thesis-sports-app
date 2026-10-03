@@ -41,6 +41,10 @@
     "business": "Επιχείρηση",
     "nameBusiness": "Ονοματεπώνυμο υπευθύνου",
     "businessName": "Επωνυμία",
-    "taxId": "ΑΦΜ"
+    "taxId": "ΑΦΜ",
+    "taxIdHint": "9 ψηφία.",
+    "submitting": "Δημιουργία…",
+    "errorGeneric": "Κάτι πήγε στραβά. Δοκίμασε ξανά.",
+    "errorEmailTaken": "Υπάρχει ήδη λογαριασμός με αυτό το email."
   }
 }

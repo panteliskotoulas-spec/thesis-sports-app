@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
 import { FormField } from '@/components/shared/FormField';
 
 type AccountType = 'INDIVIDUAL' | 'BUSINESS';
 
 export interface RegisterFormProps {
+  lng: string;
   labels: {
     accountType: string;
     individual: string;
@@ -14,15 +17,25 @@ export interface RegisterFormProps {
     nameBusiness: string;
     businessName: string;
     taxId: string;
+    taxIdHint: string;
     email: string;
     password: string;
     passwordHint: string;
     submit: string;
+    submitting: string;
+    errorGeneric: string;
+    errorEmailTaken: string;
   };
 }
 
-export function RegisterForm({ labels }: RegisterFormProps) {
+export function RegisterForm({ lng, labels }: RegisterFormProps) {
+  const router = useRouter();
+
   const [accountType, setAccountType] = useState<AccountType>('INDIVIDUAL');
+  const [pending, setPending] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
   const isBusiness = accountType === 'BUSINESS';
 
   const options: { value: AccountType; label: string }[] = [
@@ -30,14 +43,49 @@ export function RegisterForm({ labels }: RegisterFormProps) {
     { value: 'BUSINESS', label: labels.business },
   ];
 
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setPending(true);
+    setFormError(null);
+    setEmailError(null);
+
+    const form = new FormData(e.currentTarget);
+    const text = (key: string) => String(form.get(key) ?? '').trim();
+
+    try {
+      const { error } = await authClient.signUp.email({
+        name: text('name'),
+        email: text('email'),
+        password: String(form.get('password') ?? ''), // ο κωδικός δεν κόβεται (trim)
+        accountType,
+        ...(isBusiness && {
+          businessName: text('businessName'),
+          taxId: text('taxId').replace(/\s/g, ''),
+        }),
+      });
+
+      if (error) {
+        if (error.code?.startsWith('USER_ALREADY_EXISTS')) {
+          setEmailError(labels.errorEmailTaken);
+        } else {
+          setFormError(labels.errorGeneric);
+        }
+        setPending(false);
+        return;
+      }
+
+      // Το Better Auth κάνει αυτόματα sign in μετά την εγγραφή.
+      router.push(`/${lng}`);
+      router.refresh();
+    } catch {
+      setFormError(labels.errorGeneric);
+      setPending(false);
+    }
+  }
+
   return (
-    <form
-      className="flex flex-col gap-4"
-      // ΠΡΟΣΩΡΙΝΟ: χωρίς αυτό, το submit στέλνει τα πεδία (και τον κωδικό) στο URL.
-      // Φεύγει όταν μπει η πραγματική λογική εγγραφής.
-      onSubmit={(e) => e.preventDefault()}
-    >
-      {/* Διακόπτης Άτομο / Επιχείρηση: πραγματικά radio inputs, οπότε δουλεύει με πληκτρολόγιο */}
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+      {/* Διακόπτης Άτομο / Επιχείρηση */}
       <fieldset className="grid grid-cols-2 gap-1 rounded-full border-[0.5px] border-border bg-muted p-1">
         <legend className="sr-only">{labels.accountType}</legend>
 
@@ -52,6 +100,7 @@ export function RegisterForm({ labels }: RegisterFormProps) {
               value={value}
               checked={accountType === value}
               onChange={() => setAccountType(value)}
+              disabled={pending}
               className="sr-only"
             />
             {label}
@@ -66,6 +115,8 @@ export function RegisterForm({ labels }: RegisterFormProps) {
             type="text"
             label={labels.businessName}
             autoComplete="organization"
+            minLength={2}
+            maxLength={120}
             required
           />
 
@@ -73,8 +124,11 @@ export function RegisterForm({ labels }: RegisterFormProps) {
             id="taxId"
             type="text"
             label={labels.taxId}
+            hint={labels.taxIdHint}
             inputMode="numeric"
             autoComplete="off"
+            pattern="[0-9]{9}"
+            maxLength={9}
             required
           />
         </>
@@ -85,6 +139,8 @@ export function RegisterForm({ labels }: RegisterFormProps) {
         type="text"
         label={isBusiness ? labels.nameBusiness : labels.name}
         autoComplete="name"
+        minLength={2}
+        maxLength={100}
         required
       />
 
@@ -93,6 +149,7 @@ export function RegisterForm({ labels }: RegisterFormProps) {
         type="email"
         label={labels.email}
         autoComplete="email"
+        error={emailError ?? undefined}
         required
       />
 
@@ -106,11 +163,18 @@ export function RegisterForm({ labels }: RegisterFormProps) {
         required
       />
 
+      {formError && (
+        <p role="alert" className="text-sm text-destructive">
+          {formError}
+        </p>
+      )}
+
       <button
         type="submit"
+        disabled={pending}
         className="mt-2 h-11 w-full rounded-full bg-primary text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {labels.submit}
+        {pending ? labels.submitting : labels.submit}
       </button>
     </form>
   );
