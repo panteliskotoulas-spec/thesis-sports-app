@@ -23,7 +23,10 @@
     "forgot": "Forgot your password?",
     "submit": "Log in",
     "noAccount": "Don't have an account?",
-    "register": "Sign up"
+    "register": "Sign up",
+    "submitting": "Logging in…",
+    "errorInvalid": "Wrong email or password.",
+    "errorGeneric": "Something went wrong. Please try again."
   },
   "register": {
     "pageTitle": "Sign up",

@@ -23,7 +23,10 @@
     "forgot": "Ξέχασες τον κωδικό;",
     "submit": "Σύνδεση",
     "noAccount": "Δεν έχεις λογαριασμό;",
-    "register": "Εγγραφή"
+    "register": "Εγγραφή",
+    "submitting": "Σύνδεση…",
+    "errorInvalid": "Λάθος email ή κωδικός.",
+    "errorGeneric": "Κάτι πήγε στραβά. Δοκίμασε ξανά."
   },
   "register": {
     "pageTitle": "Εγγραφή",

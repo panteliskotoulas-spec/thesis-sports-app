@@ -32,6 +32,9 @@ export default async function LoginPage() {
           password: t('login.password'),
           forgot: t('login.forgot'),
           submit: t('login.submit'),
+          submitting: t('login.submitting'),
+          errorInvalid: t('login.errorInvalid'),
+          errorGeneric: t('login.errorGeneric'),
         }}
       />
     </AuthCard>
