@@ -35,6 +35,12 @@
     "passwordHint": "At least 8 characters.",
     "submit": "Create account",
     "haveAccount": "Already have an account?",
-    "login": "Log in"
+    "login": "Log in",
+    "accountType": "Account type",
+    "individual": "Individual",
+    "business": "Business",
+    "nameBusiness": "Contact person's full name",
+    "businessName": "Business name",
+    "taxId": "Tax ID (AFM)"
   }
 }

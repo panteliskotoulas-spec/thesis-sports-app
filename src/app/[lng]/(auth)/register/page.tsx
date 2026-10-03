@@ -32,7 +32,13 @@ export default async function RegisterPage() {
     >
       <RegisterForm
         labels={{
+          accountType: t('register.accountType'),
+          individual: t('register.individual'),
+          business: t('register.business'),
           name: t('register.name'),
+          nameBusiness: t('register.nameBusiness'),
+          businessName: t('register.businessName'),
+          taxId: t('register.taxId'),
           email: t('register.email'),
           password: t('register.password'),
           passwordHint: t('register.passwordHint'),
