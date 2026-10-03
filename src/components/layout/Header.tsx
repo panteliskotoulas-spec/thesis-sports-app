@@ -3,13 +3,23 @@ import { lng as routeLanguage } from 'next/root-params';
 import { getT } from '@/i18n.server';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
+import { SignOutButton } from '@/components/shared/SignOutButton';
+import { NavLink } from '@/components/shared/NavLink';
 
 export interface HeaderProps {
   user: { name: string; avatarUrl?: string } | null;
 }
 
-const navLinkClass =
-  'rounded-full px-3.5 py-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground';
+// Αρχικά από τις δύο πρώτες λέξεις του ονόματος (π.χ. "Πάνος Κωτούλας" -> "ΠΚ").
+function getInitials(name: string) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join('')
+    .toUpperCase();
+}
 
 export async function Header({ user }: HeaderProps) {
   const { t } = await getT('common');
@@ -40,9 +50,7 @@ export async function Header({ user }: HeaderProps) {
             <ul className="flex items-center gap-1 lg:gap-2">
               {navItems.map((item) => (
                 <li key={item.slug}>
-                  <Link href={`/${lng}/${item.slug}`} className={navLinkClass}>
-                    {item.label}
-                  </Link>
+                  <NavLink href={`/${lng}/${item.slug}`}>{item.label}</NavLink>
                 </li>
               ))}
             </ul>
@@ -57,9 +65,25 @@ export async function Header({ user }: HeaderProps) {
           </div>
 
           {user ? (
-            <Link href={`/${lng}/profile`}>
-              <span className="text-foreground">{user.name}</span>
-            </Link>
+            <div className="flex items-center gap-1">
+              <Link
+                href={`/${lng}/profile`}
+                aria-label={t('nav.profile')}
+                className="flex items-center gap-2 rounded-full p-1 hover:bg-secondary md:pr-3"
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex size-8 items-center justify-center rounded-full bg-secondary text-sm text-foreground"
+                >
+                  {getInitials(user.name)}
+                </span>
+                <span className="hidden max-w-40 truncate text-foreground md:inline">
+                  {user.name}
+                </span>
+              </Link>
+
+              <SignOutButton lng={lng} label={t('auth.logout')} />
+            </div>
           ) : (
             <div className="flex items-center gap-2">
               <Link

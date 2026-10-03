@@ -2,11 +2,16 @@
   "nav": {
     "fields": "Fields",
     "teams": "Teams",
-    "coaches": "Coaches"
+    "coaches": "Coaches",
+    "profile": "Profile",
+    "home": "Home",
+    "bookings": "Bookings",
+    "mobileLabel": "Main navigation"
   },
   "auth": {
     "login": "Log in",
-    "register": "Sign up"
+    "register": "Sign up",
+    "logout": "Log out"
   },
   "theme": {
     "toggle": "Toggle theme"

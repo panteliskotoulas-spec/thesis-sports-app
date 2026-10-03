@@ -2,11 +2,16 @@
   "nav": {
     "fields": "Γήπεδα",
     "teams": "Ομάδες",
-    "coaches": "Προπονητές"
+    "coaches": "Προπονητές",
+    "profile": "Προφίλ",
+    "home": "Αρχική",
+    "bookings": "Κρατήσεις",
+    "mobileLabel": "Κύρια πλοήγηση"
   },
   "auth": {
     "login": "Σύνδεση",
-    "register": "Εγγραφή"
+    "register": "Εγγραφή",
+    "logout": "Αποσύνδεση"
   },
   "theme": {
     "toggle": "Αλλαγή θέματος"
