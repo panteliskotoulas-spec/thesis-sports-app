@@ -35,7 +35,16 @@
     "typeOutdoor": "Outdoor",
     "typeIndoor": "Indoor",
     "sportLabel": "Sport",
-    "sportAll": "All sports"
+    "sportAll": "All sports",
+    "filtersButton": "Filters",
+    "sheetTitle": "Filters",
+    "sheetDescription": "Choose a date, sport and field type.",
+    "apply": "Apply",
+    "reset": "Clear",
+    "close": "Close",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "remove": "Remove"
   },
   "sort": {
     "label": "Sort by:",

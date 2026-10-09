@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { CalendarDays, Search, X } from 'lucide-react';
 import type { FieldFilters, FieldTypeFilter } from '@/lib/fields/filters';
 import type { SportType } from '@/lib/fields/types';
+import { chipBase, chipOff, chipOn } from './chipStyles';
+import { FieldsActiveChips } from './FieldsActiveChips';
+import { FieldsFilterSheet } from './FieldsFilterSheet';
 import { useApplyFilters } from './useApplyFilters';
 
 export interface FieldsFiltersLabels {
@@ -17,23 +20,31 @@ export interface FieldsFiltersLabels {
   typeIndoor: string;
   sportLabel: string;
   sportAll: string;
+  filtersButton: string;
+  sheetTitle: string;
+  sheetDescription: string;
+  apply: string;
+  reset: string;
+  close: string;
+  today: string;
+  tomorrow: string;
+  remove: string;
 }
 
 export interface FieldsFiltersProps {
   filters: FieldFilters;
   today: string;
+  tomorrow: string;
+  dateLabel: string | null;
   sports: { value: SportType; label: string }[];
   labels: FieldsFiltersLabels;
 }
 
-const chipBase =
-  'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-full border-[0.5px] px-4 text-sm font-medium';
-const chipOn = 'border-primary bg-primary text-primary-foreground';
-const chipOff = 'border-border bg-card text-foreground hover:bg-secondary';
-
 export function FieldsFilters({
   filters,
   today,
+  tomorrow,
+  dateLabel,
   sports,
   labels,
 }: FieldsFiltersProps) {
@@ -64,6 +75,10 @@ export function FieldsFilters({
     { value: 'indoor', label: labels.typeIndoor },
   ];
 
+  const activeCount = [filters.date, filters.sport, filters.type].filter(
+    Boolean,
+  ).length;
+
   function commit(patch: Partial<FieldFilters>) {
     if (timer.current) clearTimeout(timer.current);
     const q = query.trim();
@@ -83,8 +98,8 @@ export function FieldsFilters({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center">
-        <div className="relative md:max-w-lg md:flex-1">
+      <div className="flex items-center gap-2 md:gap-3">
+        <div className="relative min-w-0 flex-1 md:max-w-lg">
           <Search
             className="pointer-events-none absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-muted-foreground"
             aria-hidden="true"
@@ -99,8 +114,17 @@ export function FieldsFilters({
           />
         </div>
 
+        <FieldsFilterSheet
+          filters={filters}
+          today={today}
+          tomorrow={tomorrow}
+          sports={sports}
+          labels={labels}
+          activeCount={activeCount}
+        />
+
         <div
-          className={`inline-flex h-11 items-center gap-2 self-start rounded-full border-[0.5px] px-4 text-sm ${
+          className={`hidden h-11 items-center gap-2 rounded-full border-[0.5px] px-4 text-sm md:inline-flex ${
             filters.date
               ? 'border-accent bg-accent text-accent-foreground'
               : 'border-border bg-card text-foreground'
@@ -131,7 +155,7 @@ export function FieldsFilters({
         <div
           role="group"
           aria-label={labels.typeLabel}
-          className="flex gap-1 rounded-full border-[0.5px] border-border bg-card p-1"
+          className="hidden gap-1 rounded-full border-[0.5px] border-border bg-card p-1 md:flex"
         >
           {types.map((option) => {
             const active = filters.type === option.value;
@@ -141,7 +165,7 @@ export function FieldsFilters({
                 type="button"
                 aria-pressed={active}
                 onClick={() => commit({ type: option.value })}
-                className={`h-9 flex-1 rounded-full px-4 text-sm font-medium md:flex-none ${
+                className={`h-9 rounded-full px-4 text-sm font-medium ${
                   active
                     ? 'bg-primary text-primary-foreground'
                     : 'text-foreground hover:bg-secondary'
@@ -154,10 +178,18 @@ export function FieldsFilters({
         </div>
       </div>
 
+      <FieldsActiveChips
+        filters={filters}
+        sports={sports}
+        dateLabel={dateLabel}
+        typeLabels={{ indoor: labels.typeIndoor, outdoor: labels.typeOutdoor }}
+        removeLabel={labels.remove}
+      />
+
       <div
         role="group"
         aria-label={labels.sportLabel}
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 sm:-mx-6 sm:px-6 md:mx-0 md:flex-wrap md:overflow-visible md:px-0"
+        className="hidden gap-2 md:flex md:flex-wrap"
       >
         <button
           type="button"

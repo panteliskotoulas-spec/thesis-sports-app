@@ -48,6 +48,12 @@ export function todayInAthens(now: Date = new Date()): string {
   }).format(now);
 }
 
+export function tomorrowInAthens(now: Date = new Date()): string {
+  const date = new Date(`${todayInAthens(now)}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + 1);
+  return date.toISOString().slice(0, 10);
+}
+
 export function parseFieldFilters(params: SearchParams): FieldFilters {
   const date = firstValue(params.date);
 

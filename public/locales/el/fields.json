@@ -35,7 +35,16 @@
     "typeOutdoor": "Ανοιχτά",
     "typeIndoor": "Κλειστά",
     "sportLabel": "Άθλημα",
-    "sportAll": "Όλα τα αθλήματα"
+    "sportAll": "Όλα τα αθλήματα",
+    "filtersButton": "Φίλτρα",
+    "sheetTitle": "Φίλτρα",
+    "sheetDescription": "Επίλεξε ημερομηνία, άθλημα και τύπο γηπέδου.",
+    "apply": "Εφαρμογή",
+    "reset": "Καθαρισμός",
+    "close": "Κλείσιμο",
+    "today": "Σήμερα",
+    "tomorrow": "Αύριο",
+    "remove": "Αφαίρεση"
   },
   "sort": {
     "label": "Ταξινόμηση:",

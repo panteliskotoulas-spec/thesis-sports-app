@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { lng as routeLanguage } from 'next/root-params';
 import { getT } from '@/i18n.server';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
@@ -10,6 +11,7 @@ import {
   buildFieldsQuery,
   parseFieldFilters,
   todayInAthens,
+  tomorrowInAthens,
   type SearchParams,
 } from '@/lib/fields/filters';
 import { SPORT_TYPES } from '@/lib/fields/types';
@@ -20,12 +22,21 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('meta.title') };
 }
 
+function formatDayLabel(day: string, lng: string): string {
+  return new Intl.DateTimeFormat(lng, {
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'UTC',
+  }).format(new Date(`${day}T00:00:00Z`));
+}
+
 export default async function FieldsPage({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>;
 }) {
   const { t } = await getT('fields');
+  const lng = await routeLanguage();
   const user = await getCurrentUser();
   const filters = parseFieldFilters(await searchParams);
 
@@ -40,6 +51,8 @@ export default async function FieldsPage({
           <FieldsFilters
             filters={filters}
             today={todayInAthens()}
+            tomorrow={tomorrowInAthens()}
+            dateLabel={filters.date ? formatDayLabel(filters.date, lng) : null}
             sports={SPORT_TYPES.map((value) => ({
               value,
               label: t(`sports.${value}`),
@@ -55,6 +68,15 @@ export default async function FieldsPage({
               typeIndoor: t('filters.typeIndoor'),
               sportLabel: t('filters.sportLabel'),
               sportAll: t('filters.sportAll'),
+              filtersButton: t('filters.filtersButton'),
+              sheetTitle: t('filters.sheetTitle'),
+              sheetDescription: t('filters.sheetDescription'),
+              apply: t('filters.apply'),
+              reset: t('filters.reset'),
+              close: t('filters.close'),
+              today: t('filters.today'),
+              tomorrow: t('filters.tomorrow'),
+              remove: t('filters.remove'),
             }}
           />
         </div>
