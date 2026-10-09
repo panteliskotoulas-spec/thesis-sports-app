@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "title": "Fields"
+  },
+  "page": {
+    "title": "Fields",
+    "subtitle": "Find a field and book a time for your next game.",
+    "count_one": "{{count}} field",
+    "count_other": "{{count}} fields"
+  },
+  "card": {
+    "indoor": "Indoor",
+    "outdoor": "Outdoor",
+    "new": "New",
+    "next": "Next: {{when}}",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "from": "from",
+    "perHour": "/ hour",
+    "unavailable": "No available times"
+  },
+  "sports": {
+    "FOOTBALL": "Football",
+    "BASKETBALL": "Basketball",
+    "VOLLEYBALL": "Volleyball",
+    "TENNIS": "Tennis"
+  },
+  "filters": {
+    "search": "Search by name or area",
+    "searchLabel": "Search fields",
+    "date": "Date",
+    "clearDate": "Remove date",
+    "typeLabel": "Field type",
+    "typeAll": "All",
+    "typeOutdoor": "Outdoor",
+    "typeIndoor": "Indoor",
+    "sportLabel": "Sport",
+    "sportAll": "All sports"
+  },
+  "sort": {
+    "label": "Sort by:",
+    "newest": "Newest",
+    "price": "Price: low to high",
+    "rating": "Rating"
+  },
+  "empty": {
+    "title": "No fields found",
+    "description": "Try changing or clearing the filters to see more results.",
+    "clear": "Clear filters"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "We couldn't load the fields. Try again in a moment.",
+    "retry": "Try again"
+  }
+}
