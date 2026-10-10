@@ -263,7 +263,7 @@ export const fieldOwnerRouter = router({
             fieldId: field.id,
             startTime: { gt: now },
             OR: [
-              { reservation: { is: { status: 'CONFIRMED' } } },
+              { reservations: { some: { status: 'CONFIRMED' } } },
               { status: 'PENDING_PAYMENT', holdExpiresAt: { gt: now } },
             ],
           },
@@ -403,7 +403,7 @@ export const fieldOwnerRouter = router({
       };
 
       const deleted = await ctx.prisma.availabilitySlot.deleteMany({
-        where: { ...where, status: 'OPEN', reservation: { is: null } },
+        where: { ...where, status: 'OPEN', reservations: { none: {} } },
       });
 
       if (deleted.count > 0) return { id: input.id };

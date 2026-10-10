@@ -1,6 +1,6 @@
 model Reservation {
   id               String            @id @default(cuid())
-  slotId           String            @unique
+  slotId           String
   slot             AvailabilitySlot  @relation(fields: [slotId], references: [id])
   userId           String
   user             User              @relation(fields: [userId], references: [id])
@@ -10,4 +10,7 @@ model Reservation {
   compensationType CompensationType?
   createdAt        DateTime          @default(now())
   cancelledAt      DateTime?
+
+  @@index([slotId])
+  @@index([userId])
 }

@@ -38,6 +38,6 @@ model AvailabilitySlot {
   price         Decimal      @db.Decimal(10, 2)
   sportType     SportType
   status        SlotStatus   @default(OPEN)
-  reservation   Reservation?
+  reservations  Reservation[]
   holdExpiresAt DateTime?
 }
