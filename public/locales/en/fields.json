@@ -61,5 +61,37 @@
     "title": "Something went wrong",
     "description": "We couldn't load the fields. Try again in a moment.",
     "retry": "Try again"
+  },
+  "detail": {
+    "managedBy": "Managed by {{name}}",
+    "description": "Description",
+    "gallery": {
+      "previous": "Previous image",
+      "next": "Next image",
+      "slide": "Image {{current}} of {{total}}"
+    },
+    "availability": {
+      "title": "Availability",
+      "days": "Days",
+      "dayUnavailable": "no available times",
+      "pickDate": "Pick another date",
+      "slots": "Available times",
+      "none": "There are no available times right now.",
+      "emptyDay": "There are no available times on this day.",
+      "nextDay": "Next available day: {{day}}",
+      "book": "Continue to booking",
+      "bookSoon": "Booking will be available soon."
+    },
+    "location": {
+      "title": "Location",
+      "open": "Open in Maps"
+    },
+    "reviews": {
+      "title": "Reviews",
+      "count_one": "{{count}} review",
+      "count_other": "{{count}} reviews",
+      "empty": "No reviews yet.",
+      "stars": "Rated {{rating}} out of 5"
+    }
   }
 }

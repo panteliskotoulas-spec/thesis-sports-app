@@ -1,10 +1,11 @@
-
 model Field {
   id                String             @id @default(cuid())
   ownerId           String
   owner             User               @relation(fields: [ownerId], references: [id])
-  name              String
-  description       String
+  name              Json
+  description       Json
+  area              Json
+  sports            SportType[]        @default([])
   address           String
   latitude          Float
   longitude         Float

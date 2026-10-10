@@ -1,8 +1,8 @@
 import { lng as routeLanguage } from 'next/root-params';
 import { getT } from '@/i18n.server';
 import { hasActiveFilters, type FieldFilters } from '@/lib/fields/filters';
-import { queryMockFields } from '@/lib/fields/mock-query';
 import { toFieldListItem, type FieldListItem } from '@/lib/fields/types';
+import { getServerCaller } from '@/trpc/server/caller';
 import { FieldCard } from './FieldCard';
 import { FieldsEmpty } from './FieldsEmpty';
 import { FieldsError } from './FieldsError';
@@ -15,7 +15,9 @@ export async function FieldsList({ filters }: { filters: FieldFilters }) {
 
   let fields: FieldListItem[];
   try {
-    fields = queryMockFields(filters).map((row) => toFieldListItem(row, lng));
+    const caller = await getServerCaller();
+    const rows = await caller.fields.list(filters);
+    fields = rows.map((row) => toFieldListItem(row, lng));
   } catch (error) {
     console.error('[FieldsList]', error);
     return <FieldsError />;
