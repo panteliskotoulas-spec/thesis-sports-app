@@ -7,7 +7,14 @@ import type {
   OwnerFieldEditRow,
   OwnerFieldRow,
 } from '@/lib/fields/owner';
+import type { OwnerSlotRow } from '@/lib/fields/owner-slots';
+import { SPORT_TYPES } from '@/lib/fields/types';
 import type { LocalizedText } from '@/lib/i18n-content';
+import {
+  athensDateTime,
+  athensDayRange,
+  athensDayStart,
+} from '@/lib/server/athens-time';
 import { isOwnImageUrl } from '@/lib/server/cloudinary';
 import { toLocalized } from '@/lib/server/translate';
 import { createInput } from './field-submission';
@@ -15,6 +22,23 @@ import { createInput } from './field-submission';
 const idInput = z.object({ id: z.string().min(1) });
 
 const updateInput = createInput.extend({ id: z.string().min(1) });
+
+const dayInput = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const timeInput = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+
+const listSlotsInput = z.object({
+  fieldId: z.string().min(1),
+  date: dayInput,
+});
+
+const createSlotInput = z.object({
+  fieldId: z.string().min(1),
+  date: dayInput,
+  startTime: timeInput,
+  endTime: timeInput,
+  sportType: z.enum(SPORT_TYPES),
+  price: z.number().positive().max(9999.99),
+});
 
 const COORDINATE_EPSILON = 1e-6;
 
@@ -256,5 +280,140 @@ export const fieldOwnerRouter = router({
 
         return { archived: true };
       });
+    }),
+
+  listSlots: protectedProcedure
+    .input(listSlotsInput)
+    .query(async ({ ctx, input }): Promise<OwnerSlotRow[]> => {
+      const field = await ctx.prisma.field.findFirst({
+        where: {
+          id: input.fieldId,
+          ownerId: ctx.session.user.id,
+          archivedAt: null,
+        },
+        select: { id: true },
+      });
+
+      if (!field) throw new TRPCError({ code: 'NOT_FOUND' });
+
+      const range = athensDayRange(input.date);
+
+      const slots = await ctx.prisma.availabilitySlot.findMany({
+        where: {
+          fieldId: field.id,
+          startTime: { gte: range.start, lt: range.end },
+        },
+        orderBy: { startTime: 'asc' },
+        select: {
+          id: true,
+          startTime: true,
+          endTime: true,
+          price: true,
+          sportType: true,
+          status: true,
+        },
+      });
+
+      return slots.map((slot) => ({
+        id: slot.id,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        price: slot.price.toNumber(),
+        sportType: slot.sportType,
+        status: slot.status,
+      }));
+    }),
+
+  createSlot: protectedProcedure
+    .input(createSlotInput)
+    .mutation(async ({ ctx, input }) => {
+      const field = await ctx.prisma.field.findFirst({
+        where: {
+          id: input.fieldId,
+          ownerId: ctx.session.user.id,
+          archivedAt: null,
+        },
+        select: { id: true, status: true, sports: true },
+      });
+
+      if (!field) throw new TRPCError({ code: 'NOT_FOUND' });
+      if (field.status !== 'APPROVED') {
+        throw new TRPCError({ code: 'FORBIDDEN' });
+      }
+      if (!field.sports.includes(input.sportType)) {
+        throw new TRPCError({ code: 'BAD_REQUEST' });
+      }
+
+      const startTime = athensDateTime(input.date, input.startTime);
+      const endTime = athensDateTime(input.date, input.endTime);
+
+      if (!startTime || !endTime) throw new TRPCError({ code: 'BAD_REQUEST' });
+      if (endTime <= startTime) throw new TRPCError({ code: 'BAD_REQUEST' });
+      if (startTime <= new Date()) throw new TRPCError({ code: 'BAD_REQUEST' });
+
+      const price = Math.round(input.price * 100) / 100;
+
+      try {
+        const slot = await ctx.prisma.$transaction(
+          async (tx) => {
+            const overlapping = await tx.availabilitySlot.findFirst({
+              where: {
+                fieldId: field.id,
+                startTime: { lt: endTime },
+                endTime: { gt: startTime },
+              },
+              select: { id: true },
+            });
+
+            if (overlapping) throw new TRPCError({ code: 'CONFLICT' });
+
+            return tx.availabilitySlot.create({
+              data: {
+                fieldId: field.id,
+                date: athensDayStart(input.date),
+                startTime,
+                endTime,
+                price,
+                sportType: input.sportType,
+              },
+              select: { id: true },
+            });
+          },
+          { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+        );
+
+        return { id: slot.id };
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2034'
+        ) {
+          throw new TRPCError({ code: 'CONFLICT' });
+        }
+        throw error;
+      }
+    }),
+
+  deleteSlot: protectedProcedure
+    .input(idInput)
+    .mutation(async ({ ctx, input }) => {
+      const where = {
+        id: input.id,
+        field: { ownerId: ctx.session.user.id },
+      };
+
+      const deleted = await ctx.prisma.availabilitySlot.deleteMany({
+        where: { ...where, status: 'OPEN', reservation: { is: null } },
+      });
+
+      if (deleted.count > 0) return { id: input.id };
+
+      const existing = await ctx.prisma.availabilitySlot.findFirst({
+        where,
+        select: { id: true },
+      });
+
+      if (!existing) throw new TRPCError({ code: 'NOT_FOUND' });
+      throw new TRPCError({ code: 'CONFLICT' });
     }),
 });

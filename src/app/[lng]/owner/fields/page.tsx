@@ -45,6 +45,7 @@ export default async function OwnerFieldsPage() {
     archivedNote: t('owner.card.archivedNote'),
     rejectedReason: t('owner.card.rejectedReason'),
     view: t('owner.card.view'),
+    availability: t('owner.card.availability'),
     edit: t('owner.card.edit'),
     resubmit: t('owner.card.resubmit'),
     archive: t('owner.card.archive'),

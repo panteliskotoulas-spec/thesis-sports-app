@@ -19,6 +19,7 @@ export interface OwnerFieldCardLabels {
   archivedNote: string;
   rejectedReason: string;
   view: string;
+  availability: string;
   edit: string;
   resubmit: string;
   archive: string;
@@ -67,6 +68,7 @@ export function OwnerFieldCard({
   const [error, setError] = useState<string | null>(null);
 
   const editHref = `/${lng}/owner/fields/${field.id}/edit`;
+  const slotsHref = `/${lng}/owner/fields/${field.id}/slots`;
   const canArchive = field.status !== 'PENDING';
 
   async function handleArchive() {
@@ -204,6 +206,11 @@ export function OwnerFieldCard({
 
       {!field.archived && panel === 'idle' ? (
         <div className="mt-4 flex flex-wrap gap-2">
+          {field.status === 'APPROVED' ? (
+            <Link href={slotsHref} className={primaryButton}>
+              {labels.availability}
+            </Link>
+          ) : null}
           {field.status === 'APPROVED' ? (
             <Link href={`/${lng}/fields/${field.id}`} className={outlineButton}>
               {labels.view}

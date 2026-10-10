@@ -218,6 +218,7 @@
     },
     "card": {
       "view": "View",
+      "availability": "Availability",
       "edit": "Edit",
       "resubmit": "Fix and resubmit",
       "archive": "Archive",
@@ -255,6 +256,51 @@
       "resubmit": "Resubmit for approval",
       "noticeApproved": "If you change texts, photos or location, the field will go through approval again and won't be shown until then. Type and sports change right away.",
       "noticeRejected": "When you save, the field will be sent for approval again."
+    },
+    "slots": {
+      "meta": "Field availability",
+      "title": "Availability",
+      "back": "My fields",
+      "notApproved": {
+        "title": "This field isn't approved yet",
+        "description": "You can set time slots once the field is approved."
+      },
+      "error": {
+        "title": "Something went wrong",
+        "description": "We couldn't load the time slots. Try again in a moment."
+      },
+      "list": {
+        "heading": "Time slots for the day",
+        "empty": "There are no time slots on this day. Add one below.",
+        "statusOpen": "Available",
+        "statusPending": "Awaiting payment",
+        "statusBooked": "Booked",
+        "delete": "Delete time slot",
+        "working": "Deleting…"
+      },
+      "form": {
+        "title": "New time slot",
+        "date": "Date",
+        "start": "Start",
+        "end": "End",
+        "sport": "Sport",
+        "price": "Price (€)",
+        "pricePlaceholder": "20",
+        "submit": "Add time slot",
+        "submitting": "Saving…",
+        "errorDate": "Choose today or a later date.",
+        "errorStart": "Enter a start time.",
+        "errorEnd": "Enter an end time.",
+        "errorOrder": "The end must be after the start.",
+        "errorPast": "That start time has already passed.",
+        "errorSport": "Choose a sport.",
+        "errorPrice": "Enter a valid price, e.g. 20 or 17.50.",
+        "errorOverlap": "This time overlaps with an existing slot. Choose another time.",
+        "errorInvalid": "This time slot can't be added. Check the details and try again.",
+        "errorGeneric": "Something went wrong. Try again."
+      },
+      "deleteConflict": "This time slot can't be deleted because its status has changed.",
+      "deleteError": "The time slot wasn't deleted. Try again."
     }
   }
 }
