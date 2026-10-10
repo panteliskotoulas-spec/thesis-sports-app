@@ -9,8 +9,10 @@ export interface FieldLocationInputProps {
   value: string;
   onChange: (value: string) => void;
   onSearch: () => void;
+  onSelect: (result: GeocodeResult) => void;
   pending: boolean;
-  result: GeocodeResult | null;
+  results: GeocodeResult[];
+  selected: GeocodeResult | null;
   notFound: boolean;
   error?: string;
   labels: {
@@ -18,6 +20,7 @@ export interface FieldLocationInputProps {
     find: string;
     finding: string;
     found: string;
+    pick: string;
     notFound: string;
     openMaps: string;
     attribution: string;
@@ -30,14 +33,17 @@ export function FieldLocationInput({
   value,
   onChange,
   onSearch,
+  onSelect,
   pending,
-  result,
+  results,
+  selected,
   notFound,
   error,
   labels,
 }: FieldLocationInputProps) {
   const canSearch = value.trim().length >= MIN_QUERY_LENGTH && !pending;
   const message = notFound ? labels.notFound : error;
+  const choosing = results.length > 1;
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key !== 'Enter') return;
@@ -83,21 +89,62 @@ export function FieldLocationInput({
         </p>
       ) : null}
 
-      <div aria-live="polite">
-        {result ? (
+      <div aria-live="polite" className="flex flex-col gap-2">
+        {choosing ? (
+          <div
+            role="radiogroup"
+            aria-label={labels.pick}
+            className="mt-1 flex flex-col gap-2"
+          >
+            <p className="text-sm font-medium text-foreground">{labels.pick}</p>
+            {results.map((result) => {
+              const active =
+                selected?.latitude === result.latitude &&
+                selected?.longitude === result.longitude;
+              return (
+                <button
+                  key={`${result.latitude},${result.longitude}`}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => onSelect(result)}
+                  className={`flex items-start gap-2 rounded-xl border-[0.5px] p-3 text-left text-sm hover:bg-secondary ${
+                    active
+                      ? 'border-primary bg-accent text-accent-foreground'
+                      : 'border-border bg-card text-foreground'
+                  }`}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-[0.5px] ${
+                      active
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border'
+                    }`}
+                  >
+                    {active ? <Check className="size-3" /> : null}
+                  </span>
+                  <span className="min-w-0">{result.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {selected && !choosing ? (
           <div className="mt-1 rounded-xl bg-accent p-3 text-sm text-accent-foreground">
             <p className="flex items-start gap-2">
               <Check className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
               <span>
-                {labels.found}: {result.label}
+                {labels.found}: {selected.label}
               </span>
             </p>
             <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 pl-6 text-xs">
               <span>
-                {result.latitude.toFixed(4)}, {result.longitude.toFixed(4)}
+                {selected.latitude.toFixed(4)}, {selected.longitude.toFixed(4)}
               </span>
               <a
-                href={buildMapsUrl(result.latitude, result.longitude)}
+                href={buildMapsUrl(selected.latitude, selected.longitude)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 underline"
@@ -107,6 +154,23 @@ export function FieldLocationInput({
               </a>
             </p>
           </div>
+        ) : null}
+
+        {selected && choosing ? (
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            <span>
+              {selected.latitude.toFixed(4)}, {selected.longitude.toFixed(4)}
+            </span>
+            <a
+              href={buildMapsUrl(selected.latitude, selected.longitude)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 underline"
+            >
+              {labels.openMaps}
+              <ExternalLink className="size-3.5" aria-hidden="true" />
+            </a>
+          </p>
         ) : null}
       </div>
 

@@ -63,6 +63,7 @@ export default async function NewFieldPage() {
                 find: t('new.location.find'),
                 finding: t('new.location.finding'),
                 found: t('new.location.found'),
+                pick: t('new.location.pick'),
                 notFound: t('new.location.notFound'),
                 openMaps: t('detail.location.open'),
                 attribution: t('new.location.attribution'),

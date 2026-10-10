@@ -62,6 +62,7 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
   const [area, setArea] = useState('');
   const [address, setAddress] = useState('');
   const [location, setLocation] = useState<GeocodeResult | null>(null);
+  const [results, setResults] = useState<GeocodeResult[]>([]);
   const [notFound, setNotFound] = useState(false);
   const [searching, setSearching] = useState(false);
   const [indoor, setIndoor] = useState(false);
@@ -83,7 +84,13 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
   function handleAddressChange(value: string) {
     setAddress(value);
     setLocation(null);
+    setResults([]);
     setNotFound(false);
+    clearError('address');
+  }
+
+  function handleSelect(result: GeocodeResult) {
+    setLocation(result);
     clearError('address');
   }
 
@@ -96,10 +103,12 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
     clearError('address');
 
     try {
-      const result = await geocodeAddress(query);
-      setLocation(result);
-      setNotFound(result === null);
+      const found = await geocodeAddress(query, lng);
+      setResults(found);
+      setLocation(found.length === 1 ? found[0] : null);
+      setNotFound(found.length === 0);
     } catch {
+      setResults([]);
       setLocation(null);
       setNotFound(true);
     } finally {
@@ -143,19 +152,22 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
     setFormError(null);
 
     try {
-      const { id } = await submitNewField({
-        name: name.trim(),
-        description: description.trim(),
-        area: area.trim(),
-        address: address.trim(),
-        latitude: location.latitude,
-        longitude: location.longitude,
-        indoor,
-        sports: sports
-          .map((option) => option.value)
-          .filter((value) => selectedSports.includes(value)),
-        images: files,
-      });
+      const { id } = await submitNewField(
+        {
+          name: name.trim(),
+          description: description.trim(),
+          area: area.trim(),
+          address: address.trim(),
+          latitude: location.latitude,
+          longitude: location.longitude,
+          indoor,
+          sports: sports
+            .map((option) => option.value)
+            .filter((value) => selectedSports.includes(value)),
+          images: files,
+        },
+        lng,
+      );
 
       router.push(`/${lng}/fields/${id}`);
       router.refresh();
@@ -223,8 +235,10 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
               value={address}
               onChange={handleAddressChange}
               onSearch={handleSearch}
+              onSelect={handleSelect}
               pending={searching}
-              result={location}
+              results={results}
+              selected={location}
               notFound={notFound}
               error={errors.address}
               labels={labels.location}

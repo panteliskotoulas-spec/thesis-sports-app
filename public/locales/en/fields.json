@@ -112,6 +112,7 @@
       "find": "Find",
       "finding": "Searching…",
       "found": "Found",
+      "pick": "Pick the correct address",
       "notFound": "We couldn't find that address. Try a more detailed one, with a number and a city.",
       "attribution": "Data © OpenStreetMap"
     },
@@ -137,7 +138,7 @@
     "note": "The field will appear once it's approved.",
     "errors": {
       "required": "Fill in this field.",
-      "location": "Find the address first with the Find button.",
+      "location": "Find and pick the address first with the Find button.",
       "sports": "Choose at least one sport.",
       "images": "Add at least one photo.",
       "generic": "Something went wrong. Please try again."
