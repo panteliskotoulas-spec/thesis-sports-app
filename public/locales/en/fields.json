@@ -93,5 +93,54 @@
       "empty": "No reviews yet.",
       "stars": "Rated {{rating}} out of 5"
     }
+  },
+  "new": {
+    "meta": "Add a field",
+    "cta": "Add a field",
+    "title": "Add a field",
+    "subtitle": "Write the details in the language you're reading the page in. The translation into the other language is automatic.",
+    "basic": {
+      "title": "Basics",
+      "name": "Name",
+      "description": "Description",
+      "area": "Area",
+      "areaPlaceholder": "e.g. Ilioupoli, Attica"
+    },
+    "location": {
+      "title": "Location",
+      "address": "Address",
+      "find": "Find",
+      "finding": "Searching…",
+      "found": "Found",
+      "notFound": "We couldn't find that address. Try a more detailed one, with a number and a city.",
+      "attribution": "Data © OpenStreetMap"
+    },
+    "features": {
+      "title": "Details",
+      "type": "Field type",
+      "sports": "Sports"
+    },
+    "photos": {
+      "title": "Photos",
+      "add": "Add a photo",
+      "cover": "Cover",
+      "makeCover": "Set as cover",
+      "remove": "Remove",
+      "photo": "Photo",
+      "hint": "Up to {{max}} photos, {{size}} MB each. The first one is the cover.",
+      "errorType": "Only JPEG, PNG and WebP files are allowed.",
+      "errorSize": "Each photo must be {{size}} MB or smaller.",
+      "errorMax": "You can upload up to {{max}} photos."
+    },
+    "submit": "Submit for approval",
+    "submitting": "Submitting…",
+    "note": "The field will appear once it's approved.",
+    "errors": {
+      "required": "Fill in this field.",
+      "location": "Find the address first with the Find button.",
+      "sports": "Choose at least one sport.",
+      "images": "Add at least one photo.",
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }
