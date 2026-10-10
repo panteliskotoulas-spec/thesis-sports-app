@@ -7,10 +7,9 @@ import { SignOutButton } from '@/components/shared/SignOutButton';
 import { NavLink } from '@/components/shared/NavLink';
 
 export interface HeaderProps {
-  user: { name: string; avatarUrl?: string } | null;
+  user: { name: string; avatarUrl?: string; isAdmin?: boolean } | null;
 }
 
-// Αρχικά από τις δύο πρώτες λέξεις του ονόματος (π.χ. "Πάνος Κωτούλας" -> "ΠΚ").
 function getInitials(name: string) {
   return name
     .trim()
@@ -30,6 +29,10 @@ export async function Header({ user }: HeaderProps) {
     { slug: 'teams', label: t('nav.teams') },
     { slug: 'coaches', label: t('nav.coaches') },
   ];
+
+  if (user?.isAdmin) {
+    navItems.push({ slug: 'admin/fields', label: t('nav.admin') });
+  }
 
   return (
     <header className="border-b-[0.5px] border-border bg-background">

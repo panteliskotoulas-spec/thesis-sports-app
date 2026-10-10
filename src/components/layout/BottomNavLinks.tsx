@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CalendarDays, Home, MapPin, User } from 'lucide-react';
+import { CalendarDays, Home, MapPin, ShieldCheck, User } from 'lucide-react';
 
 // Οι Server Components δεν μπορούν να περάσουν components ως props,
 // γι' αυτό περνάμε ένα κλειδί και το εικονίδιο επιλέγεται εδώ.
@@ -11,6 +11,7 @@ const icons = {
   fields: MapPin,
   bookings: CalendarDays,
   profile: User,
+  admin: ShieldCheck,
 } as const;
 
 export interface BottomNavItem {

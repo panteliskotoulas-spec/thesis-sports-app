@@ -6,6 +6,7 @@
     "profile": "Profile",
     "home": "Home",
     "bookings": "Bookings",
+    "admin": "Admin",
     "mobileLabel": "Main navigation"
   },
   "auth": {

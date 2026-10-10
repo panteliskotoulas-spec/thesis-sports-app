@@ -11,6 +11,7 @@ model Field {
   longitude         Float
   indoor            Boolean
   status            FieldStatus        @default(PENDING)
+  rejectionReason   Json?
   images            FieldImage[]
   slots             AvailabilitySlot[]
   hostedTournaments Tournament[]

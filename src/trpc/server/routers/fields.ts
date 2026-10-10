@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { protectedProcedure, publicProcedure, router } from '../init';
+import { publicProcedure, router } from '../init';
 import {
   FIELD_SORTS,
   FIELD_TYPES,
@@ -17,11 +17,6 @@ import type { LocalizedText } from '@/lib/i18n-content';
 
 const TIME_ZONE = 'Europe/Athens';
 const MS_PER_HOUR = 3_600_000;
-
-const localizedInput = z.object({
-  el: z.string().trim().min(1),
-  en: z.string().trim().min(1),
-});
 
 const dayInput = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
@@ -333,27 +328,5 @@ export const fieldsRouter = router({
           reviewerName: shortName(review.reviewer.name),
         })),
       };
-    }),
-
-  create: protectedProcedure
-    .input(
-      z.object({
-        name: localizedInput,
-        description: localizedInput,
-        area: localizedInput,
-        sports: z.array(z.enum(SPORT_TYPES)).min(1),
-        address: z.string().min(1),
-        latitude: z.number(),
-        longitude: z.number(),
-        indoor: z.boolean(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      return ctx.prisma.field.create({
-        data: {
-          ...input,
-          ownerId: ctx.session.user.id,
-        },
-      });
     }),
 });

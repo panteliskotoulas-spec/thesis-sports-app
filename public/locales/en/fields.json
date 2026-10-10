@@ -143,5 +143,62 @@
       "images": "Add at least one photo.",
       "generic": "Something went wrong. Please try again."
     }
+  },
+  "admin": {
+    "meta": "Field approval",
+    "title": "Field approval",
+    "subtitle": "Review new fields before they go public.",
+    "tabsLabel": "Field status",
+    "status": {
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "badge": {
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "empty": {
+      "PENDING": {
+        "title": "No pending fields",
+        "description": "When someone submits a field, you'll find it here."
+      },
+      "APPROVED": {
+        "title": "No approved fields",
+        "description": "Fields you approve will show up here."
+      },
+      "REJECTED": {
+        "title": "No rejected fields",
+        "description": "Fields you reject will show up here."
+      }
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "We couldn't load the fields. Try again in a moment."
+    },
+    "card": {
+      "individual": "Individual",
+      "business": "Business",
+      "submitted": "Submitted {{date}}",
+      "photos_one": "{{count}} photo",
+      "photos_other": "{{count}} photos",
+      "details": "Details",
+      "description": "Description",
+      "address": "Address",
+      "photosTitle": "Photos",
+      "noPhotos": "There are no photos."
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "confirmReject": "Confirm rejection",
+      "cancel": "Cancel",
+      "reasonLabel": "Reason for rejection (optional)",
+      "reasonPlaceholder": "e.g. The photos don't show the field.",
+      "reasonHint": "The owner will see it. Write it in the language you're reading the page in. It's translated automatically.",
+      "rejectedReason": "Reason for rejection",
+      "working": "Saving…",
+      "errorGeneric": "Something went wrong. Please try again."
+    }
   }
 }
