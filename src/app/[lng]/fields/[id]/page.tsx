@@ -75,8 +75,8 @@ export default async function FieldPage({
           slideLabels={slideLabels}
         />
 
-        <div className="mt-6 grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start">
-          <div className="lg:col-start-1 lg:row-start-1">
+        <div className="mt-6 grid grid-cols-1 gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start">
+          <div className="min-w-0 lg:col-start-1 lg:row-start-1">
             <h1>{field.name}</h1>
             <p className="mt-1 flex items-center gap-1.5 text-muted-foreground">
               <MapPin className="size-4 shrink-0" aria-hidden="true" />
@@ -134,11 +134,11 @@ export default async function FieldPage({
             </section>
           </div>
 
-          <aside className="lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <aside className="min-w-0 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <FieldAvailability field={field} />
           </aside>
 
-          <div className="flex flex-col gap-8 lg:col-start-1 lg:row-start-2">
+          <div className="flex min-w-0 flex-col gap-8 lg:col-start-1 lg:row-start-2">
             <section aria-labelledby="location-title">
               <h2 id="location-title" className="text-lg">
                 {t('detail.location.title')}

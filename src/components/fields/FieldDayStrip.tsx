@@ -3,6 +3,7 @@ import { formatDayChip } from '@/lib/fields/detail-format';
 import type { FieldAvailabilityDay } from '@/lib/fields/detail';
 import { chipOff, chipOn } from './chipStyles';
 import { FieldDatePicker } from './FieldDatePicker';
+import { FieldDayList } from './FieldDayList';
 
 export interface FieldDayStripProps {
   days: FieldAvailabilityDay[];
@@ -28,14 +29,22 @@ export function FieldDayStrip({
   hrefBase,
   labels,
 }: FieldDayStripProps) {
-  const entries =
+  const outsideWindow =
     selectedDay && !days.some((entry) => entry.day === selectedDay)
-      ? [...days, { day: selectedDay, available: true }]
-      : days;
+      ? { day: selectedDay, available: true }
+      : null;
+  const entries = outsideWindow ? [outsideWindow, ...days] : days;
 
   return (
     <nav aria-label={labels.list}>
-      <ul className="flex items-stretch gap-2 overflow-x-auto pb-1">
+      <FieldDayList selectedDay={selectedDay}>
+        <li className="sticky left-0 z-10 shrink-0 bg-card pr-1">
+          <FieldDatePicker
+            min={today}
+            value={selectedDay}
+            label={labels.pickDate}
+          />
+        </li>
         {entries.map(({ day, available }) => {
           const parts = formatDayChip(day, lng);
           const isSelected = day === selectedDay;
@@ -77,14 +86,7 @@ export function FieldDayStrip({
             </li>
           );
         })}
-        <li className="shrink-0">
-          <FieldDatePicker
-            min={today}
-            value={selectedDay}
-            label={labels.pickDate}
-          />
-        </li>
-      </ul>
+      </FieldDayList>
     </nav>
   );
 }

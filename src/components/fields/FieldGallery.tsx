@@ -38,7 +38,7 @@ export function FieldGallery({
   if (images.length === 0) {
     return (
       <div
-        className="flex aspect-4/3 items-center justify-center rounded-xl bg-accent text-accent-foreground/50 md:aspect-2/1"
+        className="flex aspect-4/3 w-full items-center justify-center rounded-xl bg-accent text-accent-foreground/50 md:aspect-2/1"
         role="img"
         aria-label={alt}
       >
@@ -83,7 +83,7 @@ export function FieldGallery({
 
   return (
     <div
-      className="relative overflow-hidden rounded-xl bg-accent"
+      className="relative w-full overflow-hidden rounded-xl bg-accent"
       role="region"
       aria-roledescription="carousel"
       aria-label={alt}
