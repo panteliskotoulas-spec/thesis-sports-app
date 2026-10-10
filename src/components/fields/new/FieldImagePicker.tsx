@@ -7,16 +7,18 @@ import {
   ACCEPTED_IMAGE_TYPES,
   MAX_IMAGE_BYTES,
   MAX_IMAGES,
+  type ImageItem,
 } from '@/lib/fields/new-field';
 
 interface PickedImage {
   id: string;
-  file: File;
+  item: ImageItem;
   url: string;
 }
 
 export interface FieldImagePickerProps {
-  onChange: (files: File[]) => void;
+  initial?: string[];
+  onChange: (items: ImageItem[]) => void;
   error?: string;
   labels: {
     add: string;
@@ -34,12 +36,23 @@ export interface FieldImagePickerProps {
 const iconButton =
   'absolute inline-flex size-8 items-center justify-center rounded-full border-[0.5px] border-border bg-card text-foreground hover:bg-secondary';
 
+function revokeIfLocal(image: PickedImage) {
+  if (image.item.kind === 'new') URL.revokeObjectURL(image.url);
+}
+
 export function FieldImagePicker({
+  initial,
   onChange,
   error,
   labels,
 }: FieldImagePickerProps) {
-  const [images, setImages] = useState<PickedImage[]>([]);
+  const [images, setImages] = useState<PickedImage[]>(() =>
+    (initial ?? []).map((url) => ({
+      id: url,
+      item: { kind: 'existing', url },
+      url,
+    })),
+  );
   const [pickError, setPickError] = useState<string | null>(null);
   const latest = useRef<PickedImage[]>([]);
 
@@ -49,13 +62,13 @@ export function FieldImagePicker({
 
   useEffect(() => {
     return () => {
-      latest.current.forEach((image) => URL.revokeObjectURL(image.url));
+      latest.current.forEach(revokeIfLocal);
     };
   }, []);
 
   function commit(next: PickedImage[]) {
     setImages(next);
-    onChange(next.map((image) => image.file));
+    onChange(next.map((image) => image.item));
   }
 
   function handleAdd(event: ChangeEvent<HTMLInputElement>) {
@@ -81,7 +94,7 @@ export function FieldImagePicker({
       }
       accepted.push({
         id: crypto.randomUUID(),
-        file,
+        item: { kind: 'new', file },
         url: URL.createObjectURL(file),
       });
     }
@@ -92,7 +105,7 @@ export function FieldImagePicker({
 
   function handleRemove(id: string) {
     const target = images.find((image) => image.id === id);
-    if (target) URL.revokeObjectURL(target.url);
+    if (target) revokeIfLocal(target);
     setPickError(null);
     commit(images.filter((image) => image.id !== id));
   }

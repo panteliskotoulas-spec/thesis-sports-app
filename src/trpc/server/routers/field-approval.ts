@@ -34,7 +34,7 @@ export const fieldApprovalRouter = router({
     .query(async ({ ctx, input }): Promise<FieldApprovalList> => {
       const [fields, grouped] = await Promise.all([
         ctx.prisma.field.findMany({
-          where: { status: input.status },
+          where: { status: input.status, archivedAt: null },
           orderBy: { createdAt: input.status === 'PENDING' ? 'asc' : 'desc' },
           select: {
             id: true,
@@ -60,6 +60,7 @@ export const fieldApprovalRouter = router({
         }),
         ctx.prisma.field.groupBy({
           by: ['status'],
+          where: { archivedAt: null },
           _count: { _all: true },
         }),
       ]);
@@ -110,7 +111,7 @@ export const fieldApprovalRouter = router({
 
     await ctx.prisma.$transaction(async (tx) => {
       const updated = await tx.field.updateMany({
-        where: { id: field.id, status: 'PENDING' },
+        where: { id: field.id, status: 'PENDING', archivedAt: null },
         data: { status: 'APPROVED' },
       });
       if (updated.count === 0) throw new TRPCError({ code: 'CONFLICT' });
@@ -141,7 +142,7 @@ export const fieldApprovalRouter = router({
 
     await ctx.prisma.$transaction(async (tx) => {
       const updated = await tx.field.updateMany({
-        where: { id: field.id, status: 'PENDING' },
+        where: { id: field.id, status: 'PENDING', archivedAt: null },
         data: {
           status: 'REJECTED',
           ...(reason && { rejectionReason: reason }),

@@ -52,13 +52,21 @@ export default async function FieldsPage({
             <p className="mt-2 text-muted-foreground">{t('page.subtitle')}</p>
           </div>
           {user ? (
-            <Link
-              href={`/${lng}/owner/fields/new`}
-              className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90 sm:px-5"
-            >
-              <Plus className="size-4" aria-hidden="true" />
-              {t('new.cta')}
-            </Link>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+              <Link
+                href={`/${lng}/owner/fields`}
+                className="inline-flex h-11 items-center justify-center rounded-full border-[0.5px] border-border bg-card px-4 text-sm font-medium text-foreground hover:bg-secondary sm:px-5"
+              >
+                {t('owner.title')}
+              </Link>
+              <Link
+                href={`/${lng}/owner/fields/new`}
+                className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90 sm:px-5"
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                {t('new.cta')}
+              </Link>
+            </div>
           ) : null}
         </div>
 

@@ -1,7 +1,11 @@
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import superjson from 'superjson';
 import type { AppRouter } from '@/trpc/server/routers/_app';
-import type { GeocodeResult, NewFieldValues } from '@/lib/fields/new-field';
+import type {
+  GeocodeResult,
+  ImageItem,
+  NewFieldValues,
+} from '@/lib/fields/new-field';
 
 const client = createTRPCClient<AppRouter>({
   links: [httpBatchLink({ url: '/api/trpc', transformer: superjson })],
@@ -48,17 +52,31 @@ async function uploadImage(
   return result.secure_url;
 }
 
-export async function submitNewField(
-  values: NewFieldValues,
-  lng: string,
-): Promise<{ id: string }> {
-  const signature = await client.fieldSubmission.uploadSignature.mutate();
-  const images = await Promise.all(
-    values.images.map((file) => uploadImage(file, signature)),
+async function resolveImages(items: ImageItem[]): Promise<string[]> {
+  const files = items.flatMap((item) =>
+    item.kind === 'new' ? [item.file] : [],
   );
 
-  return client.fieldSubmission.create.mutate({
-    lng: lng === 'en' ? 'en' : 'el',
+  if (files.length === 0) {
+    return items.flatMap((item) =>
+      item.kind === 'existing' ? [item.url] : [],
+    );
+  }
+
+  const signature = await client.fieldSubmission.uploadSignature.mutate();
+  const uploaded = await Promise.all(
+    files.map((file) => uploadImage(file, signature)),
+  );
+
+  let next = 0;
+  return items.map((item) =>
+    item.kind === 'existing' ? item.url : uploaded[next++],
+  );
+}
+
+function toPayload(values: NewFieldValues, images: string[], lng: string) {
+  return {
+    lng: lng === 'en' ? ('en' as const) : ('el' as const),
     name: values.name,
     description: values.description,
     area: values.area,
@@ -68,5 +86,25 @@ export async function submitNewField(
     indoor: values.indoor,
     sports: values.sports,
     images,
+  };
+}
+
+export async function submitNewField(
+  values: NewFieldValues,
+  lng: string,
+): Promise<{ id: string }> {
+  const images = await resolveImages(values.images);
+  return client.fieldSubmission.create.mutate(toPayload(values, images, lng));
+}
+
+export async function updateExistingField(
+  id: string,
+  values: NewFieldValues,
+  lng: string,
+): Promise<{ id: string }> {
+  const images = await resolveImages(values.images);
+  return client.fieldOwner.update.mutate({
+    id,
+    ...toPayload(values, images, lng),
   });
 }

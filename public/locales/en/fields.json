@@ -114,7 +114,11 @@
       "found": "Found",
       "pick": "Pick the correct address",
       "notFound": "We couldn't find that address. Try a more detailed one, with a number and a city.",
-      "attribution": "Data © OpenStreetMap"
+      "attribution": "Data © OpenStreetMap",
+      "hint": "Enter street, number and city, e.g. 10 Agiou Dimitriou, Ilioupoli. If the address can't be found, use the coordinates from Google Maps.",
+      "coordinates": "Coordinates (optional)",
+      "coordinatesPlaceholder": "37.9301, 23.7611",
+      "coordinatesHint": "In Google Maps, right-click the spot and copy the two numbers shown. Paste them here. When filled in, they're used instead of the address search."
     },
     "features": {
       "title": "Details",
@@ -141,7 +145,8 @@
       "location": "Find and pick the address first with the Find button.",
       "sports": "Choose at least one sport.",
       "images": "Add at least one photo.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "coordinates": "Enter the coordinates as two numbers with a decimal point, e.g. 37.9301, 23.7611."
     }
   },
   "admin": {
@@ -199,6 +204,57 @@
       "rejectedReason": "Reason for rejection",
       "working": "Saving…",
       "errorGeneric": "Something went wrong. Please try again."
+    }
+  },
+  "owner": {
+    "meta": "My fields",
+    "title": "My fields",
+    "subtitle": "See the status of your fields and manage them.",
+    "status": {
+      "APPROVED": "Approved",
+      "PENDING": "Pending approval",
+      "REJECTED": "Rejected",
+      "ARCHIVED": "Archived"
+    },
+    "card": {
+      "view": "View",
+      "edit": "Edit",
+      "resubmit": "Fix and resubmit",
+      "archive": "Archive",
+      "pendingNote": "It won't be public until it's approved. You can still edit it.",
+      "archivedNote": "It's not shown anywhere. Past bookings are kept.",
+      "rejectedReason": "Reason for rejection"
+    },
+    "archive": {
+      "title": "Archive this field?",
+      "body": "The field will stop being shown. Bookings already made stay in the history.",
+      "confirm": "Archive",
+      "cancel": "Cancel",
+      "working": "Saving…",
+      "blockedTitle": "Can't archive right now",
+      "blockedOne": "There is 1 upcoming booking. Archive the field once it's over or cancelled.",
+      "blockedOther": "There are {count} upcoming bookings. Archive the field once they're over or cancelled.",
+      "ok": "OK",
+      "errorGeneric": "Something went wrong. Please try again."
+    },
+    "empty": {
+      "title": "You don't have any fields yet",
+      "description": "Add your first field and send it for approval."
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "We couldn't load your fields. Try again in a moment."
+    },
+    "edit": {
+      "meta": "Edit field",
+      "title": "Edit field",
+      "titleRejected": "Fix field",
+      "subtitle": "Write the details in the language you're reading the page in. If you change a text, it's translated again automatically.",
+      "save": "Save",
+      "saving": "Saving…",
+      "resubmit": "Resubmit for approval",
+      "noticeApproved": "If you change texts, photos or location, the field will go through approval again and won't be shown until then. Type and sports change right away.",
+      "noticeRejected": "When you save, the field will be sent for approval again."
     }
   }
 }

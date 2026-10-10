@@ -20,7 +20,7 @@ const geocodeInput = z.object({
   lng: languageInput,
 });
 
-const createInput = z.object({
+export const createInput = z.object({
   lng: languageInput,
   name: z.string().trim().min(1).max(NAME_MAX),
   description: z.string().trim().min(1).max(DESCRIPTION_MAX),

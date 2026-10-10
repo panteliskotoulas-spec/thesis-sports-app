@@ -125,6 +125,7 @@ export const fieldsRouter = router({
       const fields = await ctx.prisma.field.findMany({
         where: {
           status: 'APPROVED',
+          archivedAt: null,
           ...(input.type && { indoor: input.type === 'indoor' }),
           ...(input.sport && { sports: { has: input.sport } }),
         },
@@ -201,6 +202,7 @@ export const fieldsRouter = router({
           id: true,
           ownerId: true,
           status: true,
+          archivedAt: true,
           name: true,
           description: true,
           area: true,
@@ -218,7 +220,11 @@ export const fieldsRouter = router({
       });
 
       const isOwner = field !== null && ctx.session?.user.id === field.ownerId;
-      if (!field || (field.status !== 'APPROVED' && !isOwner)) {
+      if (
+        !field ||
+        field.archivedAt !== null ||
+        (field.status !== 'APPROVED' && !isOwner)
+      ) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Field not found' });
       }
 

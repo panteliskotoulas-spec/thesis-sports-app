@@ -9,11 +9,17 @@ import {
   AREA_MAX,
   DESCRIPTION_MAX,
   NAME_MAX,
+  parseCoordinates,
   type GeocodeResult,
+  type ImageItem,
   type NewFieldErrorKey,
   type NewFieldErrors,
 } from '@/lib/fields/new-field';
-import { geocodeAddress, submitNewField } from '@/lib/fields/new-field-api';
+import {
+  geocodeAddress,
+  submitNewField,
+  updateExistingField,
+} from '@/lib/fields/new-field-api';
 import type { SportType } from '@/lib/fields/types';
 import {
   FieldImagePicker,
@@ -25,8 +31,23 @@ import {
 } from './FieldLocationInput';
 import { NewFieldSection } from './NewFieldSection';
 
+export interface NewFieldInitialValues {
+  id: string;
+  name: string;
+  description: string;
+  area: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  indoor: boolean;
+  sports: SportType[];
+  images: string[];
+}
+
 export interface NewFieldFormProps {
   lng: string;
+  initial?: NewFieldInitialValues;
+  notice?: string;
   sports: { value: SportType; label: string }[];
   labels: {
     basicTitle: string;
@@ -46,6 +67,7 @@ export interface NewFieldFormProps {
     note: string;
     errorRequired: string;
     errorLocation: string;
+    errorCoordinates: string;
     errorSports: string;
     errorImages: string;
     errorGeneric: string;
@@ -54,23 +76,49 @@ export interface NewFieldFormProps {
   };
 }
 
-export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
+export function NewFieldForm({
+  lng,
+  initial,
+  notice,
+  sports,
+  labels,
+}: NewFieldFormProps) {
   const router = useRouter();
 
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [area, setArea] = useState('');
-  const [address, setAddress] = useState('');
-  const [location, setLocation] = useState<GeocodeResult | null>(null);
+  const [name, setName] = useState(initial?.name ?? '');
+  const [description, setDescription] = useState(initial?.description ?? '');
+  const [area, setArea] = useState(initial?.area ?? '');
+  const [address, setAddress] = useState(initial?.address ?? '');
+  const [location, setLocation] = useState<GeocodeResult | null>(
+    initial
+      ? {
+          label: initial.address,
+          latitude: initial.latitude,
+          longitude: initial.longitude,
+        }
+      : null,
+  );
+  const [coordinates, setCoordinates] = useState('');
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [notFound, setNotFound] = useState(false);
   const [searching, setSearching] = useState(false);
-  const [indoor, setIndoor] = useState(false);
-  const [selectedSports, setSelectedSports] = useState<SportType[]>([]);
-  const [files, setFiles] = useState<File[]>([]);
+  const [indoor, setIndoor] = useState(initial?.indoor ?? false);
+  const [selectedSports, setSelectedSports] = useState<SportType[]>(
+    initial?.sports ?? [],
+  );
+  const [images, setImages] = useState<ImageItem[]>(
+    () => initial?.images.map((url) => ({ kind: 'existing', url })) ?? [],
+  );
   const [errors, setErrors] = useState<NewFieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  const typedCoordinates = coordinates.trim()
+    ? parseCoordinates(coordinates)
+    : null;
+  const effectiveLocation: GeocodeResult | null = typedCoordinates
+    ? { label: address.trim(), ...typedCoordinates }
+    : location;
 
   function clearError(key: NewFieldErrorKey) {
     setErrors((previous) => {
@@ -86,6 +134,12 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
     setLocation(null);
     setResults([]);
     setNotFound(false);
+    clearError('address');
+  }
+
+  function handleCoordinatesChange(value: string) {
+    setCoordinates(value);
+    clearError('coordinates');
     clearError('address');
   }
 
@@ -125,8 +179,8 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
     clearError('sports');
   }
 
-  function handleFilesChange(next: File[]) {
-    setFiles(next);
+  function handleImagesChange(next: ImageItem[]) {
+    setImages(next);
     clearError('images');
   }
 
@@ -135,9 +189,13 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
     if (!name.trim()) next.name = labels.errorRequired;
     if (!description.trim()) next.description = labels.errorRequired;
     if (!area.trim()) next.area = labels.errorRequired;
-    if (!location) next.address = labels.errorLocation;
+    if (coordinates.trim() && !typedCoordinates) {
+      next.coordinates = labels.errorCoordinates;
+    }
+    if (!address.trim()) next.address = labels.errorRequired;
+    else if (!effectiveLocation) next.address = labels.errorLocation;
     if (selectedSports.length === 0) next.sports = labels.errorSports;
-    if (files.length === 0) next.images = labels.errorImages;
+    if (images.length === 0) next.images = labels.errorImages;
     return next;
   }
 
@@ -146,30 +204,30 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
 
     const next = validate();
     setErrors(next);
-    if (Object.keys(next).length > 0 || !location) return;
+    if (Object.keys(next).length > 0 || !effectiveLocation) return;
 
     setPending(true);
     setFormError(null);
 
     try {
-      const { id } = await submitNewField(
-        {
-          name: name.trim(),
-          description: description.trim(),
-          area: area.trim(),
-          address: address.trim(),
-          latitude: location.latitude,
-          longitude: location.longitude,
-          indoor,
-          sports: sports
-            .map((option) => option.value)
-            .filter((value) => selectedSports.includes(value)),
-          images: files,
-        },
-        lng,
-      );
+      const values = {
+        name: name.trim(),
+        description: description.trim(),
+        area: area.trim(),
+        address: address.trim(),
+        latitude: effectiveLocation.latitude,
+        longitude: effectiveLocation.longitude,
+        indoor,
+        sports: sports
+          .map((option) => option.value)
+          .filter((value) => selectedSports.includes(value)),
+        images,
+      };
 
-      router.push(`/${lng}/fields/${id}`);
+      if (initial) await updateExistingField(initial.id, values, lng);
+      else await submitNewField(values, lng);
+
+      router.push(`/${lng}/owner/fields`);
       router.refresh();
     } catch {
       setFormError(labels.errorGeneric);
@@ -184,6 +242,12 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
 
   return (
     <form noValidate className="flex flex-col gap-4" onSubmit={handleSubmit}>
+      {notice ? (
+        <p className="rounded-xl bg-secondary px-4 py-3 text-sm text-foreground">
+          {notice}
+        </p>
+      ) : null}
+
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <NewFieldSection title={labels.basicTitle}>
           <FormField
@@ -238,9 +302,13 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
               onSelect={handleSelect}
               pending={searching}
               results={results}
-              selected={location}
+              selected={effectiveLocation}
               notFound={notFound}
               error={errors.address}
+              coordinates={coordinates}
+              onCoordinatesChange={handleCoordinatesChange}
+              coordinatesError={errors.coordinates}
+              usingCoordinates={typedCoordinates !== null}
               labels={labels.location}
             />
           </NewFieldSection>
@@ -314,7 +382,8 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
 
       <NewFieldSection title={labels.photosTitle}>
         <FieldImagePicker
-          onChange={handleFilesChange}
+          initial={initial?.images}
+          onChange={handleImagesChange}
           error={errors.images}
           labels={labels.photos}
         />
@@ -334,9 +403,11 @@ export function NewFieldForm({ lng, sports, labels }: NewFieldFormProps) {
         >
           {pending ? labels.submitting : labels.submit}
         </button>
-        <p className="text-center text-xs text-muted-foreground lg:text-right">
-          {labels.note}
-        </p>
+        {initial ? null : (
+          <p className="text-center text-xs text-muted-foreground lg:text-right">
+            {labels.note}
+          </p>
+        )}
       </div>
     </form>
   );

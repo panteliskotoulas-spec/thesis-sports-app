@@ -3,7 +3,11 @@
 import type { KeyboardEvent } from 'react';
 import { Check, ExternalLink } from 'lucide-react';
 import { buildMapsUrl } from '@/lib/fields/detail-format';
-import { ADDRESS_MAX, type GeocodeResult } from '@/lib/fields/new-field';
+import {
+  ADDRESS_MAX,
+  COORDINATES_MAX,
+  type GeocodeResult,
+} from '@/lib/fields/new-field';
 
 export interface FieldLocationInputProps {
   value: string;
@@ -15,8 +19,16 @@ export interface FieldLocationInputProps {
   selected: GeocodeResult | null;
   notFound: boolean;
   error?: string;
+  coordinates: string;
+  onCoordinatesChange: (value: string) => void;
+  coordinatesError?: string;
+  usingCoordinates: boolean;
   labels: {
     address: string;
+    hint: string;
+    coordinates: string;
+    coordinatesPlaceholder: string;
+    coordinatesHint: string;
     find: string;
     finding: string;
     found: string;
@@ -39,11 +51,15 @@ export function FieldLocationInput({
   selected,
   notFound,
   error,
+  coordinates,
+  onCoordinatesChange,
+  coordinatesError,
+  usingCoordinates,
   labels,
 }: FieldLocationInputProps) {
   const canSearch = value.trim().length >= MIN_QUERY_LENGTH && !pending;
-  const message = notFound ? labels.notFound : error;
-  const choosing = results.length > 1;
+  const message = notFound && !usingCoordinates ? labels.notFound : error;
+  const choosing = !usingCoordinates && results.length > 1;
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key !== 'Enter') return;
@@ -66,7 +82,7 @@ export function FieldLocationInput({
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={handleKeyDown}
           aria-invalid={message ? true : undefined}
-          aria-describedby={message ? 'address-message' : undefined}
+          aria-describedby={message ? 'address-message' : 'address-hint'}
           className="h-11 min-w-0 flex-1 rounded-md border-[0.5px] border-input bg-background px-4 text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30"
         />
         <button
@@ -78,6 +94,10 @@ export function FieldLocationInput({
           {pending ? labels.finding : labels.find}
         </button>
       </div>
+
+      <p id="address-hint" className="text-xs text-muted-foreground">
+        {labels.hint}
+      </p>
 
       {message ? (
         <p
@@ -172,6 +192,39 @@ export function FieldLocationInput({
             </a>
           </p>
         ) : null}
+      </div>
+
+      <div className="mt-2 flex flex-col gap-1.5">
+        <label htmlFor="coordinates">{labels.coordinates}</label>
+        <input
+          id="coordinates"
+          name="coordinates"
+          type="text"
+          inputMode="decimal"
+          value={coordinates}
+          maxLength={COORDINATES_MAX}
+          autoComplete="off"
+          placeholder={labels.coordinatesPlaceholder}
+          onChange={(event) => onCoordinatesChange(event.target.value)}
+          aria-invalid={coordinatesError ? true : undefined}
+          aria-describedby={
+            coordinatesError ? 'coordinates-error' : 'coordinates-hint'
+          }
+          className="h-11 w-full rounded-md border-[0.5px] border-input bg-background px-4 text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30"
+        />
+        {coordinatesError ? (
+          <p
+            id="coordinates-error"
+            role="alert"
+            className="text-xs text-destructive"
+          >
+            {coordinatesError}
+          </p>
+        ) : (
+          <p id="coordinates-hint" className="text-xs text-muted-foreground">
+            {labels.coordinatesHint}
+          </p>
+        )}
       </div>
 
       <p className="text-xs text-muted-foreground">{labels.attribution}</p>

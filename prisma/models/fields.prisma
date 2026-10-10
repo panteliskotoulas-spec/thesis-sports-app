@@ -12,6 +12,7 @@ model Field {
   indoor            Boolean
   status            FieldStatus        @default(PENDING)
   rejectionReason   Json?
+  archivedAt        DateTime?
   images            FieldImage[]
   slots             AvailabilitySlot[]
   hostedTournaments Tournament[]

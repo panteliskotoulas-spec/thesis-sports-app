@@ -5,7 +5,7 @@ import { getT } from '@/i18n.server';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { NewFieldForm } from '@/components/fields/new/NewFieldForm';
-import { MAX_IMAGE_MB, MAX_IMAGES } from '@/lib/fields/new-field';
+import { buildFieldFormLabels } from '@/lib/fields/form-labels';
 import { SPORT_TYPES } from '@/lib/fields/types';
 import { getCurrentUser } from '@/lib/session';
 
@@ -21,8 +21,6 @@ export default async function NewFieldPage() {
 
   if (!user) redirect(`/${lng}/login`);
 
-  const limits = { max: MAX_IMAGES, size: MAX_IMAGE_MB };
-
   return (
     <>
       <Header user={user} />
@@ -37,49 +35,10 @@ export default async function NewFieldPage() {
               value,
               label: t(`sports.${value}`),
             }))}
-            labels={{
-              basicTitle: t('new.basic.title'),
-              name: t('new.basic.name'),
-              description: t('new.basic.description'),
-              area: t('new.basic.area'),
-              areaPlaceholder: t('new.basic.areaPlaceholder'),
-              locationTitle: t('new.location.title'),
-              featuresTitle: t('new.features.title'),
-              type: t('new.features.type'),
-              indoor: t('card.indoor'),
-              outdoor: t('card.outdoor'),
-              sports: t('new.features.sports'),
-              photosTitle: t('new.photos.title'),
+            labels={buildFieldFormLabels(t, {
               submit: t('new.submit'),
               submitting: t('new.submitting'),
-              note: t('new.note'),
-              errorRequired: t('new.errors.required'),
-              errorLocation: t('new.errors.location'),
-              errorSports: t('new.errors.sports'),
-              errorImages: t('new.errors.images'),
-              errorGeneric: t('new.errors.generic'),
-              location: {
-                address: t('new.location.address'),
-                find: t('new.location.find'),
-                finding: t('new.location.finding'),
-                found: t('new.location.found'),
-                pick: t('new.location.pick'),
-                notFound: t('new.location.notFound'),
-                openMaps: t('detail.location.open'),
-                attribution: t('new.location.attribution'),
-              },
-              photos: {
-                add: t('new.photos.add'),
-                cover: t('new.photos.cover'),
-                makeCover: t('new.photos.makeCover'),
-                remove: t('new.photos.remove'),
-                photo: t('new.photos.photo'),
-                hint: t('new.photos.hint', limits),
-                errorType: t('new.photos.errorType'),
-                errorSize: t('new.photos.errorSize', limits),
-                errorMax: t('new.photos.errorMax', limits),
-              },
-            }}
+            })}
           />
         </div>
       </main>
