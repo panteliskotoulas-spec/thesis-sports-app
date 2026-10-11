@@ -34,6 +34,7 @@ export async function startCheckout(
     const result = await client.reservations.startCheckout.mutate({
       slotId: input.slotId,
       useCredit: input.useCredit,
+      teamId: input.teamId ?? null,
       lng: input.lng === 'en' ? 'en' : 'el',
     });
     if (result.url) return { status: 'redirect', url: result.url };

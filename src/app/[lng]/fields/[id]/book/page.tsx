@@ -16,7 +16,6 @@ import { formatDayChip, formatTimeRange } from '@/lib/fields/detail-format';
 import { todayInAthens } from '@/lib/fields/filters';
 import { localized } from '@/lib/i18n-content';
 import { getCurrentUser } from '@/lib/session';
-import { getMockTeamBookingOptions } from '@/lib/teams/team-booking-mock';
 import { buildTeamBookingLabels } from '@/lib/teams/team-labels';
 import { getServerCaller } from '@/trpc/server/caller';
 
@@ -44,9 +43,10 @@ export default async function BookingPage({
   const slotId = Array.isArray(query.slot) ? query.slot[0] : query.slot;
   if (!slotId) notFound();
 
+  const caller = await getServerCaller();
+
   let row: BookingSummaryRow;
   try {
-    const caller = await getServerCaller();
     row = await caller.reservations.getSummary({ slotId });
   } catch (error) {
     if (error instanceof TRPCError && error.code === 'NOT_FOUND') notFound();
@@ -54,6 +54,8 @@ export default async function BookingPage({
   }
 
   if (row.fieldId !== id) notFound();
+
+  const teams = await caller.teams.bookableTeams({ sportType: row.sportType });
 
   const backHref = `/${lng}/fields/${id}`;
 
@@ -113,7 +115,7 @@ export default async function BookingPage({
               location={row.address || null}
               price={row.price}
               balance={row.balance}
-              teams={getMockTeamBookingOptions(row.sportType)}
+              teams={teams}
               backHref={backHref}
               labels={labels}
             />

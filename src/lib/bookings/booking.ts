@@ -27,6 +27,7 @@ export interface BookingItem {
 export interface StartCheckoutInput {
   slotId: string;
   useCredit: boolean;
+  teamId?: string | null;
   lng: string;
 }
 

@@ -14,7 +14,7 @@ import { TeamMembersList } from '@/components/teams/TeamMembersList';
 import { TeamReservations } from '@/components/teams/TeamReservations';
 import { getCurrentUser } from '@/lib/session';
 import { formatTeamSince, toTeamDetailItem } from '@/lib/teams/team';
-import { getMockTeamReservations } from '@/lib/teams/team-booking-mock';
+import { toTeamReservationItem } from '@/lib/teams/team-booking';
 import {
   buildTeamJoinLabels,
   buildTeamReservationsLabels,
@@ -54,6 +54,17 @@ export default async function TeamPage({ params }: TeamPageProps) {
   if (!data) notFound();
   const team = toTeamDetailItem(data.team, lng);
   const viewer = data.viewer;
+
+  const reservations =
+    viewer.kind === 'leader' || viewer.kind === 'member'
+      ? (
+          await (
+            await getServerCaller()
+          ).teams.upcomingReservations({
+            teamId: id,
+          })
+        ).map((row) => toTeamReservationItem(row, lng))
+      : [];
 
   return (
     <>
@@ -137,7 +148,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
         {viewer.kind === 'leader' || viewer.kind === 'member' ? (
           <div className="mt-4">
             <TeamReservations
-              items={getMockTeamReservations(lng)}
+              items={reservations}
               labels={buildTeamReservationsLabels(t)}
             />
           </div>

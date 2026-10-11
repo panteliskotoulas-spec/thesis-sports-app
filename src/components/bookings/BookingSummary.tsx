@@ -127,7 +127,7 @@ export function BookingSummary({
     setError(null);
     setTaken(false);
 
-    const result = await startCheckout({ slotId, useCredit, lng });
+    const result = await startCheckout({ slotId, useCredit, teamId, lng });
 
     if (result.status === 'redirect') {
       window.location.assign(result.url);
