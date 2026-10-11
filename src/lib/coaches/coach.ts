@@ -1,4 +1,5 @@
 import type { SportType } from '@/lib/fields/types';
+import { localized, type LocalizedText } from '@/lib/i18n-content';
 
 export const COACH_STATUSES = ['PENDING', 'APPROVED', 'REJECTED'] as const;
 export type CoachStatusValue = (typeof COACH_STATUSES)[number];
@@ -48,6 +49,33 @@ export interface CoachApprovalList {
   counts: Record<CoachStatusValue, number>;
 }
 
+export interface CoachApprovalRecord {
+  id: string;
+  name: string;
+  email: string;
+  sportType: SportType;
+  bio: LocalizedText;
+  certifications: string | null;
+  hourlyRate: number;
+  status: CoachStatusValue;
+  rejectionReason: LocalizedText | null;
+  createdAt: Date;
+}
+
+export interface CoachApprovalRecordList {
+  coaches: CoachApprovalRecord[];
+  counts: Record<CoachStatusValue, number>;
+}
+
+export interface CoachMineRecord {
+  status: CoachStatusValue;
+  rejectionReason: LocalizedText | null;
+  sportType: SportType;
+  bio: LocalizedText;
+  hourlyRate: number;
+  certifications: string | null;
+}
+
 export interface CoachApprovalCardData {
   id: string;
   name: string;
@@ -95,4 +123,17 @@ export function getInitials(name: string): string {
     .slice(0, 2)
     .map((part) => part.charAt(0).toUpperCase())
     .join('');
+}
+
+export function toCoachApprovalRow(
+  record: CoachApprovalRecord,
+  lng: string,
+): CoachApprovalRow {
+  return {
+    ...record,
+    bio: localized(record.bio, lng),
+    rejectionReason: record.rejectionReason
+      ? localized(record.rejectionReason, lng)
+      : null,
+  };
 }

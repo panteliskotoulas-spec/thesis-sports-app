@@ -1,15 +1,16 @@
-
 model Coach {
-  id             String                  @id @default(cuid())
-  userId         String                  @unique
-  user           User                    @relation(fields: [userId], references: [id])
-  sportType      SportType
-  bio            String
-  hourlyRate     Decimal                 @db.Decimal(10, 2)
-  certifications String?
-  status         CoachStatus             @default(PENDING)
-  slots          CoachAvailabilitySlot[]
-  reviews        CoachReview[]
+  id              String                  @id @default(cuid())
+  userId          String                  @unique
+  user            User                    @relation(fields: [userId], references: [id])
+  sportType       SportType
+  bio             Json
+  hourlyRate      Decimal                 @db.Decimal(10, 2)
+  certifications  String?
+  status          CoachStatus             @default(PENDING)
+  rejectionReason Json?
+  createdAt       DateTime                @default(now())
+  slots           CoachAvailabilitySlot[]
+  reviews         CoachReview[]
 }
 
 model CoachAvailabilitySlot {

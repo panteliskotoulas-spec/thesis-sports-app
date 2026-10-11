@@ -1,4 +1,6 @@
 import { router } from '../init';
+import { coachApprovalRouter } from './coach-approval';
+import { coachesRouter } from './coaches';
 import { fieldApprovalRouter } from './field-approval';
 import { fieldOwnerRouter } from './field-owner';
 import { fieldSubmissionRouter } from './field-submission';
@@ -19,6 +21,8 @@ export const appRouter = router({
   ownerBookings: ownerBookingsRouter,
   teams: teamsRouter,
   splits: splitsRouter,
+  coaches: coachesRouter,
+  coachApproval: coachApprovalRouter,
 });
 
 export type AppRouter = typeof appRouter;
