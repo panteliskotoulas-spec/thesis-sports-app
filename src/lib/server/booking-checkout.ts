@@ -200,7 +200,7 @@ export async function confirmCheckoutSession(
             slot.startTime,
             slot.endTime,
           ),
-          linkUrl: '/bookings',
+          linkUrl: `/bookings?focus=${reservation.id}`,
         },
       });
     });
@@ -350,7 +350,7 @@ export async function startCheckout(
             slot.startTime,
             slot.endTime,
           ),
-          linkUrl: '/bookings',
+          linkUrl: `/bookings?focus=${reservation.id}`,
         },
       });
     });

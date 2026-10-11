@@ -6,7 +6,12 @@ import {
   canCancelBooking,
   type CompensationValue,
 } from '@/lib/bookings/booking';
-import { decimalToCents, money } from '@/lib/server/booking-shared';
+import { reservationCancelledMessage } from '@/lib/server/booking-notifications';
+import {
+  asLocalized,
+  decimalToCents,
+  money,
+} from '@/lib/server/booking-shared';
 import { getStripe } from '@/lib/server/stripe';
 
 export interface CancelReservationParams {
@@ -27,7 +32,13 @@ export async function cancelReservation(
       id: true,
       slotId: true,
       status: true,
-      slot: { select: { startTime: true } },
+      slot: {
+        select: {
+          startTime: true,
+          endTime: true,
+          field: { select: { name: true } },
+        },
+      },
     },
   });
 
@@ -54,6 +65,7 @@ export async function cancelReservation(
 
   const refundCents = refund ? cardCents : 0;
   const creditBackCents = refund ? creditCents : totalCents;
+  const outcome = !refund ? 'credit' : creditBackCents > 0 ? 'mixed' : 'card';
 
   if (refundCents > 0 && !payment.stripePaymentIntentId) {
     throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
@@ -95,6 +107,20 @@ export async function cancelReservation(
       await tx.payment.update({
         where: { id: payment.id },
         data: { status: 'REFUNDED' },
+      });
+
+      await tx.notification.create({
+        data: {
+          userId: params.userId,
+          type: 'RESERVATION_CANCELLED',
+          message: reservationCancelledMessage(
+            asLocalized(reservation.slot.field.name),
+            reservation.slot.startTime,
+            reservation.slot.endTime,
+            outcome,
+          ),
+          linkUrl: `/bookings?focus=${reservation.id}`,
+        },
       });
 
       if (refundCents > 0 && payment.stripePaymentIntentId) {

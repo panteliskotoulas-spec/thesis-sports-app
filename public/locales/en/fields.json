@@ -383,5 +383,23 @@
       "confirm": "Cancel booking",
       "working": "One moment…"
     }
+  },
+  "notifications": {
+    "meta": "Notifications",
+    "title": "Notifications",
+    "subtitle": "The latest updates about your account.",
+    "bell": "Notifications",
+    "bellUnread": "Notifications, {count} unread",
+    "panelTitle": "Notifications",
+    "markAllRead": "Mark all as read",
+    "viewAll": "View all",
+    "emptyTitle": "No notifications yet",
+    "emptyDescription": "When something's new, you'll see it here.",
+    "loading": "Loading…",
+    "error": "Couldn't load your notifications. Try again.",
+    "retry": "Try again",
+    "loadMore": "Load more",
+    "justNow": "just now",
+    "unread": "Unread"
   }
 }

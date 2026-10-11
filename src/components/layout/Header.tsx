@@ -5,6 +5,11 @@ import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { SignOutButton } from '@/components/shared/SignOutButton';
 import { NavLink } from '@/components/shared/NavLink';
+import {
+  NotificationBell,
+  type NotificationBellLabels,
+} from '@/components/notifications/NotificationBell';
+import { getServerCaller } from '@/trpc/server/caller';
 
 export interface HeaderProps {
   user: { name: string; avatarUrl?: string; isAdmin?: boolean } | null;
@@ -20,9 +25,38 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
+async function loadUnreadCount(): Promise<number> {
+  try {
+    const caller = await getServerCaller();
+    return await caller.notifications.unreadCount();
+  } catch {
+    return 0;
+  }
+}
+
 export async function Header({ user }: HeaderProps) {
   const { t } = await getT('common');
+  const { t: tn } = await getT('fields');
   const lng = await routeLanguage();
+  const language = lng === 'en' ? 'en' : 'el';
+  const unread = user ? await loadUnreadCount() : 0;
+
+  const bellLabels: NotificationBellLabels = {
+    bell: tn('notifications.bell'),
+    bellUnread: tn('notifications.bellUnread'),
+    panelTitle: tn('notifications.panelTitle'),
+    markAllRead: tn('notifications.markAllRead'),
+    viewAll: tn('notifications.viewAll'),
+    emptyTitle: tn('notifications.emptyTitle'),
+    emptyDescription: tn('notifications.emptyDescription'),
+    loading: tn('notifications.loading'),
+    error: tn('notifications.error'),
+    retry: tn('notifications.retry'),
+    row: {
+      justNow: tn('notifications.justNow'),
+      unread: tn('notifications.unread'),
+    },
+  };
 
   const navItems = [
     { slug: 'fields', label: t('nav.fields') },
@@ -69,6 +103,13 @@ export async function Header({ user }: HeaderProps) {
 
           {user ? (
             <div className="flex items-center gap-1">
+              <NotificationBell
+                key={unread}
+                lng={language}
+                initialUnread={unread}
+                listHref={`/${lng}/notifications`}
+                labels={bellLabels}
+              />
               <Link
                 href={`/${lng}/profile`}
                 aria-label={t('nav.profile')}

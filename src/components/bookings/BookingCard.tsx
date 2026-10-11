@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Calendar, CalendarX, Clock } from 'lucide-react';
 import {
@@ -31,6 +31,7 @@ export interface BookingCardLabels {
 
 export interface BookingCardProps {
   item: BookingItem;
+  highlighted?: boolean;
   labels: BookingCardLabels;
   onCancel: (
     id: string,
@@ -90,10 +91,22 @@ function paidBreakdown(item: BookingItem, labels: BookingCardLabels): string {
   return parts.join(' · ');
 }
 
-export function BookingCard({ item, labels, onCancel }: BookingCardProps) {
+export function BookingCard({
+  item,
+  highlighted = false,
+  labels,
+  onCancel,
+}: BookingCardProps) {
+  const ref = useRef<HTMLLIElement>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (highlighted) {
+      ref.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }, [highlighted]);
 
   const badge = badgeFor(item, labels);
   const cancelled = item.status === 'CANCELLED';
@@ -122,7 +135,12 @@ export function BookingCard({ item, labels, onCancel }: BookingCardProps) {
   }
 
   return (
-    <li className="rounded-xl border-[0.5px] border-border bg-card p-4">
+    <li
+      ref={ref}
+      className={`rounded-xl border-[0.5px] bg-card p-4 ${
+        highlighted ? 'border-primary ring-1 ring-primary' : 'border-border'
+      }`}
+    >
       <div className="flex items-start justify-between gap-3">
         <Link
           href={item.fieldHref}

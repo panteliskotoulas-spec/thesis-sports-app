@@ -31,6 +31,7 @@ export interface BookingsListProps {
   past: BookingItem[];
   browseHref: string;
   justBooked: boolean;
+  focusId: string | null;
   labels: BookingsListLabels;
 }
 
@@ -41,10 +42,13 @@ export function BookingsList({
   past,
   browseHref,
   justBooked,
+  focusId,
   labels,
 }: BookingsListProps) {
   const router = useRouter();
-  const [tab, setTab] = useState<Tab>('upcoming');
+  const [tab, setTab] = useState<Tab>(() =>
+    focusId && past.some((item) => item.id === focusId) ? 'past' : 'upcoming',
+  );
   const [notice, setNotice] = useState<string | null>(
     justBooked ? labels.bookedNotice : null,
   );
@@ -123,6 +127,7 @@ export function BookingsList({
             <BookingCard
               key={item.id}
               item={item}
+              highlighted={item.id === focusId}
               labels={labels.card}
               onCancel={handleCancel}
             />
