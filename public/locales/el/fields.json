@@ -63,6 +63,7 @@
     "retry": "Δοκίμασε ξανά"
   },
   "detail": {
+    "back": "Όλα τα γήπεδα",
     "managedBy": "Διαχειριστής: {{name}}",
     "description": "Περιγραφή",
     "gallery": {

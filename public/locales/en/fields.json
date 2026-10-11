@@ -63,6 +63,7 @@
     "retry": "Try again"
   },
   "detail": {
+    "back": "All fields",
     "managedBy": "Managed by {{name}}",
     "description": "Description",
     "gallery": {

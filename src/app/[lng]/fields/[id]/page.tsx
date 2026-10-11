@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
-import { ExternalLink, Home, MapPin, Star, Sun } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Home, MapPin, Star, Sun } from 'lucide-react';
 import { TRPCError } from '@trpc/server';
 import { getT } from '@/i18n.server';
 import { Header } from '@/components/layout/Header';
@@ -67,6 +68,14 @@ export default async function FieldPage({
     <>
       <Header user={user} />
       <main className="mx-auto w-full max-w-360 flex-1 px-4 py-6 sm:px-6 md:py-10 lg:px-8">
+        <Link
+          href={`/${lng}/fields`}
+          className="mb-2 inline-flex h-10 items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          {t('detail.back')}
+        </Link>
+
         <FieldGallery
           images={field.images}
           alt={field.name}
