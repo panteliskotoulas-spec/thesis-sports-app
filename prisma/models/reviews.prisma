@@ -1,4 +1,3 @@
-
 model FieldReview {
   id            String   @id @default(cuid())
   fieldId       String
@@ -14,13 +13,16 @@ model FieldReview {
 model CoachReview {
   id         String   @id @default(cuid())
   coachId    String
-  coach      Coach    @relation(fields: [coachId], references: [id])
+  coach      Coach           @relation(fields: [coachId], references: [id])
   reviewerId String
-  reviewer   User     @relation(fields: [reviewerId], references: [id])
-  sessionId  String   @unique
+  reviewer   User            @relation(fields: [reviewerId], references: [id])
+  sessionId  String          @unique
+  session    CoachingSession @relation(fields: [sessionId], references: [id])
   rating     Int
   comment    String?
-  createdAt  DateTime @default(now())
+  createdAt  DateTime        @default(now())
+
+  @@index([coachId, createdAt])
 }
 
 model UserReview {

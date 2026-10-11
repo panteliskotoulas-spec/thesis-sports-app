@@ -42,6 +42,7 @@ model CoachingSession {
   paidAt           DateTime?
   cancelledAt      DateTime?
   compensationType CompensationType?
+  review           CoachReview?
 
   @@index([slotId])
   @@index([userId])
