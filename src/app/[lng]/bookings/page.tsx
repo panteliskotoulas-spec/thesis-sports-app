@@ -11,6 +11,7 @@ import {
   type BookingsListLabels,
 } from '@/components/bookings/BookingsList';
 import { splitBookingRows, toBookingItem } from '@/lib/bookings/booking-rows';
+import { buildFieldReviewFormLabels } from '@/lib/reviews/review-labels';
 import { getCurrentUser } from '@/lib/session';
 import { getServerCaller } from '@/trpc/server/caller';
 
@@ -27,6 +28,7 @@ export default async function BookingsPage({
   const query = await searchParams;
   const { t } = await getT('fields');
   const { t: tc } = await getT('coaches');
+  const { t: tr } = await getT('reviews');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
 
@@ -51,6 +53,7 @@ export default async function BookingsPage({
     emptyPastDescription: t('booking.list.emptyPastDescription'),
     bookedNotice: t('booking.list.bookedNotice'),
     cancelledNotice: t('booking.list.cancelledNotice'),
+    reviewedNotice: tr('field.reviewedNotice'),
     card: {
       statusConfirmed: t('booking.card.statusConfirmed'),
       statusCompleted: t('booking.card.statusCompleted'),
@@ -67,6 +70,12 @@ export default async function BookingsPage({
       errorTooLate: t('booking.card.errorTooLate'),
       errorConflict: t('booking.card.errorConflict'),
       errorGeneric: t('booking.card.errorGeneric'),
+      review: {
+        write: tr('field.write'),
+        yourReview: tr('field.yourReview'),
+        stars: tr('stars'),
+        form: buildFieldReviewFormLabels(tr),
+      },
       panel: {
         title: t('booking.cancel.title'),
         optionRefundTitle: t('booking.cancel.optionRefundTitle'),

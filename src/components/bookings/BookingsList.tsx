@@ -11,6 +11,12 @@ import type {
   CompensationValue,
 } from '@/lib/bookings/booking';
 import { cancelBooking } from '@/lib/bookings/booking-api';
+import { submitFieldReview } from '@/lib/fields/field-review-api';
+import type {
+  ReviewInput,
+  SessionReview,
+  SubmitReviewResult,
+} from '@/lib/reviews/review';
 import { BookingCard, type BookingCardLabels } from './BookingCard';
 
 export interface BookingsListLabels {
@@ -23,6 +29,7 @@ export interface BookingsListLabels {
   emptyPastDescription: string;
   bookedNotice: string;
   cancelledNotice: string;
+  reviewedNotice: string;
   card: BookingCardLabels;
 }
 
@@ -52,6 +59,7 @@ export function BookingsList({
   const [notice, setNotice] = useState<string | null>(
     justBooked ? labels.bookedNotice : null,
   );
+  const [reviews, setReviews] = useState<Record<string, SessionReview>>({});
 
   async function handleCancel(
     id: string,
@@ -67,7 +75,24 @@ export function BookingsList({
     return result;
   }
 
-  const items = tab === 'upcoming' ? upcoming : past;
+  async function handleReview(
+    id: string,
+    input: ReviewInput,
+  ): Promise<SubmitReviewResult> {
+    return submitFieldReview(id, input);
+  }
+
+  function handleReviewed(id: string, input: ReviewInput) {
+    setReviews((current) => ({
+      ...current,
+      [id]: { rating: input.rating, comment: input.comment || null },
+    }));
+    setNotice(labels.reviewedNotice);
+  }
+
+  const items = (tab === 'upcoming' ? upcoming : past).map((item) =>
+    reviews[item.id] ? { ...item, review: reviews[item.id] } : item,
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -130,6 +155,8 @@ export function BookingsList({
               highlighted={item.id === focusId}
               labels={labels.card}
               onCancel={handleCancel}
+              onReview={handleReview}
+              onReviewed={handleReviewed}
             />
           ))}
         </ul>

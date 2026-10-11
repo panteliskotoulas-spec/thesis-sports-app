@@ -1,3 +1,5 @@
+import type { SessionReview } from '@/lib/reviews/review';
+
 export const HOLD_MINUTES = 30;
 export const CANCEL_WINDOW_HOURS = 24;
 
@@ -22,6 +24,8 @@ export interface BookingItem {
   compensation: CompensationValue | null;
   cancelledBy: CancelledByValue | null;
   teamName: string | null;
+  reviewable: boolean;
+  review: SessionReview | null;
 }
 
 export interface StartCheckoutInput {

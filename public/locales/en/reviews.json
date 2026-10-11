@@ -33,5 +33,15 @@
     "write": "Write a review",
     "yourReview": "Your review",
     "reviewedNotice": "Thanks for your review."
+  },
+  "field": {
+    "write": "Write a review",
+    "yourReview": "Your review",
+    "reviewedNotice": "Thanks for your review.",
+    "form": {
+      "prompt": "How was the field?",
+      "errorConflict": "You've already reviewed this booking.",
+      "errorForbidden": "You can't review this booking."
+    }
   }
 }

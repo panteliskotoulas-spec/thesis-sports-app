@@ -10,11 +10,13 @@ import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { FieldAvailability } from '@/components/fields/FieldAvailability';
 import { FieldGallery } from '@/components/fields/FieldGallery';
-import { FieldReviews } from '@/components/fields/FieldReviews';
+import { FieldReviewsSection } from '@/components/fields/FieldReviewsSection';
 import { parseDetailDate, toFieldDetail } from '@/lib/fields/detail';
 import { buildMapsUrl } from '@/lib/fields/detail-format';
 import type { SearchParams } from '@/lib/fields/filters';
 import { formatRating } from '@/lib/fields/format';
+import { REVIEW_PAGE_SIZE } from '@/lib/reviews/review';
+import { buildReviewsSectionLabels } from '@/lib/reviews/review-labels';
 import { getCurrentUser } from '@/lib/session';
 import { getServerCaller } from '@/trpc/server/caller';
 
@@ -50,6 +52,7 @@ export default async function FieldPage({
 }: FieldPageProps) {
   const { id } = await params;
   const { t } = await getT('fields');
+  const { t: tr } = await getT('reviews');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
 
@@ -167,7 +170,15 @@ export default async function FieldPage({
               </a>
             </section>
 
-            <FieldReviews field={field} />
+            <FieldReviewsSection
+              fieldId={field.id}
+              lng={lng}
+              rating={field.rating}
+              items={field.reviews}
+              total={field.rating?.count ?? 0}
+              pageSize={REVIEW_PAGE_SIZE}
+              labels={buildReviewsSectionLabels(tr)}
+            />
           </div>
         </div>
       </main>

@@ -2,14 +2,27 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Calendar, CalendarX, Clock, Users } from 'lucide-react';
+import { Calendar, CalendarX, Clock, Star, Users } from 'lucide-react';
 import {
   fillTemplate,
   type BookingItem,
   type CancelBookingResult,
   type CompensationValue,
 } from '@/lib/bookings/booking';
+import type { ReviewInput, SubmitReviewResult } from '@/lib/reviews/review';
+import {
+  ReviewForm,
+  type ReviewFormLabels,
+} from '@/components/reviews/ReviewForm';
+import { StarRating } from '@/components/reviews/StarRating';
 import { CancelPanel, type CancelPanelLabels } from './CancelPanel';
+
+export interface BookingReviewLabels {
+  write: string;
+  yourReview: string;
+  stars: string;
+  form: ReviewFormLabels;
+}
 
 export interface BookingCardLabels {
   statusConfirmed: string;
@@ -27,6 +40,7 @@ export interface BookingCardLabels {
   errorTooLate: string;
   errorConflict: string;
   errorGeneric: string;
+  review: BookingReviewLabels;
   panel: CancelPanelLabels;
 }
 
@@ -38,6 +52,8 @@ export interface BookingCardProps {
     id: string,
     compensation: CompensationValue,
   ) => Promise<CancelBookingResult>;
+  onReview: (id: string, input: ReviewInput) => Promise<SubmitReviewResult>;
+  onReviewed: (id: string, input: ReviewInput) => void;
 }
 
 const badgeBase =
@@ -100,9 +116,12 @@ export function BookingCard({
   highlighted = false,
   labels,
   onCancel,
+  onReview,
+  onReviewed,
 }: BookingCardProps) {
   const ref = useRef<HTMLLIElement>(null);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -177,6 +196,48 @@ export function BookingCard({
         <span>{fillTemplate(labels.paid, { amount: item.total })}</span>
         <span>{paidBreakdown(item, labels)}</span>
       </div>
+
+      {item.reviewable ? (
+        item.review ? (
+          <div className="mt-3 border-t-[0.5px] border-border pt-3">
+            <p className="text-sm text-muted-foreground">
+              {labels.review.yourReview}
+            </p>
+            <div className="mt-1">
+              <StarRating
+                value={item.review.rating}
+                label={fillTemplate(labels.review.stars, {
+                  rating: String(item.review.rating),
+                })}
+              />
+            </div>
+            {item.review.comment ? (
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                {item.review.comment}
+              </p>
+            ) : null}
+          </div>
+        ) : reviewOpen ? (
+          <ReviewForm
+            labels={labels.review.form}
+            onSubmit={(input) => onReview(item.id, input)}
+            onSubmitted={(input) => {
+              setReviewOpen(false);
+              onReviewed(item.id, input);
+            }}
+            onCancel={() => setReviewOpen(false)}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setReviewOpen(true)}
+            className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border-[0.5px] border-border bg-card px-4 text-sm font-medium text-foreground hover:bg-secondary"
+          >
+            <Star className="size-4" aria-hidden="true" />
+            {labels.review.write}
+          </button>
+        )
+      ) : null}
 
       {cancelled ? (
         <p className="mt-2 text-sm text-muted-foreground">

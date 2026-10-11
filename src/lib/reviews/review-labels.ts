@@ -44,3 +44,12 @@ export function buildReviewsSectionLabels(tr: Translate): ReviewsSectionLabels {
     stars: tr('stars'),
   };
 }
+
+export function buildFieldReviewFormLabels(tr: Translate): ReviewFormLabels {
+  return {
+    ...buildReviewFormLabels(tr),
+    prompt: tr('field.form.prompt'),
+    errorConflict: tr('field.form.errorConflict'),
+    errorForbidden: tr('field.form.errorForbidden'),
+  };
+}

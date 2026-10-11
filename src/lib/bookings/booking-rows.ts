@@ -10,6 +10,7 @@ import { formatDayChip, formatTimeRange } from '@/lib/fields/detail-format';
 import { todayInAthens } from '@/lib/fields/filters';
 import type { SportType } from '@/lib/fields/types';
 import { localized, type LocalizedText } from '@/lib/i18n-content';
+import type { SessionReview } from '@/lib/reviews/review';
 
 export interface BookingSummaryRow {
   slotId: string;
@@ -37,6 +38,7 @@ export interface BookingRow {
   total: number;
   credit: number;
   teamName?: string | null;
+  review?: SessionReview | null;
 }
 
 function isUpcoming(row: BookingRow, now: Date): boolean {
@@ -83,5 +85,7 @@ export function toBookingItem(
     compensation: row.compensation,
     cancelledBy: row.cancelledBy,
     teamName: row.teamName ?? null,
+    reviewable: row.status === 'CONFIRMED' && !upcoming,
+    review: row.review ?? null,
   };
 }
