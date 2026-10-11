@@ -16,6 +16,8 @@ import { formatDayChip, formatTimeRange } from '@/lib/fields/detail-format';
 import { todayInAthens } from '@/lib/fields/filters';
 import { localized } from '@/lib/i18n-content';
 import { getCurrentUser } from '@/lib/session';
+import { getMockTeamBookingOptions } from '@/lib/teams/team-booking-mock';
+import { buildTeamBookingLabels } from '@/lib/teams/team-labels';
 import { getServerCaller } from '@/trpc/server/caller';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -33,6 +35,7 @@ export default async function BookingPage({
   const { id } = await params;
   const query = await searchParams;
   const { t } = await getT('fields');
+  const { t: tt } = await getT('teams');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
 
@@ -55,6 +58,7 @@ export default async function BookingPage({
   const backHref = `/${lng}/fields/${id}`;
 
   const labels: BookingSummaryLabels = {
+    team: buildTeamBookingLabels(tt),
     credit: {
       title: t('booking.summary.credit.title'),
       available: t('booking.summary.credit.available'),
@@ -109,6 +113,7 @@ export default async function BookingPage({
               location={row.address || null}
               price={row.price}
               balance={row.balance}
+              teams={getMockTeamBookingOptions(row.sportType)}
               backHref={backHref}
               labels={labels}
             />

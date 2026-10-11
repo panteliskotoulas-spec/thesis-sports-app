@@ -21,6 +21,7 @@ export interface BookingItem {
   credit: string | null;
   compensation: CompensationValue | null;
   cancelledBy: CancelledByValue | null;
+  teamName: string | null;
 }
 
 export interface StartCheckoutInput {

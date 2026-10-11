@@ -36,6 +36,7 @@ export interface BookingRow {
   cancelledBy: CancelledByValue | null;
   total: number;
   credit: number;
+  teamName?: string | null;
 }
 
 function isUpcoming(row: BookingRow, now: Date): boolean {
@@ -81,5 +82,6 @@ export function toBookingItem(
     credit: row.credit > 0 ? formatAmount(row.credit, lng) : null,
     compensation: row.compensation,
     cancelledBy: row.cancelledBy,
+    teamName: row.teamName ?? null,
   };
 }

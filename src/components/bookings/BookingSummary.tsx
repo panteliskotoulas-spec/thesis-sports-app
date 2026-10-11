@@ -22,10 +22,13 @@ import {
   fromCents,
   toCents,
 } from '@/lib/bookings/payment-split';
+import type { TeamBookingOption } from '@/lib/teams/team-booking';
 import { CreditToggle, type CreditToggleLabels } from './CreditToggle';
+import { TeamBookingSelect, type TeamBookingLabels } from './TeamBookingSelect';
 
 export interface BookingSummaryLabels {
   credit: CreditToggleLabels;
+  team: TeamBookingLabels;
   priceRow: string;
   creditRow: string;
   cardRow: string;
@@ -57,6 +60,7 @@ export interface BookingSummaryProps {
   location: string | null;
   price: number;
   balance: number;
+  teams: TeamBookingOption[];
   backHref: string;
   labels: BookingSummaryLabels;
 }
@@ -84,6 +88,7 @@ export function BookingSummary({
   location,
   price,
   balance,
+  teams,
   backHref,
   labels,
 }: BookingSummaryProps) {
@@ -92,6 +97,7 @@ export function BookingSummary({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [taken, setTaken] = useState(false);
+  const [teamId, setTeamId] = useState<string | null>(null);
 
   const split = computePaymentSplit(
     toCents(price),
@@ -167,6 +173,16 @@ export function BookingSummary({
           ) : null}
         </ul>
       </section>
+
+      {teams.length > 0 ? (
+        <TeamBookingSelect
+          teams={teams}
+          value={teamId}
+          labels={labels.team}
+          disabled={busy}
+          onChange={setTeamId}
+        />
+      ) : null}
 
       <CreditToggle
         balanceText={formatAmount(balance, lng)}

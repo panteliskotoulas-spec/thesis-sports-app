@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Calendar, CalendarX, Clock } from 'lucide-react';
+import { Calendar, CalendarX, Clock, Users } from 'lucide-react';
 import {
   fillTemplate,
   type BookingItem,
@@ -157,6 +157,12 @@ export function BookingCard({
 
       <ul className="mt-2.5 flex flex-col gap-1.5 text-sm text-muted-foreground">
         <li>{item.sport}</li>
+        {item.teamName ? (
+          <li className="flex items-center gap-2">
+            <Users className="size-4 shrink-0" aria-hidden="true" />
+            {item.teamName}
+          </li>
+        ) : null}
         <li className="flex items-center gap-2">
           <Calendar className="size-4 shrink-0" aria-hidden="true" />
           {item.date}

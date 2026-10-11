@@ -1,7 +1,9 @@
 import type { getT } from '@/i18n.server';
+import type { TeamBookingLabels } from '@/components/bookings/TeamBookingSelect';
 import type { TeamFormLabels } from '@/components/teams/NewTeamForm';
 import type { TeamJoinLabels } from '@/components/teams/TeamJoinButton';
 import type { TeamManageLabels } from '@/components/teams/TeamManage';
+import type { TeamReservationsLabels } from '@/components/teams/TeamReservations';
 import { MAX_IMAGE_MB } from '@/lib/fields/new-field';
 
 type Translate = Awaited<ReturnType<typeof getT>>['t'];
@@ -103,5 +105,26 @@ export function buildTeamManageLabels(t: Translate): TeamManageLabels {
     justNow: t('manage.justNow'),
     errorConflict: t('manage.errorConflict'),
     errorGeneric: t('manage.errorGeneric'),
+  };
+}
+
+export function buildTeamBookingLabels(t: Translate): TeamBookingLabels {
+  return {
+    title: t('booking.title'),
+    me: t('booking.me'),
+    members: t('booking.members'),
+    note: t('booking.note'),
+    hint: t('booking.hint'),
+  };
+}
+
+export function buildTeamReservationsLabels(
+  t: Translate,
+): TeamReservationsLabels {
+  return {
+    title: t('reservations.title'),
+    empty: t('reservations.empty'),
+    confirmed: t('reservations.confirmed'),
+    bookedBy: t('reservations.bookedBy'),
   };
 }

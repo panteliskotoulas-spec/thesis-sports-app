@@ -11,9 +11,14 @@ import { Header } from '@/components/layout/Header';
 import { TeamAvatar } from '@/components/teams/TeamAvatar';
 import { TeamJoinButton } from '@/components/teams/TeamJoinButton';
 import { TeamMembersList } from '@/components/teams/TeamMembersList';
+import { TeamReservations } from '@/components/teams/TeamReservations';
 import { getCurrentUser } from '@/lib/session';
 import { formatTeamSince, toTeamDetailItem } from '@/lib/teams/team';
-import { buildTeamJoinLabels } from '@/lib/teams/team-labels';
+import { getMockTeamReservations } from '@/lib/teams/team-booking-mock';
+import {
+  buildTeamJoinLabels,
+  buildTeamReservationsLabels,
+} from '@/lib/teams/team-labels';
 import { getServerCaller } from '@/trpc/server/caller';
 
 interface TeamPageProps {
@@ -128,6 +133,15 @@ export default async function TeamPage({ params }: TeamPageProps) {
             </div>
           ) : null}
         </section>
+
+        {viewer.kind === 'leader' || viewer.kind === 'member' ? (
+          <div className="mt-4">
+            <TeamReservations
+              items={getMockTeamReservations(lng)}
+              labels={buildTeamReservationsLabels(t)}
+            />
+          </div>
+        ) : null}
 
         <div className="mt-4">
           <TeamMembersList

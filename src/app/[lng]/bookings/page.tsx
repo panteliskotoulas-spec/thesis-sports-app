@@ -11,6 +11,7 @@ import {
 } from '@/components/bookings/BookingsList';
 import { splitBookingRows, toBookingItem } from '@/lib/bookings/booking-rows';
 import { getCurrentUser } from '@/lib/session';
+import { withMockTeamName } from '@/lib/teams/team-booking-mock';
 import { getServerCaller } from '@/trpc/server/caller';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -31,7 +32,7 @@ export default async function BookingsPage({
   if (!user) redirect(`/${lng}/login`);
 
   const caller = await getServerCaller();
-  const rows = await caller.reservations.listMine();
+  const rows = withMockTeamName(await caller.reservations.listMine());
 
   const now = new Date();
   const { upcoming, past } = splitBookingRows(rows, now);

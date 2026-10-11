@@ -149,5 +149,18 @@
     "justNow": "Just now",
     "errorConflict": "Something changed in the team. Refresh the page and try again.",
     "errorGeneric": "Something went wrong. Try again."
+  },
+  "booking": {
+    "title": "Book as",
+    "me": "Me",
+    "members": "{current} of {max} members",
+    "note": "Team members will be notified and will see the booking on the team page.",
+    "hint": "You only see teams you lead in the same sport."
+  },
+  "reservations": {
+    "title": "Upcoming bookings",
+    "empty": "There are no upcoming bookings.",
+    "confirmed": "Confirmed",
+    "bookedBy": "Booked by {name} (leader)"
   }
 }
