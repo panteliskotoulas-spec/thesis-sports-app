@@ -1,12 +1,15 @@
 {
   "meta": {
-    "apply": "Coach application"
+    "apply": "Coach application",
+    "list": "Coaches",
+    "slots": "My availability"
   },
   "apply": {
     "back": "Back to coaches",
     "title": "Become a coach",
     "subtitle": "Fill in your profile. An admin will review it, and once it's approved you'll be able to set your available times.",
-    "reviewNote": "If you change your sport, description or rate later, your profile will be reviewed again."
+    "reviewNote": "If you change your sport, description or rate later, your profile will be reviewed again.",
+    "manageSlots": "My availability"
   },
   "status": {
     "reason": "Reason",
@@ -92,5 +95,96 @@
       "title": "Something went wrong",
       "description": "We couldn't load the applications. Try again in a moment."
     }
+  },
+  "page": {
+    "title": "Coaches",
+    "subtitle": "Find a coach for your sport and your area.",
+    "count_one": "{{count}} coach",
+    "count_other": "{{count}} coaches",
+    "apply": "Become a coach"
+  },
+  "filters": {
+    "search": "Area, e.g. Glyfada",
+    "searchLabel": "Search coaches by area",
+    "sportLabel": "Sport",
+    "sportAll": "All"
+  },
+  "card": {
+    "next": "Next: {{when}}",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "from": "from",
+    "approx": "about",
+    "perHour": "/ hour",
+    "unavailable": "No available times",
+    "profile": "Profile"
+  },
+  "empty": {
+    "title": "No coaches found",
+    "description": "Try changing the area or the sport to see more results.",
+    "clear": "Clear filters"
+  },
+  "detail": {
+    "back": "Back to coaches",
+    "about": "About the coach",
+    "certifications": "Certifications",
+    "availability": {
+      "title": "Available times",
+      "days": "Days",
+      "dayUnavailable": "no available times",
+      "pickDate": "Pick another date",
+      "slots": "Times for the day",
+      "none": "There are no available times right now.",
+      "emptyDay": "There are no available times on this day.",
+      "nextDay": "Next available day: {{day}}",
+      "request": "Request",
+      "requestSoon": "Sending a request will be available soon."
+    }
+  },
+  "slots": {
+    "meta": "My availability",
+    "title": "My availability",
+    "subtitle": "Set when you are available and at what price.",
+    "back": "Back to my profile",
+    "notApproved": {
+      "title": "Your profile is not approved",
+      "description": "You can set your available times once your profile is approved.",
+      "cta": "Go to my profile"
+    },
+    "dateBar": {
+      "date": "Date",
+      "today": "Today",
+      "tomorrow": "Tomorrow"
+    },
+    "list": {
+      "heading": "Times for the day",
+      "empty": "There are no times on this day. Add one below.",
+      "statusOpen": "Open",
+      "statusPending": "Request pending",
+      "statusBooked": "Booked",
+      "delete": "Delete time",
+      "working": "Deleting…"
+    },
+    "form": {
+      "title": "New time",
+      "date": "Date",
+      "start": "Start",
+      "end": "End",
+      "price": "Price (€)",
+      "pricePlaceholder": "25",
+      "submit": "Add time",
+      "submitting": "Saving…",
+      "errorDate": "Pick a date from today onwards.",
+      "errorStart": "Enter a start time.",
+      "errorEnd": "Enter an end time.",
+      "errorOrder": "The end must be after the start.",
+      "errorPast": "The start time has already passed.",
+      "errorPrice": "Enter a valid price, e.g. 25 or 37.50.",
+      "errorOverlap": "This time overlaps with an existing one. Pick another time.",
+      "errorInvalid": "This time cannot be added. Check the details and try again.",
+      "errorGeneric": "Something went wrong. Try again."
+    },
+    "deleteConflict": "This time cannot be deleted because its status has changed.",
+    "deleteError": "The time was not deleted. Try again."
   }
 }

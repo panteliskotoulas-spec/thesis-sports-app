@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CalendarClock } from 'lucide-react';
 import { getT } from '@/i18n.server';
 import { CoachApplyForm } from '@/components/coaches/CoachApplyForm';
 import { CoachStatusBanner } from '@/components/coaches/CoachStatusBanner';
@@ -84,6 +84,16 @@ export default async function CoachApplyPage() {
             {t('apply.reviewNote')}
           </p>
         )}
+
+        {status === 'APPROVED' ? (
+          <Link
+            href={`/${lng}/coaches/slots`}
+            className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full border-[0.5px] border-border bg-card px-5 text-sm font-medium text-foreground hover:bg-secondary"
+          >
+            <CalendarClock className="size-4" aria-hidden="true" />
+            {t('apply.manageSlots')}
+          </Link>
+        ) : null}
 
         <div className="mt-6">
           <CoachApplyForm

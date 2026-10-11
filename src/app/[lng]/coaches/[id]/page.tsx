@@ -1,0 +1,112 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { lng as routeLanguage } from 'next/root-params';
+import { ArrowLeft, Award, MapPin } from 'lucide-react';
+import { getT } from '@/i18n.server';
+import { BottomNav } from '@/components/layout/BottomNav';
+import { Header } from '@/components/layout/Header';
+import { CoachAvailability } from '@/components/coaches/CoachAvailability';
+import { mockGetCoach } from '@/lib/coaches/coach-mock';
+import { toCoachDetail } from '@/lib/coaches/coach-public';
+import { parseDetailDate } from '@/lib/fields/detail';
+import type { SearchParams } from '@/lib/fields/filters';
+import { getCurrentUser } from '@/lib/session';
+
+interface CoachPageProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<SearchParams>;
+}
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: CoachPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const row = mockGetCoach(id, parseDetailDate(await searchParams));
+  return row ? { title: row.name } : {};
+}
+
+export default async function CoachPage({
+  params,
+  searchParams,
+}: CoachPageProps) {
+  const { id } = await params;
+  const { t } = await getT('coaches');
+  const { t: tf } = await getT('fields');
+  const lng = await routeLanguage();
+  const user = await getCurrentUser();
+
+  const row = mockGetCoach(id, parseDetailDate(await searchParams));
+  if (!row) notFound();
+  const coach = toCoachDetail(row, lng);
+
+  return (
+    <>
+      <Header user={user} />
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6 md:py-10 lg:px-8">
+        <Link
+          href={`/${lng}/coaches`}
+          className="mb-2 inline-flex h-10 items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          {t('detail.back')}
+        </Link>
+
+        <div className="mt-2 grid grid-cols-1 gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start">
+          <div className="min-w-0">
+            <div className="flex items-center gap-4">
+              <span
+                aria-hidden="true"
+                className="flex size-18 shrink-0 items-center justify-center rounded-full bg-accent text-2xl font-medium text-accent-foreground"
+              >
+                {coach.initials}
+              </span>
+              <div className="min-w-0">
+                <h1>{coach.name}</h1>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">
+                    {tf(`sports.${coach.sportType}`)}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
+                    {coach.area}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <section className="mt-6" aria-labelledby="coach-about-title">
+              <h2 id="coach-about-title" className="text-lg">
+                {t('detail.about')}
+              </h2>
+              <p className="mt-2 whitespace-pre-line text-muted-foreground">
+                {coach.bio}
+              </p>
+            </section>
+
+            {coach.certifications ? (
+              <section className="mt-6" aria-labelledby="coach-certs-title">
+                <h2 id="coach-certs-title" className="text-lg">
+                  {t('detail.certifications')}
+                </h2>
+                <p className="mt-2 flex items-start gap-1.5 text-muted-foreground">
+                  <Award
+                    className="mt-0.5 size-4 shrink-0"
+                    aria-hidden="true"
+                  />
+                  {coach.certifications}
+                </p>
+              </section>
+            ) : null}
+          </div>
+
+          <aside className="min-w-0 lg:sticky lg:top-24">
+            <CoachAvailability coach={coach} />
+          </aside>
+        </div>
+      </main>
+      <BottomNav user={user} />
+    </>
+  );
+}
