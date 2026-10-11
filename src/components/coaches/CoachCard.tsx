@@ -8,7 +8,6 @@ import {
   formatRating,
 } from '@/lib/fields/format';
 import type { CoachListItem } from '@/lib/coaches/coach-public';
-import { getMockCoachRating } from '@/lib/reviews/mock-reviews';
 
 export async function CoachCard({ coach }: { coach: CoachListItem }) {
   const { t } = await getT('coaches');
@@ -16,7 +15,7 @@ export async function CoachCard({ coach }: { coach: CoachListItem }) {
   const { t: tr } = await getT('reviews');
   const lng = await routeLanguage();
 
-  const rating = getMockCoachRating(coach.id);
+  const rating = coach.rating;
 
   const available =
     coach.nextSlotAt !== null && coach.pricePerHourFrom !== null;

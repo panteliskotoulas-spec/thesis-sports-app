@@ -15,6 +15,7 @@ import { dayWindow } from '@/lib/fields/detail';
 import { todayInAthens } from '@/lib/fields/filters';
 import { SPORT_TYPES } from '@/lib/fields/types';
 import type { LocalizedText } from '@/lib/i18n-content';
+import { getCoachRatings } from '@/lib/server/coach-review';
 import { expireStaleCoachSessions } from '@/lib/server/coach-session';
 import { toLocalized } from '@/lib/server/translate';
 
@@ -110,6 +111,11 @@ export const coachesRouter = router({
         },
       });
 
+      const ratings = await getCoachRatings(
+        ctx.prisma,
+        coaches.map((coach) => coach.id),
+      );
+
       const rows: CoachListRow[] = coaches.map((coach) => ({
         id: coach.id,
         name: coach.user.name,
@@ -119,6 +125,7 @@ export const coachesRouter = router({
         hourlyRate: Number(coach.hourlyRate),
         nextSlotAt: coach.slots[0]?.startTime ?? null,
         pricePerHourFrom: cheapestPerHour(coach.slots),
+        rating: ratings.get(coach.id) ?? null,
       }));
 
       return rows
@@ -191,6 +198,9 @@ export const coachesRouter = router({
               .find((day) => day > selectedDay) ?? null)
           : null;
 
+      const rating =
+        (await getCoachRatings(ctx.prisma, [coach.id])).get(coach.id) ?? null;
+
       return {
         id: coach.id,
         name: coach.user.name,
@@ -201,6 +211,7 @@ export const coachesRouter = router({
         hourlyRate: Number(coach.hourlyRate),
         isSelf: isOwner,
         pricePerHourFrom: cheapestPerHour(slots),
+        rating,
         days,
         selectedDay,
         slots: selectedSlots.map((slot) => ({

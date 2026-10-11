@@ -509,6 +509,7 @@ export async function listUserSessions(
         paidAt: true,
         compensationType: true,
         team: { select: { name: true } },
+        review: { select: { rating: true, comment: true } },
         slot: {
           select: {
             startTime: true,
@@ -562,6 +563,7 @@ export async function listUserSessions(
     wasPaid: entry.paidAt !== null,
     compensation: entry.compensationType,
     teamName: entry.team?.name ?? null,
+    review: entry.review ?? null,
   }));
 
   return { rows, balance: user ? user.creditBalance.toNumber() : 0 };

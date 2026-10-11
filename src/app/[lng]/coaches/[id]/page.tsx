@@ -14,8 +14,7 @@ import { toCoachDetail } from '@/lib/coaches/coach-public';
 import { parseDetailDate } from '@/lib/fields/detail';
 import { formatRating } from '@/lib/fields/format';
 import type { SearchParams } from '@/lib/fields/filters';
-import { getMockCoachReviews } from '@/lib/reviews/mock-reviews';
-import { REVIEW_PAGE_SIZE, summarizeRatings } from '@/lib/reviews/review';
+import { REVIEW_PAGE_SIZE, type ReviewPage } from '@/lib/reviews/review';
 import { buildReviewsSectionLabels } from '@/lib/reviews/review-labels';
 import { getCurrentUser } from '@/lib/session';
 import type { TeamBookingOption } from '@/lib/teams/team-booking';
@@ -60,8 +59,19 @@ export default async function CoachPage({
   if (!row) notFound();
   const coach = toCoachDetail(row, lng);
 
-  const allReviews = getMockCoachReviews(coach.id);
-  const rating = summarizeRatings(allReviews.map((review) => review.rating));
+  const rating = coach.rating;
+
+  let reviews: ReviewPage = { items: [], total: 0, rating };
+  try {
+    const caller = await getServerCaller();
+    reviews = await caller.coachReviews.list({
+      coachId: coach.id,
+      offset: 0,
+      limit: REVIEW_PAGE_SIZE,
+    });
+  } catch (error) {
+    console.error('[CoachPage] reviews', error);
+  }
 
   let teams: TeamBookingOption[] = [];
   if (user && !coach.isSelf) {
@@ -157,9 +167,9 @@ export default async function CoachPage({
               <CoachReviewsSection
                 coachId={coach.id}
                 lng={lng}
-                rating={rating}
-                items={allReviews.slice(0, REVIEW_PAGE_SIZE)}
-                total={allReviews.length}
+                rating={reviews.rating}
+                items={reviews.items}
+                total={reviews.total}
                 pageSize={REVIEW_PAGE_SIZE}
                 labels={buildReviewsSectionLabels(tr)}
               />

@@ -4,6 +4,7 @@ import type { SearchParams } from '@/lib/fields/filters';
 import { formatPricePerHour } from '@/lib/fields/format';
 import { SPORT_TYPES, type SportType } from '@/lib/fields/types';
 import { localized, type LocalizedText } from '@/lib/i18n-content';
+import type { ReviewRating } from '@/lib/reviews/review';
 import { getInitials } from './coach';
 
 export interface CoachFilters {
@@ -43,6 +44,7 @@ export interface CoachListRow {
   hourlyRate: number;
   nextSlotAt: Date | null;
   pricePerHourFrom: number | null;
+  rating: ReviewRating | null;
 }
 
 export interface CoachListItem extends Omit<CoachListRow, 'area' | 'bio'> {
@@ -77,6 +79,7 @@ export interface CoachDetailRow {
   hourlyRate: number;
   isSelf: boolean;
   pricePerHourFrom: number | null;
+  rating: ReviewRating | null;
   days: FieldAvailabilityDay[];
   selectedDay: string | null;
   slots: CoachDetailSlot[];

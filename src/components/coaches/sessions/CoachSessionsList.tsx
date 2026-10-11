@@ -169,9 +169,7 @@ export function CoachSessionsList({
     id: string,
     input: ReviewInput,
   ): Promise<SubmitReviewResult> {
-    const target = items.find((item) => item.id === id);
-    if (!target) return 'error';
-    return submitCoachReview(id, target.coachId, input);
+    return submitCoachReview(id, input);
   }
 
   function handleReviewed(id: string, input: ReviewInput) {
