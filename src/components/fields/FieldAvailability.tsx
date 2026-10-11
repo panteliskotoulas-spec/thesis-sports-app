@@ -60,7 +60,8 @@ export async function FieldAvailability({ field }: { field: FieldDetail }) {
             slots={slotItems}
             heading={t('detail.availability.slots')}
             bookLabel={t('detail.availability.book')}
-            bookNote={t('detail.availability.bookSoon')}
+            pickHint={t('detail.availability.pickSlot')}
+            bookHref={`${hrefBase}/book`}
           />
         ) : (
           <div className="rounded-xl bg-secondary p-4 text-sm">

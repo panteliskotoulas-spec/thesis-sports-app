@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export interface SlotItem {
   id: string;
@@ -13,16 +14,25 @@ export interface FieldSlotsProps {
   slots: SlotItem[];
   heading: string;
   bookLabel: string;
-  bookNote: string;
+  pickHint: string;
+  bookHref: string;
 }
+
+const bookClass =
+  'flex h-11 items-center justify-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground';
 
 export function FieldSlots({
   slots,
   heading,
   bookLabel,
-  bookNote,
+  pickHint,
+  bookHref,
 }: FieldSlotsProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = slots.find((slot) => slot.id === selectedId) ?? null;
+  const target = selected
+    ? `${bookHref}?slot=${encodeURIComponent(selected.id)}`
+    : null;
 
   return (
     <div>
@@ -55,16 +65,26 @@ export function FieldSlots({
         })}
       </ul>
 
-      <button
-        type="button"
-        disabled
-        className="mt-4 h-11 w-full rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {bookLabel}
-      </button>
-      <p className="mt-2 text-center text-xs text-muted-foreground">
-        {bookNote}
-      </p>
+      <div className="mt-4">
+        {target ? (
+          <Link href={target} className={`${bookClass} w-full`}>
+            {bookLabel}
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className={`${bookClass} w-full cursor-not-allowed opacity-50`}
+          >
+            {bookLabel}
+          </button>
+        )}
+        {!selected ? (
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            {pickHint}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

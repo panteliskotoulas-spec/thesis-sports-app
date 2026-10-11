@@ -80,7 +80,7 @@
       "emptyDay": "There are no available times on this day.",
       "nextDay": "Next available day: {{day}}",
       "book": "Continue to booking",
-      "bookSoon": "Booking will be available soon."
+      "pickSlot": "Pick a time to continue."
     },
     "location": {
       "title": "Location",
@@ -301,6 +301,87 @@
       },
       "deleteConflict": "This time slot can't be deleted because its status has changed.",
       "deleteError": "The time slot wasn't deleted. Try again."
+    }
+  },
+  "booking": {
+    "meta": "Booking",
+    "title": "Complete your booking",
+    "back": "Back to the field",
+    "unavailable": {
+      "title": "This time is no longer available",
+      "description": "Someone else got this time or it has passed. Pick another one.",
+      "action": "Back to the field"
+    },
+    "summary": {
+      "credit": {
+        "title": "Account credit",
+        "available": "Available balance: {amount}",
+        "none": "You have no credit available.",
+        "toggle": "Use credit for this booking",
+        "limited": "We use a bit less credit so that the amount you pay by card is at least €0.50."
+      },
+      "priceRow": "Price",
+      "creditRow": "Credit",
+      "cardRow": "Pay by card",
+      "totalRow": "Total",
+      "methodRow": "Payment method:",
+      "methodCard": "Card",
+      "methodCredit": "Credit",
+      "methodMixed": "Credit + card",
+      "holdNote": "We hold this time for 30 minutes while you complete the payment.",
+      "cancelNote": "Free cancellation up to 24 hours before the start.",
+      "payCard": "Pay {amount}",
+      "confirm": "Confirm booking",
+      "working": "One moment…",
+      "stripeNote": "Secure payment via Stripe",
+      "backToField": "Choose another time",
+      "errorTaken": "This time is no longer available.",
+      "errorMinimum": "The card amount must be at least €0.50.",
+      "errorInvalid": "The booking could not be made with these details.",
+      "errorGeneric": "Something went wrong. Please try again."
+    },
+    "list": {
+      "meta": "My bookings",
+      "title": "My bookings",
+      "subtitle": "See your upcoming bookings and their history.",
+      "tabUpcoming": "Upcoming",
+      "tabPast": "History",
+      "emptyUpcomingTitle": "You have no upcoming bookings",
+      "emptyUpcomingDescription": "Find a field and book your time.",
+      "emptyUpcomingAction": "Browse fields",
+      "emptyPastTitle": "No history yet",
+      "emptyPastDescription": "Completed and cancelled bookings will appear here.",
+      "bookedNotice": "Your booking is confirmed.",
+      "cancelledNotice": "Your booking was cancelled.",
+      "paymentFailed": "Your payment could not be turned into a booking because the time or the credit was no longer available. The amount you paid was refunded."
+    },
+    "card": {
+      "statusConfirmed": "Confirmed",
+      "statusCompleted": "Completed",
+      "statusCancelled": "Cancelled",
+      "paid": "Total {amount}",
+      "paidCard": "Card {amount}",
+      "paidCredit": "Credit {amount}",
+      "cancel": "Cancel booking",
+      "cancelLocked": "Cancellation is no longer possible, because less than 24 hours remain.",
+      "refundedCard": "{amount} was refunded to your card.",
+      "refundedMixed": "{card} was refunded to your card and {credit} to your credit.",
+      "refundedCredit": "{amount} was added to your credit.",
+      "errorTooLate": "Cancellation is no longer possible, because less than 24 hours remain.",
+      "errorConflict": "This booking has already changed. Refresh the page.",
+      "errorGeneric": "The booking could not be cancelled. Please try again."
+    },
+    "cancel": {
+      "title": "What should happen to your money?",
+      "optionRefundTitle": "Refund to card",
+      "optionRefundCard": "{amount} is refunded to your card.",
+      "optionRefundMixed": "{card} is refunded to your card and {credit} to your credit.",
+      "optionCreditTitle": "Credit on your account",
+      "optionCredit": "{amount} is added to your credit for future bookings.",
+      "warning": "Cancelling cannot be undone.",
+      "back": "Back",
+      "confirm": "Cancel booking",
+      "working": "One moment…"
     }
   }
 }
