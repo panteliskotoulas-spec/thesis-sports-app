@@ -4,10 +4,13 @@ model FieldReview {
   field         Field    @relation(fields: [fieldId], references: [id])
   reviewerId    String
   reviewer      User     @relation(fields: [reviewerId], references: [id])
-  reservationId String   @unique
+  reservationId String      @unique
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
   rating        Int
   comment       String?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime    @default(now())
+
+  @@index([fieldId, createdAt])
 }
 
 model CoachReview {

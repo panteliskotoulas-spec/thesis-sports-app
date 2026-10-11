@@ -114,6 +114,7 @@ export const reservationsRouter = router({
         compensationType: true,
         cancelledBy: true,
         team: { select: { name: true } },
+        review: { select: { rating: true, comment: true } },
         slot: {
           select: {
             startTime: true,
@@ -152,6 +153,7 @@ export const reservationsRouter = router({
           compensation: reservation.compensationType,
           cancelledBy: reservation.cancelledBy,
           teamName: reservation.team?.name ?? null,
+          review: reservation.review ?? null,
           total: decimalToCents(payment.amount) / 100,
           credit: decimalToCents(payment.creditApplied) / 100,
         },

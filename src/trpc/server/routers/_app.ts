@@ -6,6 +6,7 @@ import { coachSlotsRouter } from './coach-slots';
 import { coachesRouter } from './coaches';
 import { fieldApprovalRouter } from './field-approval';
 import { fieldOwnerRouter } from './field-owner';
+import { fieldReviewsRouter } from './field-reviews';
 import { fieldSubmissionRouter } from './field-submission';
 import { fieldsRouter } from './fields';
 import { notificationsRouter } from './notifications';
@@ -19,6 +20,7 @@ export const appRouter = router({
   fieldSubmission: fieldSubmissionRouter,
   fieldApproval: fieldApprovalRouter,
   fieldOwner: fieldOwnerRouter,
+  fieldReviews: fieldReviewsRouter,
   reservations: reservationsRouter,
   notifications: notificationsRouter,
   ownerBookings: ownerBookingsRouter,

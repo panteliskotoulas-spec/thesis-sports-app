@@ -11,6 +11,7 @@ model Reservation {
   cancelledBy      CancelledBy?
   createdAt        DateTime          @default(now())
   cancelledAt      DateTime?
+  review           FieldReview?
 
   @@index([slotId])
   @@index([userId])

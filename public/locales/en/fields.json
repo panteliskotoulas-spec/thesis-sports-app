@@ -88,13 +88,6 @@
     "location": {
       "title": "Location",
       "open": "Open in Maps"
-    },
-    "reviews": {
-      "title": "Reviews",
-      "count_one": "{{count}} review",
-      "count_other": "{{count}} reviews",
-      "empty": "No reviews yet.",
-      "stars": "Rated {{rating}} out of 5"
     }
   },
   "new": {
