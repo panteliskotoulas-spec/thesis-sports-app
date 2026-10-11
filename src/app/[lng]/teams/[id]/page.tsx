@@ -15,7 +15,6 @@ import { TeamReservations } from '@/components/teams/TeamReservations';
 import { getCurrentUser } from '@/lib/session';
 import { formatTeamSince, toTeamDetailItem } from '@/lib/teams/team';
 import { toTeamReservationItem } from '@/lib/teams/team-booking';
-import { getMockTeamSplit } from '@/lib/teams/team-split-mock';
 import {
   buildTeamJoinLabels,
   buildTeamReservationsLabels,
@@ -24,6 +23,7 @@ import { getServerCaller } from '@/trpc/server/caller';
 
 interface TeamPageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ split?: string }>;
 }
 
 const loadTeam = cache(async (id: string) => {
@@ -44,8 +44,12 @@ export async function generateMetadata({
   return data ? { title: data.team.name } : {};
 }
 
-export default async function TeamPage({ params }: TeamPageProps) {
+export default async function TeamPage({
+  params,
+  searchParams,
+}: TeamPageProps) {
   const { id } = await params;
+  const query = await searchParams;
   const { t } = await getT('teams');
   const { t: tf } = await getT('fields');
   const lng = await routeLanguage();
@@ -64,12 +68,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
           ).teams.upcomingReservations({
             teamId: id,
           })
-        ).map((row) => ({
-          ...toTeamReservationItem(row, lng),
-          split: getMockTeamSplit(
-            viewer.kind === 'leader' ? 'leader' : 'member',
-          ),
-        }))
+        ).map((row) => toTeamReservationItem(row, lng))
       : [];
 
   return (
@@ -83,6 +82,21 @@ export default async function TeamPage({ params }: TeamPageProps) {
           <ArrowLeft className="size-4" aria-hidden="true" />
           {t('detail.back')}
         </Link>
+
+        {query.split === 'paid' || query.split === 'failed' ? (
+          <p
+            role="status"
+            className={`mt-2 rounded-xl px-4 py-3 text-sm ${
+              query.split === 'paid'
+                ? 'bg-accent text-accent-foreground'
+                : 'bg-destructive/10 text-destructive'
+            }`}
+          >
+            {query.split === 'paid'
+              ? t('split.noticePaid')
+              : t('split.noticeFailed')}
+          </p>
+        ) : null}
 
         <section className="mt-2 rounded-xl border-[0.5px] border-border bg-card p-4 sm:p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">

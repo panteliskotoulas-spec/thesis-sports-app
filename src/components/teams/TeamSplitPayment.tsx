@@ -13,7 +13,7 @@ import {
   fromCents,
   toCents,
 } from '@/lib/bookings/payment-split';
-import { mockPayTeamSplit } from '@/lib/teams/team-split-mock';
+import { startSplitCheckout } from '@/lib/teams/team-split-api';
 
 export interface TeamSplitPaymentLabels {
   credit: CreditToggleLabels;
@@ -27,11 +27,13 @@ export interface TeamSplitPaymentLabels {
   stripeNote: string;
   refundNote: string;
   errorMinimum: string;
+  errorUnavailable: string;
   errorGeneric: string;
 }
 
 export interface TeamSplitPaymentProps {
   lng: string;
+  reservationId: string;
   fieldName: string;
   date: string;
   time: string;
@@ -44,6 +46,7 @@ export interface TeamSplitPaymentProps {
 
 export function TeamSplitPayment({
   lng,
+  reservationId,
   fieldName,
   date,
   time,
@@ -56,7 +59,7 @@ export function TeamSplitPayment({
   const router = useRouter();
   const [useCredit, setUseCredit] = useState(balance > 0);
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const split = computePaymentSplit(
     toCents(share),
@@ -76,17 +79,31 @@ export function TeamSplitPayment({
     if (busy || !split.valid) return;
 
     setBusy(true);
-    setFailed(false);
+    setError(null);
 
-    const ok = await mockPayTeamSplit();
+    const result = await startSplitCheckout({ reservationId, useCredit, lng });
 
-    if (ok) {
-      router.push(backHref);
+    if (result.status === 'redirect') {
+      window.location.assign(result.url);
+      return;
+    }
+
+    if (result.status === 'paid') {
+      router.push(`${backHref}?split=paid`);
+      return;
+    }
+
+    if (result.status === 'unauthorized') {
+      router.push(`/${lng}/login`);
       return;
     }
 
     setBusy(false);
-    setFailed(true);
+    setError(
+      result.status === 'unavailable'
+        ? labels.errorUnavailable
+        : labels.errorGeneric,
+    );
   }
 
   return (
@@ -154,9 +171,9 @@ export function TeamSplitPayment({
         </p>
       ) : null}
 
-      {failed ? (
+      {error ? (
         <p role="alert" className="text-sm text-destructive">
-          {labels.errorGeneric}
+          {error}
         </p>
       ) : null}
 

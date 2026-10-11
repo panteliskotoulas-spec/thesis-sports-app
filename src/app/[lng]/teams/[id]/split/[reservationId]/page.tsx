@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
 import { ArrowLeft } from 'lucide-react';
 import { TRPCError } from '@trpc/server';
@@ -8,9 +8,12 @@ import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
 import { TeamSplitPayment } from '@/components/teams/TeamSplitPayment';
+import { formatDayChip, formatTimeRange } from '@/lib/fields/detail-format';
+import { todayInAthens } from '@/lib/fields/filters';
+import { localized } from '@/lib/i18n-content';
 import { getCurrentUser } from '@/lib/session';
 import { buildTeamSplitPaymentLabels } from '@/lib/teams/team-labels';
-import { getMockTeamSplitPayment } from '@/lib/teams/team-split-mock';
+import type { TeamSplitPayRow } from '@/lib/teams/team-split';
 import { getServerCaller } from '@/trpc/server/caller';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,7 +26,7 @@ export default async function TeamSplitPayPage({
 }: {
   params: Promise<{ id: string; reservationId: string }>;
 }) {
-  const { id } = await params;
+  const { id, reservationId } = await params;
   const { t } = await getT('teams');
   const { t: tf } = await getT('fields');
   const lng = await routeLanguage();
@@ -32,17 +35,17 @@ export default async function TeamSplitPayPage({
   if (!user) redirect(`/${lng}/login`);
 
   const caller = await getServerCaller();
-  let data;
+  const backHref = `/${lng}/teams/${id}`;
+
+  let row: TeamSplitPayRow;
   try {
-    data = await caller.teams.getById({ id });
+    row = await caller.splits.getForPay({ teamId: id, reservationId });
   } catch (error) {
-    if (error instanceof TRPCError && error.code === 'NOT_FOUND') notFound();
+    if (error instanceof TRPCError && error.code === 'NOT_FOUND') {
+      redirect(backHref);
+    }
     throw error;
   }
-  if (data.viewer.kind !== 'member') redirect(`/${lng}/teams/${id}`);
-
-  const payment = getMockTeamSplitPayment(lng);
-  const backHref = `/${lng}/teams/${id}`;
 
   return (
     <>
@@ -61,12 +64,13 @@ export default async function TeamSplitPayPage({
         <div className="mt-6">
           <TeamSplitPayment
             lng={lng}
-            fieldName={payment.fieldName}
-            date={payment.date}
-            time={payment.time}
-            leaderName={payment.leaderName}
-            share={payment.share}
-            balance={payment.balance}
+            reservationId={reservationId}
+            fieldName={localized(row.fieldName, lng)}
+            date={formatDayChip(todayInAthens(row.startTime), lng).full}
+            time={formatTimeRange(row.startTime, row.endTime, lng)}
+            leaderName={row.leaderName}
+            share={row.share}
+            balance={row.balance}
             backHref={backHref}
             labels={buildTeamSplitPaymentLabels(t, tf)}
           />

@@ -169,6 +169,7 @@ export function buildTeamSplitPaymentLabels(
     stripeNote: tf('booking.summary.stripeNote'),
     refundNote: t('splitPay.refundNote'),
     errorMinimum: tf('booking.summary.errorMinimum'),
+    errorUnavailable: t('splitPay.errorUnavailable'),
     errorGeneric: tf('booking.summary.errorGeneric'),
   };
 }

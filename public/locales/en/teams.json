@@ -174,13 +174,16 @@
     "yourShare": "You owe {amount}",
     "toLeader": "Share for {name} (leader)",
     "pay": "Pay your share",
-    "youPaid": "You paid your share"
+    "youPaid": "You paid your share",
+    "noticePaid": "Your share was paid.",
+    "noticeFailed": "The payment for your share didn't go through."
   },
   "splitPay": {
     "back": "Back to team",
     "title": "Pay your share",
     "shareLabel": "Share for {name} (leader)",
     "confirm": "Pay with credit",
-    "refundNote": "If the booking is cancelled, your share is returned to you."
+    "refundNote": "If the booking is cancelled, your share is returned to you.",
+    "errorUnavailable": "This share is no longer available. The booking may have been cancelled, or you've already paid."
   }
 }
