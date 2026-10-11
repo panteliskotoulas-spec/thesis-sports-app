@@ -3,15 +3,20 @@ import Link from 'next/link';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
-import { ArrowLeft, Award, MapPin } from 'lucide-react';
+import { ArrowLeft, Award, MapPin, Star } from 'lucide-react';
 import { TRPCError } from '@trpc/server';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
 import { CoachAvailability } from '@/components/coaches/CoachAvailability';
+import { CoachReviewsSection } from '@/components/coaches/CoachReviewsSection';
 import { toCoachDetail } from '@/lib/coaches/coach-public';
 import { parseDetailDate } from '@/lib/fields/detail';
+import { formatRating } from '@/lib/fields/format';
 import type { SearchParams } from '@/lib/fields/filters';
+import { getMockCoachReviews } from '@/lib/reviews/mock-reviews';
+import { REVIEW_PAGE_SIZE, summarizeRatings } from '@/lib/reviews/review';
+import { buildReviewsSectionLabels } from '@/lib/reviews/review-labels';
 import { getCurrentUser } from '@/lib/session';
 import type { TeamBookingOption } from '@/lib/teams/team-booking';
 import { getServerCaller } from '@/trpc/server/caller';
@@ -47,12 +52,16 @@ export default async function CoachPage({
   const { id } = await params;
   const { t } = await getT('coaches');
   const { t: tf } = await getT('fields');
+  const { t: tr } = await getT('reviews');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
 
   const row = await loadCoach(id, parseDetailDate(await searchParams));
   if (!row) notFound();
   const coach = toCoachDetail(row, lng);
+
+  const allReviews = getMockCoachReviews(coach.id);
+  const rating = summarizeRatings(allReviews.map((review) => review.rating));
 
   let teams: TeamBookingOption[] = [];
   if (user && !coach.isSelf) {
@@ -91,6 +100,22 @@ export default async function CoachPage({
                   <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">
                     {tf(`sports.${coach.sportType}`)}
                   </span>
+                  {rating ? (
+                    <span className="inline-flex items-center gap-1 text-sm">
+                      <Star
+                        className="size-3.5 fill-terracotta text-terracotta"
+                        aria-hidden="true"
+                      />
+                      <strong>{formatRating(rating.average, lng)}</strong>
+                      <span className="text-muted-foreground">
+                        ({rating.count})
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-accent-foreground">
+                      {tr('new')}
+                    </span>
+                  )}
                   {coach.area ? (
                     <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
                       <MapPin
@@ -127,6 +152,18 @@ export default async function CoachPage({
                 </p>
               </section>
             ) : null}
+
+            <div className="mt-6">
+              <CoachReviewsSection
+                coachId={coach.id}
+                lng={lng}
+                rating={rating}
+                items={allReviews.slice(0, REVIEW_PAGE_SIZE)}
+                total={allReviews.length}
+                pageSize={REVIEW_PAGE_SIZE}
+                labels={buildReviewsSectionLabels(tr)}
+              />
+            </div>
           </div>
 
           <aside className="min-w-0 lg:sticky lg:top-24">

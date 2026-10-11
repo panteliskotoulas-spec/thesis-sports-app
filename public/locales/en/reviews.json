@@ -1,0 +1,37 @@
+{
+  "new": "New",
+  "title": "Reviews",
+  "countOne": "{count} review",
+  "countOther": "{count} reviews",
+  "empty": "No reviews yet.",
+  "stars": "Rated {rating} out of 5",
+  "more": "More reviews",
+  "loading": "Just a moment…",
+  "loadError": "Couldn't load the reviews. Try again.",
+  "form": {
+    "legend": "Rating",
+    "star": "{rating} out of 5",
+    "choose": "Choose a rating",
+    "rating1": "Poor",
+    "rating2": "Fair",
+    "rating3": "Good",
+    "rating4": "Very good",
+    "rating5": "Excellent",
+    "prompt": "How was the session?",
+    "commentLabel": "Comment (optional)",
+    "commentPlaceholder": "Tell us what you liked or what could be better.",
+    "counter": "{count}/{max}",
+    "submit": "Submit review",
+    "submitting": "Just a moment…",
+    "cancel": "Cancel",
+    "errorRating": "Choose a rating from 1 to 5.",
+    "errorConflict": "You've already reviewed this session.",
+    "errorForbidden": "You can't review this session.",
+    "errorGeneric": "Something went wrong. Try again."
+  },
+  "session": {
+    "write": "Write a review",
+    "yourReview": "Your review",
+    "reviewedNotice": "Thanks for your review."
+  }
+}

@@ -6,6 +6,7 @@ import {
 import { formatDayChip, formatTimeRange } from '@/lib/fields/detail-format';
 import { todayInAthens } from '@/lib/fields/filters';
 import type { SportType } from '@/lib/fields/types';
+import type { SessionReview } from '@/lib/reviews/review';
 
 export const SESSION_PAYMENT_WINDOW_HOURS = 24;
 
@@ -64,10 +65,12 @@ export interface CoachSessionRow {
   wasPaid: boolean;
   compensation: CompensationValue | null;
   teamName: string | null;
+  review?: SessionReview | null;
 }
 
 export interface CoachSessionItem {
   id: string;
+  coachId: string;
   coachName: string;
   coachHref: string;
   sport: string;
@@ -83,6 +86,8 @@ export interface CoachSessionItem {
   wasPaid: boolean;
   compensation: CompensationValue | null;
   canCancel: boolean;
+  reviewable: boolean;
+  review: SessionReview | null;
   teamName: string | null;
 }
 
@@ -148,6 +153,7 @@ export function toCoachSessionItem(
 
   return {
     id: row.id,
+    coachId: row.coachId,
     coachName: row.coachName,
     coachHref: `/${lng}/coaches/${row.coachId}`,
     sport: sportLabel,
@@ -166,6 +172,8 @@ export function toCoachSessionItem(
       row.state === 'CONFIRMED' &&
       row.startTime > now &&
       canCancelBooking(row.startTime, now),
+    reviewable: row.state === 'CONFIRMED' && row.endTime <= now,
+    review: row.review ?? null,
     teamName: row.teamName,
   };
 }

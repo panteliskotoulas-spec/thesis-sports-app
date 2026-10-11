@@ -2,6 +2,7 @@ import type { getT } from '@/i18n.server';
 import type { CoachSlotRequestLabels } from '@/components/coaches/CoachSlotRequest';
 import type { CoachRequestsListLabels } from '@/components/coaches/requests/CoachRequestsList';
 import type { CoachSessionsListLabels } from '@/components/coaches/sessions/CoachSessionsList';
+import { buildReviewFormLabels } from '@/lib/reviews/review-labels';
 import { buildTeamBookingLabels } from '@/lib/teams/team-labels';
 
 type Translate = Awaited<ReturnType<typeof getT>>['t'];
@@ -55,6 +56,7 @@ export function buildCoachRequestsLabels(
 export function buildCoachSessionsLabels(
   t: Translate,
   tf: Translate,
+  tr: Translate,
 ): CoachSessionsListLabels {
   return {
     tabAll: t('sessions.tabAll'),
@@ -67,6 +69,7 @@ export function buildCoachSessionsLabels(
     paidNotice: t('sessions.paidNotice'),
     cancelledNotice: t('sessions.cancelledNotice'),
     requestCancelledNotice: t('sessions.requestCancelledNotice'),
+    reviewedNotice: tr('session.reviewedNotice'),
     card: {
       statusRequested: t('sessions.card.statusRequested'),
       statusAwaitingPayment: t('sessions.card.statusAwaitingPayment'),
@@ -89,6 +92,12 @@ export function buildCoachSessionsLabels(
       errorTooLate: t('sessions.card.errorTooLate'),
       errorConflict: t('sessions.card.errorConflict'),
       errorGeneric: t('sessions.card.errorGeneric'),
+      review: {
+        write: tr('session.write'),
+        yourReview: tr('session.yourReview'),
+        stars: tr('stars'),
+        form: buildReviewFormLabels(tr),
+      },
       credit: {
         title: tf('booking.summary.credit.title'),
         available: tf('booking.summary.credit.available'),

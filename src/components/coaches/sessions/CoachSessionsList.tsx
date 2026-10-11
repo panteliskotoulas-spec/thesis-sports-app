@@ -11,10 +11,12 @@ import {
 } from '@/lib/bookings/payment-split';
 import { chipBase, chipOff, chipOn } from '@/components/fields/chipStyles';
 import { formatAmount, type CompensationValue } from '@/lib/bookings/booking';
+import { submitCoachReview } from '@/lib/coaches/coach-review-api';
 import {
   cancelCoachSession,
   payCoachSession,
 } from '@/lib/coaches/coach-session-api';
+import type { ReviewInput, SubmitReviewResult } from '@/lib/reviews/review';
 import type {
   CancelSessionResult,
   CoachSessionItem,
@@ -36,6 +38,7 @@ export interface CoachSessionsListLabels {
   paidNotice: string;
   cancelledNotice: string;
   requestCancelledNotice: string;
+  reviewedNotice: string;
   card: CoachSessionCardLabels;
 }
 
@@ -162,6 +165,29 @@ export function CoachSessionsList({
     return result;
   }
 
+  async function handleReview(
+    id: string,
+    input: ReviewInput,
+  ): Promise<SubmitReviewResult> {
+    const target = items.find((item) => item.id === id);
+    if (!target) return 'error';
+    return submitCoachReview(id, target.coachId, input);
+  }
+
+  function handleReviewed(id: string, input: ReviewInput) {
+    setItems((current) =>
+      current.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              review: { rating: input.rating, comment: input.comment || null },
+            }
+          : item,
+      ),
+    );
+    setNotice(labels.reviewedNotice);
+  }
+
   const visible = items.filter(
     (item) => filter === 'ALL' || item.state === filter,
   );
@@ -216,6 +242,8 @@ export function CoachSessionsList({
               balance={balance}
               onPay={handlePay}
               onCancel={handleCancel}
+              onReview={handleReview}
+              onReviewed={handleReviewed}
             />
           ))}
         </ul>

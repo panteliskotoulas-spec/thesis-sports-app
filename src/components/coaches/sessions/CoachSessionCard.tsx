@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Calendar, CalendarX, Clock, Info, Users } from 'lucide-react';
+import { Calendar, CalendarX, Clock, Info, Star, Users } from 'lucide-react';
 import {
   CreditToggle,
   type CreditToggleLabels,
@@ -27,6 +27,19 @@ import {
   fromCents,
   toCents,
 } from '@/lib/bookings/payment-split';
+import type { ReviewInput, SubmitReviewResult } from '@/lib/reviews/review';
+import {
+  ReviewForm,
+  type ReviewFormLabels,
+} from '@/components/reviews/ReviewForm';
+import { StarRating } from '@/components/reviews/StarRating';
+
+export interface SessionReviewLabels {
+  write: string;
+  yourReview: string;
+  stars: string;
+  form: ReviewFormLabels;
+}
 
 export interface CoachSessionCardLabels {
   statusRequested: string;
@@ -50,6 +63,7 @@ export interface CoachSessionCardLabels {
   errorTooLate: string;
   errorConflict: string;
   errorGeneric: string;
+  review: SessionReviewLabels;
   credit: CreditToggleLabels;
   panel: CancelPanelLabels;
 }
@@ -67,6 +81,8 @@ export interface CoachSessionCardProps {
     id: string,
     compensation: CompensationValue | null,
   ) => Promise<CancelSessionResult>;
+  onReview: (id: string, input: ReviewInput) => Promise<SubmitReviewResult>;
+  onReviewed: (id: string, input: ReviewInput) => void;
 }
 
 const badgeBase =
@@ -150,7 +166,10 @@ export function CoachSessionCard({
   balance,
   onPay,
   onCancel,
+  onReview,
+  onReviewed,
 }: CoachSessionCardProps) {
+  const [reviewOpen, setReviewOpen] = useState(false);
   const [useCredit, setUseCredit] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [busy, setBusy] = useState<'pay' | 'cancel' | null>(null);
@@ -240,6 +259,48 @@ export function CoachSessionCard({
         </p>
       )}
 
+      {item.reviewable ? (
+        item.review ? (
+          <div className="mt-3 border-t-[0.5px] border-border pt-3">
+            <p className="text-sm text-muted-foreground">
+              {labels.review.yourReview}
+            </p>
+            <div className="mt-1">
+              <StarRating
+                value={item.review.rating}
+                label={fillTemplate(labels.review.stars, {
+                  rating: String(item.review.rating),
+                })}
+              />
+            </div>
+            {item.review.comment ? (
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                {item.review.comment}
+              </p>
+            ) : null}
+          </div>
+        ) : reviewOpen ? (
+          <ReviewForm
+            labels={labels.review.form}
+            onSubmit={(input) => onReview(item.id, input)}
+            onSubmitted={(input) => {
+              setReviewOpen(false);
+              onReviewed(item.id, input);
+            }}
+            onCancel={() => setReviewOpen(false)}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setReviewOpen(true)}
+            className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border-[0.5px] border-border bg-card px-4 text-sm font-medium text-foreground hover:bg-secondary"
+          >
+            <Star className="size-4" aria-hidden="true" />
+            {labels.review.write}
+          </button>
+        )
+      ) : null}
+
       {item.state === 'CANCELLED' && item.wasPaid ? (
         <p className="mt-2 text-sm text-muted-foreground">
           {refundedText(item, labels)}
@@ -293,7 +354,7 @@ export function CoachSessionCard({
         </button>
       ) : null}
 
-      {item.state === 'CONFIRMED' && !panelOpen ? (
+      {item.state === 'CONFIRMED' && !item.reviewable && !panelOpen ? (
         item.canCancel ? (
           <button
             type="button"

@@ -1,14 +1,22 @@
 import Link from 'next/link';
-import { ArrowRight, CalendarOff, Clock, MapPin } from 'lucide-react';
+import { ArrowRight, CalendarOff, Clock, MapPin, Star } from 'lucide-react';
 import { lng as routeLanguage } from 'next/root-params';
 import { getT } from '@/i18n.server';
-import { formatNextSlot, formatPricePerHour } from '@/lib/fields/format';
+import {
+  formatNextSlot,
+  formatPricePerHour,
+  formatRating,
+} from '@/lib/fields/format';
 import type { CoachListItem } from '@/lib/coaches/coach-public';
+import { getMockCoachRating } from '@/lib/reviews/mock-reviews';
 
 export async function CoachCard({ coach }: { coach: CoachListItem }) {
   const { t } = await getT('coaches');
   const { t: tf } = await getT('fields');
+  const { t: tr } = await getT('reviews');
   const lng = await routeLanguage();
+
+  const rating = getMockCoachRating(coach.id);
 
   const available =
     coach.nextSlotAt !== null && coach.pricePerHourFrom !== null;
@@ -26,12 +34,26 @@ export async function CoachCard({ coach }: { coach: CoachListItem }) {
           >
             {coach.initials}
           </span>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h3 className="truncate text-base">{coach.name}</h3>
             <span className="mt-1 inline-block rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">
               {tf(`sports.${coach.sportType}`)}
             </span>
           </div>
+          {rating ? (
+            <span className="inline-flex shrink-0 items-center gap-1 self-start text-sm">
+              <Star
+                className="size-3.5 fill-terracotta text-terracotta"
+                aria-hidden="true"
+              />
+              <strong>{formatRating(rating.average, lng)}</strong>
+              <span className="text-muted-foreground">({rating.count})</span>
+            </span>
+          ) : (
+            <span className="shrink-0 self-start rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-accent-foreground">
+              {tr('new')}
+            </span>
+          )}
         </div>
 
         {coach.area ? (
