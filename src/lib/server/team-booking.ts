@@ -57,6 +57,7 @@ export interface TeamReservationNoticeParams {
   teamId: string;
   teamName: string;
   excludeUserId: string;
+  alsoExcludeUserIds?: string[];
   fieldName: LocalizedText;
   startTime: Date;
   endTime: Date;
@@ -67,7 +68,12 @@ export async function notifyTeamOfReservation(
   params: TeamReservationNoticeParams & { bookerName: string },
 ): Promise<void> {
   const members = await tx.teamMembership.findMany({
-    where: { teamId: params.teamId, userId: { not: params.excludeUserId } },
+    where: {
+      teamId: params.teamId,
+      userId: {
+        notIn: [params.excludeUserId, ...(params.alsoExcludeUserIds ?? [])],
+      },
+    },
     select: { userId: true },
   });
   if (members.length === 0) return;
@@ -95,7 +101,12 @@ export async function notifyTeamOfCancellation(
   params: TeamReservationNoticeParams,
 ): Promise<void> {
   const members = await tx.teamMembership.findMany({
-    where: { teamId: params.teamId, userId: { not: params.excludeUserId } },
+    where: {
+      teamId: params.teamId,
+      userId: {
+        notIn: [params.excludeUserId, ...(params.alsoExcludeUserIds ?? [])],
+      },
+    },
     select: { userId: true },
   });
   if (members.length === 0) return;

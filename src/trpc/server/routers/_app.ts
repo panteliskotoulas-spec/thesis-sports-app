@@ -6,6 +6,7 @@ import { fieldsRouter } from './fields';
 import { notificationsRouter } from './notifications';
 import { ownerBookingsRouter } from './owner-bookings';
 import { reservationsRouter } from './reservations';
+import { splitsRouter } from './splits';
 import { teamsRouter } from './teams';
 
 export const appRouter = router({
@@ -17,6 +18,7 @@ export const appRouter = router({
   notifications: notificationsRouter,
   ownerBookings: ownerBookingsRouter,
   teams: teamsRouter,
+  splits: splitsRouter,
 });
 
 export type AppRouter = typeof appRouter;

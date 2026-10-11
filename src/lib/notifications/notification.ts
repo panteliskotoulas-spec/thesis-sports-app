@@ -15,6 +15,7 @@ export type NotificationType =
   | 'LEADERSHIP_TRANSFERRED'
   | 'TEAM_RESERVATION_CREATED'
   | 'TEAM_RESERVATION_CANCELLED'
+  | 'TEAM_SPLIT_PAID'
   | 'MATCH_RESULT_SUBMITTED'
   | 'REVIEW_RECEIVED'
   | 'PAYOUT_RECEIVED'
@@ -70,6 +71,7 @@ const appearances: Record<NotificationType, NotificationAppearance> = {
   LEADERSHIP_TRANSFERRED: { icon: 'user', tone: 'default' },
   TEAM_RESERVATION_CREATED: { icon: 'check', tone: 'default' },
   TEAM_RESERVATION_CANCELLED: { icon: 'calendarX', tone: 'default' },
+  TEAM_SPLIT_PAID: { icon: 'wallet', tone: 'default' },
   MATCH_RESULT_SUBMITTED: { icon: 'bell', tone: 'default' },
   REVIEW_RECEIVED: { icon: 'star', tone: 'default' },
   PAYOUT_RECEIVED: { icon: 'wallet', tone: 'default' },

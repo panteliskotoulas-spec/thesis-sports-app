@@ -30,6 +30,10 @@ import {
   joinRequestRejectedMessage,
   leadershipTransferredMessage,
 } from '@/lib/server/team-notifications';
+import {
+  buildSplitSummaries,
+  cancelPendingSplitsForMember,
+} from '@/lib/server/team-split';
 import { toLocalized } from '@/lib/server/translate';
 
 type Db = PrismaClient | Prisma.TransactionClient;
@@ -329,6 +333,7 @@ export const teamsRouter = router({
         orderBy: { slot: { startTime: 'asc' } },
         select: {
           id: true,
+          userId: true,
           user: { select: { name: true } },
           slot: {
             select: {
@@ -340,6 +345,15 @@ export const teamsRouter = router({
         },
       });
 
+      const summaries = await buildSplitSummaries(ctx.prisma, {
+        viewerId: ctx.session.user.id,
+        reservations: reservations.map((reservation) => ({
+          id: reservation.id,
+          userId: reservation.userId,
+          payerName: reservation.user.name,
+        })),
+      });
+
       return reservations.map((reservation) => ({
         id: reservation.id,
         fieldId: reservation.slot.field.id,
@@ -347,6 +361,7 @@ export const teamsRouter = router({
         startTime: reservation.slot.startTime,
         endTime: reservation.slot.endTime,
         bookedBy: reservation.user.name,
+        split: summaries.get(reservation.id) ?? null,
       }));
     }),
 
@@ -621,14 +636,22 @@ export const teamsRouter = router({
   leave: protectedProcedure
     .input(teamIdInput)
     .mutation(async ({ ctx, input }) => {
-      const left = await ctx.prisma.teamMembership.deleteMany({
-        where: {
-          teamId: input.teamId,
-          userId: ctx.session.user.id,
-          role: 'MEMBER',
-        },
+      await ctx.prisma.$transaction(async (tx) => {
+        const left = await tx.teamMembership.deleteMany({
+          where: {
+            teamId: input.teamId,
+            userId: ctx.session.user.id,
+            role: 'MEMBER',
+          },
+        });
+        if (left.count === 0) throw new TRPCError({ code: 'CONFLICT' });
+
+        await cancelPendingSplitsForMember(
+          tx,
+          input.teamId,
+          ctx.session.user.id,
+        );
       });
-      if (left.count === 0) throw new TRPCError({ code: 'CONFLICT' });
 
       return { id: input.teamId };
     }),
@@ -638,10 +661,14 @@ export const teamsRouter = router({
     .mutation(async ({ ctx, input }) => {
       await assertLeader(ctx.prisma, input.teamId, ctx.session.user.id);
 
-      const removed = await ctx.prisma.teamMembership.deleteMany({
-        where: { teamId: input.teamId, userId: input.userId, role: 'MEMBER' },
+      await ctx.prisma.$transaction(async (tx) => {
+        const removed = await tx.teamMembership.deleteMany({
+          where: { teamId: input.teamId, userId: input.userId, role: 'MEMBER' },
+        });
+        if (removed.count === 0) throw new TRPCError({ code: 'CONFLICT' });
+
+        await cancelPendingSplitsForMember(tx, input.teamId, input.userId);
       });
-      if (removed.count === 0) throw new TRPCError({ code: 'CONFLICT' });
 
       return { id: input.userId };
     }),

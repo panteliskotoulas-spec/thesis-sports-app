@@ -11,6 +11,7 @@ model Payment {
   stripePaymentIntentId String?
   userId                String?
   slotId                String?
+  splitId               String?
   teamId                String?
   holdExpiresAt         DateTime?
   createdAt             DateTime      @default(now())
@@ -18,14 +19,20 @@ model Payment {
   @@index([reservationId])
   @@index([sessionId])
   @@index([slotId])
+  @@index([splitId])
 }
 
 model PaymentSplit {
-  id            String  @id @default(cuid())
+  id            String      @id @default(cuid())
   reservationId String
   userId        String
-  amount        Decimal @db.Decimal(10, 2)
-  status        String
+  amount        Decimal     @db.Decimal(10, 2)
+  status        SplitStatus @default(PENDING)
+  paidAt        DateTime?
+  createdAt     DateTime    @default(now())
+
+  @@unique([reservationId, userId])
+  @@index([userId])
 }
 
 model CreditTransaction {

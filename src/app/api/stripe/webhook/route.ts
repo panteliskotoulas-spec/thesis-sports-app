@@ -6,6 +6,7 @@ import {
   releaseHold,
 } from '@/lib/server/booking-checkout';
 import { getStripe, getWebhookSecret } from '@/lib/server/stripe';
+import { confirmSplitCheckoutSession } from '@/lib/server/team-split-payment';
 
 export const runtime = 'nodejs';
 
@@ -30,7 +31,13 @@ export async function POST(request: Request) {
 
   try {
     if (event.type === 'checkout.session.completed') {
-      await confirmCheckoutSession(prisma, event.data.object.id);
+      const session = event.data.object;
+
+      if (session.metadata?.splitId) {
+        await confirmSplitCheckoutSession(prisma, session.id);
+      } else {
+        await confirmCheckoutSession(prisma, session.id);
+      }
     }
 
     if (event.type === 'checkout.session.expired') {

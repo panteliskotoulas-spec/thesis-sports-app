@@ -18,6 +18,15 @@ function describeSlot(
   return `${day}, ${formatTimeRange(startTime, endTime, lng)}`;
 }
 
+function formatMoney(cents: number, lng: 'el' | 'en'): string {
+  return new Intl.NumberFormat(lng, {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(cents / 100);
+}
+
 export type CancellationOutcome = 'card' | 'mixed' | 'credit';
 
 const cancellationTails: Record<CancellationOutcome, LocalizedText> = {
@@ -120,5 +129,47 @@ export function teamReservationCancelledMessage(
   return {
     el: `Η κράτηση της ομάδας «${teamName}» στο «${fieldName.el}» για ${describeSlot(startTime, endTime, 'el')} ακυρώθηκε.`,
     en: `The booking for team "${teamName}" at "${fieldName.en}" for ${describeSlot(startTime, endTime, 'en')} was cancelled.`,
+  };
+}
+
+export function teamSplitRequestedMessage(
+  teamName: string,
+  fieldName: LocalizedText,
+  leaderName: string,
+  amountCents: number,
+  startTime: Date,
+  endTime: Date,
+): LocalizedText {
+  return {
+    el: `Σου αναλογούν ${formatMoney(amountCents, 'el')} για την κράτηση της ομάδας «${teamName}» στο «${fieldName.el}», ${describeSlot(startTime, endTime, 'el')}. Πλήρωσε το μερίδιό σου, που επιστρέφεται στον/στην ${leaderName} (έκλεισε το γήπεδο).`,
+    en: `You owe ${formatMoney(amountCents, 'en')} for your team "${teamName}" booking at "${fieldName.en}", ${describeSlot(startTime, endTime, 'en')}. Pay your share; it goes back to ${leaderName}, who booked the field.`,
+  };
+}
+
+export function teamSplitPaidMessage(
+  memberName: string,
+  amountCents: number,
+  fieldName: LocalizedText,
+  startTime: Date,
+  endTime: Date,
+): LocalizedText {
+  return {
+    el: `Το μέλος ${memberName} πλήρωσε το μερίδιό του (${formatMoney(amountCents, 'el')}) για το «${fieldName.el}», ${describeSlot(startTime, endTime, 'el')}. Το ποσό προστέθηκε στην πίστωσή σου.`,
+    en: `${memberName} paid their share (${formatMoney(amountCents, 'en')}) for "${fieldName.en}", ${describeSlot(startTime, endTime, 'en')}. The amount was added to your credit.`,
+  };
+}
+
+export function teamSplitRefundedMessage(
+  teamName: string,
+  fieldName: LocalizedText,
+  startTime: Date,
+  endTime: Date,
+  outcome: CancellationOutcome,
+): LocalizedText {
+  const tail = cancellationTails[outcome];
+
+  return {
+    el: `Η κράτηση της ομάδας «${teamName}» στο «${fieldName.el}» για ${describeSlot(startTime, endTime, 'el')} ακυρώθηκε και το μερίδιό σου επιστράφηκε. ${tail.el}`,
+    en: `The booking for team "${teamName}" at "${fieldName.en}" for ${describeSlot(startTime, endTime, 'en')} was cancelled and your share was returned. ${tail.en}`,
   };
 }

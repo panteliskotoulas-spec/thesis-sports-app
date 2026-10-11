@@ -27,6 +27,7 @@ import {
   notifyTeamOfReservation,
   resolveBookingTeam,
 } from '@/lib/server/team-booking';
+import { createReservationSplits } from '@/lib/server/team-split';
 
 export interface StartCheckoutParams {
   userId: string;
@@ -239,10 +240,23 @@ export async function confirmCheckoutSession(
       }
 
       if (team) {
+        const requested = await createReservationSplits(tx, {
+          reservationId: reservation.id,
+          teamId: team.id,
+          teamName: team.name,
+          payerId: userId,
+          payerName: player?.name ?? '',
+          totalCents: decimalToCents(payment.amount),
+          fieldName: asLocalized(slot.field.name),
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+        });
+
         await notifyTeamOfReservation(tx, {
           teamId: team.id,
           teamName: team.name,
           excludeUserId: userId,
+          alsoExcludeUserIds: requested,
           bookerName: player?.name ?? '',
           fieldName: asLocalized(slot.field.name),
           startTime: slot.startTime,
@@ -437,10 +451,23 @@ export async function startCheckout(
       }
 
       if (team) {
+        const requested = await createReservationSplits(tx, {
+          reservationId: reservation.id,
+          teamId: team.id,
+          teamName: team.name,
+          payerId: params.userId,
+          payerName: user.name,
+          totalCents: priceCents,
+          fieldName: asLocalized(slot.field.name),
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+        });
+
         await notifyTeamOfReservation(tx, {
           teamId: team.id,
           teamName: team.name,
           excludeUserId: params.userId,
+          alsoExcludeUserIds: requested,
           bookerName: user.name,
           fieldName: asLocalized(slot.field.name),
           startTime: slot.startTime,

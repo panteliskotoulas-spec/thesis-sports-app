@@ -1,3 +1,5 @@
+import type { LocalizedText } from '@/lib/i18n-content';
+
 export type TeamSplitStatus = 'PENDING' | 'PAID';
 
 export type TeamSplitViewer = 'leader' | 'member';
@@ -48,4 +50,15 @@ export function memberInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   const letters = parts.slice(0, 2).map((part) => part.charAt(0));
   return letters.join('').toUpperCase();
+}
+
+export interface TeamSplitPayRow {
+  splitId: string;
+  fieldId: string;
+  fieldName: LocalizedText;
+  startTime: Date;
+  endTime: Date;
+  leaderName: string;
+  share: number;
+  balance: number;
 }

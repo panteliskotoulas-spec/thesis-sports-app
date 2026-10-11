@@ -19,6 +19,7 @@ import {
 } from '@/lib/server/booking-shared';
 import { getStripe } from '@/lib/server/stripe';
 import { notifyTeamOfCancellation } from '@/lib/server/team-booking';
+import { settleSplitsOnCancel } from '@/lib/server/team-split';
 
 export interface CancelReservationParams {
   userId: string;
@@ -57,10 +58,27 @@ interface CancellationPlan {
   paymentId: string;
   paymentIntentId: string | null;
   compensation: CompensationValue;
-  refundCents: number;
-  creditBackCents: number;
+  cardCents: number;
+  creditCents: number;
   cancelledBy: CancelledByValue;
   now: Date;
+}
+
+function netCompensation(params: {
+  compensation: CompensationValue;
+  cardCents: number;
+  creditCents: number;
+  splitCents: number;
+}): { refundCents: number; creditBackCents: number } {
+  const cardNet = Math.max(0, params.cardCents - params.splitCents);
+  const fromCredit = params.splitCents - (params.cardCents - cardNet);
+  const creditNet = Math.max(0, params.creditCents - fromCredit);
+
+  if (params.compensation === 'REFUND') {
+    return { refundCents: cardNet, creditBackCents: creditNet };
+  }
+
+  return { refundCents: 0, creditBackCents: cardNet + creditNet };
 }
 
 async function executeCancellation(
@@ -69,12 +87,6 @@ async function executeCancellation(
 ): Promise<{ id: string }> {
   const { reservation } = plan;
   const fieldName = asLocalized(reservation.slot.field.name);
-  const outcome =
-    plan.refundCents === 0
-      ? 'credit'
-      : plan.creditBackCents > 0
-        ? 'mixed'
-        : 'card';
 
   await prisma.$transaction(
     async (tx) => {
@@ -96,16 +108,46 @@ async function executeCancellation(
         });
       }
 
-      if (plan.creditBackCents > 0) {
+      const settled =
+        reservation.teamId && reservation.team
+          ? await settleSplitsOnCancel(tx, {
+              reservationId: reservation.id,
+              teamId: reservation.teamId,
+              teamName: reservation.team.name,
+              fieldName,
+              startTime: reservation.slot.startTime,
+              endTime: reservation.slot.endTime,
+            })
+          : { receivedCents: 0, refundedUserIds: [] as string[] };
+
+      const net = netCompensation({
+        compensation: plan.compensation,
+        cardCents: plan.cardCents,
+        creditCents: plan.creditCents,
+        splitCents: settled.receivedCents,
+      });
+
+      if (net.refundCents > 0 && !plan.paymentIntentId) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      }
+
+      const outcome =
+        net.refundCents === 0
+          ? 'credit'
+          : net.creditBackCents > 0
+            ? 'mixed'
+            : 'card';
+
+      if (net.creditBackCents > 0) {
         await tx.user.update({
           where: { id: reservation.userId },
-          data: { creditBalance: { increment: money(plan.creditBackCents) } },
+          data: { creditBalance: { increment: money(net.creditBackCents) } },
         });
 
         await tx.creditTransaction.create({
           data: {
             userId: reservation.userId,
-            amount: money(plan.creditBackCents),
+            amount: money(net.creditBackCents),
             type: 'EARNED_FROM_CANCELLATION',
             relatedReservationId: reservation.id,
           },
@@ -163,17 +205,18 @@ async function executeCancellation(
           teamId: reservation.teamId,
           teamName: reservation.team.name,
           excludeUserId: reservation.userId,
+          alsoExcludeUserIds: settled.refundedUserIds,
           fieldName,
           startTime: reservation.slot.startTime,
           endTime: reservation.slot.endTime,
         });
       }
 
-      if (plan.refundCents > 0 && plan.paymentIntentId) {
+      if (net.refundCents > 0 && plan.paymentIntentId) {
         await getStripe().refunds.create(
           {
             payment_intent: plan.paymentIntentId,
-            amount: plan.refundCents,
+            amount: net.refundCents,
           },
           { idempotencyKey: `refund-reservation-${reservation.id}` },
         );
@@ -217,10 +260,7 @@ export async function cancelReservation(
   const refund = params.compensation === 'REFUND';
   if (refund && cardCents <= 0) throw new TRPCError({ code: 'BAD_REQUEST' });
 
-  const refundCents = refund ? cardCents : 0;
-  const creditBackCents = refund ? creditCents : totalCents;
-
-  if (refundCents > 0 && !payment.stripePaymentIntentId) {
+  if (refund && !payment.stripePaymentIntentId) {
     throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
   }
 
@@ -229,8 +269,8 @@ export async function cancelReservation(
     paymentId: payment.id,
     paymentIntentId: payment.stripePaymentIntentId,
     compensation: params.compensation,
-    refundCents,
-    creditBackCents,
+    cardCents,
+    creditCents,
     cancelledBy: 'PLAYER',
     now,
   });
@@ -277,8 +317,8 @@ export async function cancelReservationByOwner(
     paymentId: payment.id,
     paymentIntentId: payment.stripePaymentIntentId,
     compensation: cardCents > 0 ? 'REFUND' : 'CREDIT',
-    refundCents: cardCents,
-    creditBackCents: creditCents,
+    cardCents,
+    creditCents,
     cancelledBy: 'OWNER',
     now,
   });

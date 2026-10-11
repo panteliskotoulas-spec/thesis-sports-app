@@ -30,6 +30,7 @@ export interface TeamReservationRow {
   startTime: Date;
   endTime: Date;
   bookedBy: string;
+  split: TeamSplitSummary | null;
 }
 
 export function toTeamReservationItem(
@@ -43,6 +44,6 @@ export function toTeamReservationItem(
     date: formatDayChip(todayInAthens(row.startTime), lng).full,
     time: formatTimeRange(row.startTime, row.endTime, lng),
     bookedBy: row.bookedBy,
-    split: null,
+    split: row.split,
   };
 }
