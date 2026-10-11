@@ -1,51 +1,54 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
 import { ArrowLeft, MapPin, UserSearch } from 'lucide-react';
+import { TRPCError } from '@trpc/server';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
 import { TeamAvatar } from '@/components/teams/TeamAvatar';
 import { TeamJoinButton } from '@/components/teams/TeamJoinButton';
 import { TeamMembersList } from '@/components/teams/TeamMembersList';
-import type { SearchParams } from '@/lib/fields/filters';
 import { getCurrentUser } from '@/lib/session';
 import { formatTeamSince, toTeamDetailItem } from '@/lib/teams/team';
 import { buildTeamJoinLabels } from '@/lib/teams/team-labels';
-import {
-  getMockTeamDetail,
-  mockViewerState,
-  parseMockView,
-} from '@/lib/teams/team-mock';
+import { getServerCaller } from '@/trpc/server/caller';
 
 interface TeamPageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<SearchParams>;
 }
+
+const loadTeam = cache(async (id: string) => {
+  try {
+    const caller = await getServerCaller();
+    return await caller.teams.getById({ id });
+  } catch (error) {
+    if (error instanceof TRPCError && error.code === 'NOT_FOUND') return null;
+    throw error;
+  }
+});
 
 export async function generateMetadata({
   params,
 }: TeamPageProps): Promise<Metadata> {
   const { id } = await params;
-  const row = getMockTeamDetail(id);
-  return row ? { title: row.name } : {};
+  const data = await loadTeam(id);
+  return data ? { title: data.team.name } : {};
 }
 
-export default async function TeamPage({
-  params,
-  searchParams,
-}: TeamPageProps) {
+export default async function TeamPage({ params }: TeamPageProps) {
   const { id } = await params;
   const { t } = await getT('teams');
   const { t: tf } = await getT('fields');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
 
-  const row = getMockTeamDetail(id);
-  if (!row) notFound();
-  const team = toTeamDetailItem(row, lng);
-  const viewer = mockViewerState(parseMockView((await searchParams).view));
+  const data = await loadTeam(id);
+  if (!data) notFound();
+  const team = toTeamDetailItem(data.team, lng);
+  const viewer = data.viewer;
 
   return (
     <>

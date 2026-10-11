@@ -9,7 +9,7 @@ import { SPORT_TYPES } from '@/lib/fields/types';
 import { getCurrentUser } from '@/lib/session';
 import { TEAM_LEVELS } from '@/lib/teams/team';
 import { buildTeamFormLabels } from '@/lib/teams/team-labels';
-import { MOCK_TAKEN_SPORTS } from '@/lib/teams/team-mock';
+import { getServerCaller } from '@/trpc/server/caller';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT('teams');
@@ -24,6 +24,9 @@ export default async function NewTeamPage() {
 
   if (!user) redirect(`/${lng}/login`);
 
+  const caller = await getServerCaller();
+  const takenSports = await caller.teams.takenSports();
+
   return (
     <>
       <Header user={user} />
@@ -34,7 +37,7 @@ export default async function NewTeamPage() {
         <div className="mt-6">
           <NewTeamForm
             lng={lng}
-            takenSports={MOCK_TAKEN_SPORTS}
+            takenSports={takenSports}
             sports={SPORT_TYPES.map((value) => ({
               value,
               label: tf(`sports.${value}`),

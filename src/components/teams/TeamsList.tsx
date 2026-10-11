@@ -4,7 +4,7 @@ import {
   hasActiveTeamFilters,
   type TeamFilters,
 } from '@/lib/teams/team-filters';
-import { getMockTeams } from '@/lib/teams/team-mock';
+import { getServerCaller } from '@/trpc/server/caller';
 import { toTeamListItem, type TeamListItem } from '@/lib/teams/team';
 import { TeamCard } from './TeamCard';
 import { TeamsEmpty } from './TeamsEmpty';
@@ -17,7 +17,9 @@ export async function TeamsList({ filters }: { filters: TeamFilters }) {
 
   let teams: TeamListItem[];
   try {
-    teams = getMockTeams(filters).map((row) => toTeamListItem(row, lng));
+    const caller = await getServerCaller();
+    const rows = await caller.teams.list(filters);
+    teams = rows.map((row) => toTeamListItem(row, lng));
   } catch (error) {
     console.error('[TeamsList]', error);
     return <TeamsError />;

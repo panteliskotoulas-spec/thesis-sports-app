@@ -174,10 +174,10 @@ export function NewTeamForm({
 
     try {
       if (initial) {
-        await updateExistingTeam(initial.id, values);
+        await updateExistingTeam(initial.id, values, lng);
         router.push(`/${lng}/teams/${initial.id}/manage`);
       } else {
-        const created = await submitNewTeam(values);
+        const created = await submitNewTeam(values, lng);
         router.push(`/${lng}/teams/${created.id}`);
       }
       router.refresh();

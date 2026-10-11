@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
 import { ArrowLeft } from 'lucide-react';
+import { TRPCError } from '@trpc/server';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
@@ -10,7 +11,7 @@ import { TeamManage } from '@/components/teams/TeamManage';
 import { getCurrentUser } from '@/lib/session';
 import { toJoinRequestItem } from '@/lib/teams/team';
 import { buildTeamManageLabels } from '@/lib/teams/team-labels';
-import { getMockJoinRequests, getMockTeamDetail } from '@/lib/teams/team-mock';
+import { getServerCaller } from '@/trpc/server/caller';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT('teams');
@@ -29,8 +30,18 @@ export default async function ManageTeamPage({
 
   if (!user) redirect(`/${lng}/login`);
 
-  const row = getMockTeamDetail(id);
-  if (!row) notFound();
+  const caller = await getServerCaller();
+  let data;
+  try {
+    data = await caller.teams.getById({ id });
+  } catch (error) {
+    if (error instanceof TRPCError && error.code === 'NOT_FOUND') notFound();
+    throw error;
+  }
+  if (data.viewer.kind !== 'leader') redirect(`/${lng}/teams/${id}`);
+
+  const row = data.team;
+  const requests = await caller.teams.joinRequests({ teamId: id });
 
   return (
     <>
@@ -53,8 +64,8 @@ export default async function ManageTeamPage({
             lng={lng}
             nowIso={new Date().toISOString()}
             maxMembers={row.maxMembers}
-            currentUserId="user-1"
-            requests={getMockJoinRequests().map(toJoinRequestItem)}
+            currentUserId={user.id}
+            requests={requests.map(toJoinRequestItem)}
             members={row.members.map((member) => ({
               userId: member.userId,
               name: member.name,

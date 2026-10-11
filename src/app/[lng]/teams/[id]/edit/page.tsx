@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
 import { ArrowLeft } from 'lucide-react';
+import { TRPCError } from '@trpc/server';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
@@ -11,7 +12,7 @@ import { SPORT_TYPES } from '@/lib/fields/types';
 import { getCurrentUser } from '@/lib/session';
 import { TEAM_LEVELS, toTeamDetailItem } from '@/lib/teams/team';
 import { buildTeamFormLabels } from '@/lib/teams/team-labels';
-import { getMockTeamDetail } from '@/lib/teams/team-mock';
+import { getServerCaller } from '@/trpc/server/caller';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT('teams');
@@ -31,9 +32,17 @@ export default async function EditTeamPage({
 
   if (!user) redirect(`/${lng}/login`);
 
-  const row = getMockTeamDetail(id);
-  if (!row) notFound();
-  const team = toTeamDetailItem(row, lng);
+  const caller = await getServerCaller();
+  let data;
+  try {
+    data = await caller.teams.getById({ id });
+  } catch (error) {
+    if (error instanceof TRPCError && error.code === 'NOT_FOUND') notFound();
+    throw error;
+  }
+  if (data.viewer.kind !== 'leader') redirect(`/${lng}/teams/${id}`);
+
+  const team = toTeamDetailItem(data.team, lng);
 
   return (
     <>
