@@ -2,6 +2,7 @@ import { formatDayChip, formatTimeRange } from '@/lib/fields/detail-format';
 import { todayInAthens } from '@/lib/fields/filters';
 import type { SportType } from '@/lib/fields/types';
 import { localized, type LocalizedText } from '@/lib/i18n-content';
+import type { TeamSplitSummary } from '@/lib/teams/team-split';
 
 export interface TeamBookingOption {
   id: string;
@@ -19,6 +20,7 @@ export interface TeamReservationItem {
   date: string;
   time: string;
   bookedBy: string;
+  split: TeamSplitSummary | null;
 }
 
 export interface TeamReservationRow {
@@ -41,5 +43,6 @@ export function toTeamReservationItem(
     date: formatDayChip(todayInAthens(row.startTime), lng).full,
     time: formatTimeRange(row.startTime, row.endTime, lng),
     bookedBy: row.bookedBy,
+    split: null,
   };
 }

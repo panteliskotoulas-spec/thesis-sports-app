@@ -3,7 +3,8 @@
     "title": "Teams",
     "new": "New team",
     "manage": "Manage team",
-    "edit": "Edit team"
+    "edit": "Edit team",
+    "splitPay": "Pay your share"
   },
   "page": {
     "title": "Teams",
@@ -162,5 +163,24 @@
     "empty": "There are no upcoming bookings.",
     "confirmed": "Confirmed",
     "bookedBy": "Booked by {name} (leader)"
+  },
+  "split": {
+    "title": "Team shares",
+    "progress": "{paid} of {total} paid",
+    "collected": "Collected {collected} of {owed}",
+    "paid": "Paid",
+    "pending": "Pending",
+    "leaderNote": "You paid {total}. Your own share is {share}.",
+    "yourShare": "You owe {amount}",
+    "toLeader": "Share for {name} (leader)",
+    "pay": "Pay your share",
+    "youPaid": "You paid your share"
+  },
+  "splitPay": {
+    "back": "Back to team",
+    "title": "Pay your share",
+    "shareLabel": "Share for {name} (leader)",
+    "confirm": "Pay with credit",
+    "refundNote": "If the booking is cancelled, your share is returned to you."
   }
 }

@@ -1,5 +1,9 @@
 import Link from 'next/link';
 import { Calendar, Clock } from 'lucide-react';
+import {
+  TeamSplitProgress,
+  type TeamSplitLabels,
+} from '@/components/teams/TeamSplitProgress';
 import { fillTemplate } from '@/lib/bookings/booking';
 import type { TeamReservationItem } from '@/lib/teams/team-booking';
 
@@ -8,14 +12,22 @@ export interface TeamReservationsLabels {
   empty: string;
   confirmed: string;
   bookedBy: string;
+  split: TeamSplitLabels;
 }
 
 export interface TeamReservationsProps {
   items: TeamReservationItem[];
+  lng: string;
+  teamId: string;
   labels: TeamReservationsLabels;
 }
 
-export function TeamReservations({ items, labels }: TeamReservationsProps) {
+export function TeamReservations({
+  items,
+  lng,
+  teamId,
+  labels,
+}: TeamReservationsProps) {
   return (
     <section className="rounded-xl border-[0.5px] border-border bg-card p-4 sm:p-5">
       <h2 className="text-lg">{labels.title}</h2>
@@ -53,6 +65,15 @@ export function TeamReservations({ items, labels }: TeamReservationsProps) {
               <p className="mt-2 text-xs text-muted-foreground">
                 {fillTemplate(labels.bookedBy, { name: item.bookedBy })}
               </p>
+              {item.split ? (
+                <TeamSplitProgress
+                  split={item.split}
+                  lng={lng}
+                  teamId={teamId}
+                  reservationId={item.id}
+                  labels={labels.split}
+                />
+              ) : null}
             </li>
           ))}
         </ul>

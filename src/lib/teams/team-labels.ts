@@ -4,6 +4,8 @@ import type { TeamFormLabels } from '@/components/teams/NewTeamForm';
 import type { TeamJoinLabels } from '@/components/teams/TeamJoinButton';
 import type { TeamManageLabels } from '@/components/teams/TeamManage';
 import type { TeamReservationsLabels } from '@/components/teams/TeamReservations';
+import type { TeamSplitLabels } from '@/components/teams/TeamSplitProgress';
+import type { TeamSplitPaymentLabels } from '@/components/teams/TeamSplitPayment';
 import { MAX_IMAGE_MB } from '@/lib/fields/new-field';
 
 type Translate = Awaited<ReturnType<typeof getT>>['t'];
@@ -126,5 +128,47 @@ export function buildTeamReservationsLabels(
     empty: t('reservations.empty'),
     confirmed: t('reservations.confirmed'),
     bookedBy: t('reservations.bookedBy'),
+    split: buildTeamSplitLabels(t),
+  };
+}
+
+export function buildTeamSplitLabels(t: Translate): TeamSplitLabels {
+  return {
+    title: t('split.title'),
+    progress: t('split.progress'),
+    collected: t('split.collected'),
+    paid: t('split.paid'),
+    pending: t('split.pending'),
+    leaderNote: t('split.leaderNote'),
+    yourShare: t('split.yourShare'),
+    toLeader: t('split.toLeader'),
+    pay: t('split.pay'),
+    youPaid: t('split.youPaid'),
+  };
+}
+
+export function buildTeamSplitPaymentLabels(
+  t: Translate,
+  tf: Translate,
+): TeamSplitPaymentLabels {
+  return {
+    credit: {
+      title: tf('booking.summary.credit.title'),
+      available: tf('booking.summary.credit.available'),
+      none: tf('booking.summary.credit.none'),
+      toggle: tf('booking.summary.credit.toggle'),
+      limited: tf('booking.summary.credit.limited'),
+    },
+    shareLabel: t('splitPay.shareLabel'),
+    creditRow: tf('booking.summary.creditRow'),
+    cardRow: tf('booking.summary.cardRow'),
+    totalRow: tf('booking.summary.totalRow'),
+    payCard: tf('booking.summary.payCard'),
+    confirm: t('splitPay.confirm'),
+    working: tf('booking.summary.working'),
+    stripeNote: tf('booking.summary.stripeNote'),
+    refundNote: t('splitPay.refundNote'),
+    errorMinimum: tf('booking.summary.errorMinimum'),
+    errorGeneric: tf('booking.summary.errorGeneric'),
   };
 }

@@ -15,6 +15,7 @@ import { TeamReservations } from '@/components/teams/TeamReservations';
 import { getCurrentUser } from '@/lib/session';
 import { formatTeamSince, toTeamDetailItem } from '@/lib/teams/team';
 import { toTeamReservationItem } from '@/lib/teams/team-booking';
+import { getMockTeamSplit } from '@/lib/teams/team-split-mock';
 import {
   buildTeamJoinLabels,
   buildTeamReservationsLabels,
@@ -63,7 +64,12 @@ export default async function TeamPage({ params }: TeamPageProps) {
           ).teams.upcomingReservations({
             teamId: id,
           })
-        ).map((row) => toTeamReservationItem(row, lng))
+        ).map((row) => ({
+          ...toTeamReservationItem(row, lng),
+          split: getMockTeamSplit(
+            viewer.kind === 'leader' ? 'leader' : 'member',
+          ),
+        }))
       : [];
 
   return (
@@ -149,6 +155,8 @@ export default async function TeamPage({ params }: TeamPageProps) {
           <div className="mt-4">
             <TeamReservations
               items={reservations}
+              lng={lng}
+              teamId={team.id}
               labels={buildTeamReservationsLabels(t)}
             />
           </div>
