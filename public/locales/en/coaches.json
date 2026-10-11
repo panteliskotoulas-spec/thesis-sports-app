@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "apply": "Coach application"
+  },
+  "apply": {
+    "back": "Back to coaches",
+    "title": "Become a coach",
+    "subtitle": "Fill in your profile. An admin will review it, and once it's approved you'll be able to set your available times.",
+    "reviewNote": "If you change your sport, description or rate later, your profile will be reviewed again."
+  },
+  "status": {
+    "reason": "Reason",
+    "PENDING": {
+      "title": "Your application is pending",
+      "description": "You'll be notified as soon as an admin reviews it."
+    },
+    "APPROVED": {
+      "title": "Your profile is approved",
+      "description": "If you change your sport, description or rate, your profile will be reviewed again."
+    },
+    "REJECTED": {
+      "title": "Your application was rejected",
+      "description": "Update your profile and send it again."
+    }
+  },
+  "form": {
+    "sectionTitle": "Coach details",
+    "sport": "Sport",
+    "bio": "About you",
+    "translationHint": "Automatically translated to Greek.",
+    "rate": "Hourly rate (€)",
+    "rateHint": "An indicative rate shown in the list. You'll set the price of each session in your available times.",
+    "certifications": "Certifications (optional)",
+    "certificationsPlaceholder": "e.g. Tennis coaching diploma, level B",
+    "submitCreate": "Submit application",
+    "submitUpdate": "Save changes",
+    "submitResubmit": "Resubmit application",
+    "submitting": "Sending…",
+    "saved": "Your profile was saved.",
+    "errors": {
+      "required": "Fill in this field.",
+      "sport": "Choose a sport.",
+      "rate": "Enter a rate from {min} to {max} €.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "admin": {
+    "meta": "Coach approval",
+    "title": "Coach approval",
+    "subtitle": "Review coach profiles before they go public.",
+    "tabsLabel": "Coach status",
+    "status": {
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "badge": {
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "empty": {
+      "PENDING": {
+        "title": "No pending applications",
+        "description": "When someone applies to be a coach, you'll find it here."
+      },
+      "APPROVED": {
+        "title": "No approved coaches",
+        "description": "Coaches you approve will show up here."
+      },
+      "REJECTED": {
+        "title": "No rejected applications",
+        "description": "Applications you reject will show up here."
+      }
+    },
+    "card": {
+      "rate": "{{rate}} / hour",
+      "submitted": "Submitted {{date}}"
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "confirmReject": "Confirm rejection",
+      "cancel": "Cancel",
+      "reasonLabel": "Reason for rejection (optional)",
+      "reasonPlaceholder": "e.g. The description is too short.",
+      "reasonHint": "The user will see it. Write it in the language you read the page in, it will be translated automatically.",
+      "rejectedReason": "Reason for rejection",
+      "working": "Saving…",
+      "errorGeneric": "Something went wrong. Try again."
+    }
+  }
+}
