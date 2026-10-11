@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "title": "Teams",
+    "new": "New team",
+    "manage": "Manage team",
+    "edit": "Edit team"
+  },
+  "page": {
+    "title": "Teams",
+    "subtitle": "Find a team that needs players, or start your own.",
+    "create": "Create a team",
+    "count_one": "{{count}} team",
+    "count_other": "{{count}} teams"
+  },
+  "filters": {
+    "sportLabel": "Sport",
+    "sportAll": "All",
+    "recruiting": "Looking for players"
+  },
+  "levels": {
+    "BEGINNER": "Beginner",
+    "INTERMEDIATE": "Intermediate",
+    "ADVANCED": "Advanced"
+  },
+  "card": {
+    "recruiting": "Looking for players",
+    "looking": "Looking for: {{position}}",
+    "members": "{{current}} of {{max}} members",
+    "full": "Full"
+  },
+  "empty": {
+    "title": "We couldn't find any teams",
+    "description": "Try changing or clearing the filters, or start the first team yourself.",
+    "clear": "Clear filters",
+    "create": "Create a team"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "We couldn't load the teams. Try again in a moment.",
+    "retry": "Try again"
+  },
+  "detail": {
+    "back": "All teams",
+    "since": "Created {{date}}",
+    "recruitingTitle": "We're looking for a player",
+    "recruitingPosition": "Position we need: {{position}}",
+    "recruitingAny": "Send a request and the leader will see it.",
+    "membersTitle": "Members",
+    "leader": "Leader"
+  },
+  "new": {
+    "title": "Create your team",
+    "subtitle": "Fill in the basics and open the team to new players whenever you like."
+  },
+  "edit": {
+    "title": "Edit team",
+    "back": "Back to management"
+  },
+  "form": {
+    "basicTitle": "Team details",
+    "membersTitle": "Members and recruiting",
+    "name": "Team name",
+    "sport": "Sport",
+    "sportLockedHint": "The sport can't be changed after the team is created.",
+    "sportTakenHint": "You already have a team for: {sports}. You can have one team per sport.",
+    "level": "Level",
+    "area": "Area",
+    "areaPlaceholder": "e.g. Pefki, Thessaloniki",
+    "translationHint": "Translated automatically into Greek.",
+    "description": "Description (optional)",
+    "maxMembers": "Maximum members",
+    "maxMembersHint": "From {min} to {max} members.",
+    "increase": "Increase",
+    "decrease": "Decrease",
+    "recruiting": "We're looking for players",
+    "recruitingHint": "The team shows up in the filter for teams that are looking for players.",
+    "neededPosition": "Position you need (optional)",
+    "neededPositionPlaceholder": "e.g. Goalkeeper",
+    "submitCreate": "Create team",
+    "submitCreating": "Creating…",
+    "submitSave": "Save",
+    "submitSaving": "Saving…",
+    "errors": {
+      "required": "Fill in this field.",
+      "sport": "Pick a sport.",
+      "members": "Pick between {min} and {max} members.",
+      "generic": "Something went wrong. Try again."
+    },
+    "logo": {
+      "add": "Upload a logo",
+      "change": "Change logo",
+      "remove": "Remove",
+      "hint": "Optional. JPG, PNG or WebP, up to {{size}} MB.",
+      "errorType": "Pick a JPG, PNG or WebP image.",
+      "errorSize": "The image is larger than {{size}} MB."
+    }
+  },
+  "join": {
+    "login": "Log in to send a request",
+    "join": "Send request",
+    "joining": "Sending…",
+    "cancelRequest": "Pending · Cancel",
+    "cancelling": "Cancelling…",
+    "leave": "Leave team",
+    "leaveTitle": "Leave the team?",
+    "leaveBody": "You'll lose your spot and you'll need to send a new request to rejoin.",
+    "leaveConfirm": "Leave team",
+    "leaveBack": "Back",
+    "leaving": "Leaving…",
+    "manage": "Manage",
+    "full": "The team is full",
+    "sportTaken": "You already have a team in this sport",
+    "errorConflict": "Something changed in the team. Refresh the page and try again.",
+    "errorGeneric": "Something went wrong. Try again."
+  },
+  "manage": {
+    "title": "Team management",
+    "back": "Back to the team",
+    "requestsTitle": "Join requests",
+    "requestsEmpty": "There are no new requests.",
+    "requestsFull": "The team is full. Raise the maximum number of members or remove someone to accept new requests.",
+    "accept": "Accept",
+    "reject": "Decline",
+    "membersTitle": "Members ({current} of {max})",
+    "leader": "Leader",
+    "leaderYou": "Leader · you",
+    "menuLabel": "Actions for {name}",
+    "transfer": "Transfer leadership",
+    "remove": "Remove from team",
+    "confirm": {
+      "transferTitle": "Transfer leadership",
+      "transferBody": "{name} will become the team leader and you will stay on as a regular member.",
+      "transferAction": "Transfer",
+      "removeTitle": "Remove from team",
+      "removeBody": "{name} will leave the team and will need to send a new request to rejoin.",
+      "removeAction": "Remove",
+      "deleteTitle": "Delete team",
+      "deleteBody": "The team will be deleted permanently and you can't undo this.",
+      "deleteAction": "Delete",
+      "back": "Back",
+      "working": "One moment…"
+    },
+    "infoTitle": "Team details",
+    "infoBody": "Change the name, logo, level, area, description, maximum members and the \"Looking for players\" setting.",
+    "edit": "Edit details",
+    "leaveTitle": "Leader leaving",
+    "leaveBody": "To leave, transfer leadership to another member first. If you're the only member, you can delete the team.",
+    "deleteAction": "Delete team",
+    "justNow": "Just now",
+    "errorConflict": "Something changed in the team. Refresh the page and try again.",
+    "errorGeneric": "Something went wrong. Try again."
+  }
+}
