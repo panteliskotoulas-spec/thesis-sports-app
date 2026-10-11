@@ -238,13 +238,25 @@
       "working": "Just a moment…",
       "paid": "Paid",
       "awaitingPayment": "Awaiting payment · until {deadline}",
-      "paymentExpired": "Payment expired"
+      "paymentExpired": "Payment expired",
+      "cancel": "Cancel session",
+      "panelTitle": "Cancel this session?",
+      "panelBodyCard": "{amount} will be refunded to the player's card.",
+      "panelBodyMixed": "{card} will be refunded to the player's card and {credit} to their credit.",
+      "panelBodyCredit": "{amount} will be added to the player's credit.",
+      "panelNote": "The slot will stay closed and the player will be notified. Cancelling can't be undone.",
+      "panelBack": "Back",
+      "panelConfirm": "Cancel session",
+      "panelWorking": "Just a moment…",
+      "errorConflict": "The session changed or was already cancelled.",
+      "errorGeneric": "Something went wrong. Try again."
     },
     "error": {
       "title": "Requests could not be loaded",
       "description": "Something went wrong. Please try again shortly.",
       "retry": "Try again"
-    }
+    },
+    "cancelledNotice": "Session cancelled and the player has been notified."
   },
   "sessions": {
     "meta": "My sessions",
@@ -283,7 +295,8 @@
       "refundedCredit": "{amount} added to your credit.",
       "errorTooLate": "Cancelling is no longer possible.",
       "errorConflict": "The session changed. Refresh the page.",
-      "errorGeneric": "Something went wrong. Try again."
+      "errorGeneric": "Something went wrong. Try again.",
+      "statusCancelledByCoach": "Cancelled by the coach"
     },
     "cancel": {
       "title": "What should happen to your money?",

@@ -34,6 +34,11 @@ export type PaySessionResult =
   | { status: 'conflict' }
   | { status: 'error' };
 
+export type CancelCoachRequestResult =
+  | { status: 'ok' }
+  | { status: 'conflict' }
+  | { status: 'error' };
+
 export type CancelSessionResult =
   | { status: 'ok' }
   | { status: 'tooLate' }
@@ -65,6 +70,7 @@ export interface CoachSessionRow {
   wasPaid: boolean;
   compensation: CompensationValue | null;
   teamName: string | null;
+  cancelledByCoach?: boolean;
   review?: SessionReview | null;
 }
 
@@ -89,6 +95,7 @@ export interface CoachSessionItem {
   reviewable: boolean;
   review: SessionReview | null;
   teamName: string | null;
+  cancelledByCoach: boolean;
 }
 
 export interface CoachRequestRow {
@@ -101,6 +108,7 @@ export interface CoachRequestRow {
   state: CoachRequestState;
   payment: CoachRequestPayment | null;
   payBy: Date | null;
+  credit?: number;
 }
 
 export interface CoachRequestItem {
@@ -114,6 +122,9 @@ export interface CoachRequestItem {
   state: CoachRequestState;
   payment: CoachRequestPayment | null;
   payBy: string | null;
+  canCancel: boolean;
+  card: string | null;
+  credit: string | null;
 }
 
 export interface CoachRequestSlotItem {
@@ -175,13 +186,18 @@ export function toCoachSessionItem(
     reviewable: row.state === 'CONFIRMED' && row.endTime <= now,
     review: row.review ?? null,
     teamName: row.teamName,
+    cancelledByCoach: row.cancelledByCoach ?? false,
   };
 }
 
 export function toCoachRequestItem(
   row: CoachRequestRow,
   lng: string,
+  now: Date = new Date(),
 ): CoachRequestItem {
+  const credit = row.credit ?? 0;
+  const card = Math.max(0, Math.round((row.price - credit) * 100) / 100);
+
   return {
     id: row.id,
     requesterName: row.requesterName,
@@ -193,5 +209,9 @@ export function toCoachRequestItem(
     state: row.state,
     payment: row.payment,
     payBy: row.payBy ? formatDeadline(row.payBy, lng) : null,
+    canCancel:
+      row.state === 'ACCEPTED' && row.payment === 'PAID' && row.endTime > now,
+    card: card > 0 ? formatAmount(card, lng) : null,
+    credit: credit > 0 ? formatAmount(credit, lng) : null,
   };
 }

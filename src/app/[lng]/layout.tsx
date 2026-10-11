@@ -44,6 +44,7 @@ export default async function RootLayout({
             <TRPCReactProvider>{children}</TRPCReactProvider>
           </ThemeProvider>
         </I18nProvider>
+        <script src="https://app.embed.im/accessibility.js" defer />
       </body>
     </html>
   );

@@ -40,6 +40,7 @@ export function buildCoachRequestsLabels(
     acceptedNotice: t('requests.acceptedNotice'),
     rejectedNotice: t('requests.rejectedNotice'),
     errorConflict: t('requests.errorConflict'),
+    cancelledNotice: t('requests.cancelledNotice'),
     errorGeneric: t('requests.errorGeneric'),
     card: {
       individual: t('requests.card.individual'),
@@ -49,6 +50,17 @@ export function buildCoachRequestsLabels(
       paid: t('requests.card.paid'),
       awaitingPayment: t('requests.card.awaitingPayment'),
       paymentExpired: t('requests.card.paymentExpired'),
+      cancel: t('requests.card.cancel'),
+      panelTitle: t('requests.card.panelTitle'),
+      panelBodyCard: t('requests.card.panelBodyCard'),
+      panelBodyMixed: t('requests.card.panelBodyMixed'),
+      panelBodyCredit: t('requests.card.panelBodyCredit'),
+      panelNote: t('requests.card.panelNote'),
+      panelBack: t('requests.card.panelBack'),
+      panelConfirm: t('requests.card.panelConfirm'),
+      panelWorking: t('requests.card.panelWorking'),
+      errorConflict: t('requests.card.errorConflict'),
+      errorGeneric: t('requests.card.errorGeneric'),
     },
   };
 }
@@ -76,6 +88,7 @@ export function buildCoachSessionsLabels(
       statusConfirmed: t('sessions.card.statusConfirmed'),
       statusRejected: t('sessions.card.statusRejected'),
       statusCancelled: t('sessions.card.statusCancelled'),
+      statusCancelledByCoach: t('sessions.card.statusCancelledByCoach'),
       statusExpired: t('sessions.card.statusExpired'),
       payNote: t('sessions.card.payNote'),
       pay: t('sessions.card.pay'),

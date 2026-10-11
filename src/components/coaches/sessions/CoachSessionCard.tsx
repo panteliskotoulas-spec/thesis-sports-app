@@ -20,7 +20,6 @@ import {
 import type {
   CancelSessionResult,
   CoachSessionItem,
-  CoachSessionState,
 } from '@/lib/coaches/coach-session';
 import {
   computePaymentSplit,
@@ -47,6 +46,7 @@ export interface CoachSessionCardLabels {
   statusConfirmed: string;
   statusRejected: string;
   statusCancelled: string;
+  statusCancelledByCoach: string;
   statusExpired: string;
   payNote: string;
   pay: string;
@@ -89,10 +89,10 @@ const badgeBase =
   'inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium';
 
 function badgeFor(
-  state: CoachSessionState,
+  item: CoachSessionItem,
   labels: CoachSessionCardLabels,
 ): { text: string; className: string } {
-  switch (state) {
+  switch (item.state) {
     case 'CONFIRMED':
       return {
         text: labels.statusConfirmed,
@@ -120,7 +120,9 @@ function badgeFor(
       };
     default:
       return {
-        text: labels.statusCancelled,
+        text: item.cancelledByCoach
+          ? labels.statusCancelledByCoach
+          : labels.statusCancelled,
         className: 'bg-secondary text-destructive',
       };
   }
@@ -175,7 +177,7 @@ export function CoachSessionCard({
   const [busy, setBusy] = useState<'pay' | 'cancel' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const badge = badgeFor(item.state, labels);
+  const badge = badgeFor(item, labels);
   const split = computePaymentSplit(
     toCents(item.price),
     toCents(balance),

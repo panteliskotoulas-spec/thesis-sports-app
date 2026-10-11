@@ -2,6 +2,7 @@ import { createTRPCClient, httpBatchLink, TRPCClientError } from '@trpc/client';
 import superjson from 'superjson';
 import type { AppRouter } from '@/trpc/server/routers/_app';
 import type {
+  CancelCoachRequestResult,
   CancelSessionInput,
   CancelSessionResult,
   PaySessionResult,
@@ -96,4 +97,11 @@ export async function cancelCoachSession(
     if (code === 'CONFLICT') return { status: 'conflict' };
     return { status: 'error' };
   }
+}
+
+export async function cancelCoachRequest(
+  requestId: string,
+): Promise<CancelCoachRequestResult> {
+  void requestId;
+  return { status: 'error' };
 }

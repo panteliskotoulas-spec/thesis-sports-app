@@ -4,9 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { chipBase, chipOff, chipOn } from '@/components/fields/chipStyles';
-import { respondCoachRequest } from '@/lib/coaches/coach-session-api';
+import {
+  cancelCoachRequest,
+  respondCoachRequest,
+} from '@/lib/coaches/coach-session-api';
 import {
   formatDeadline,
+  type CancelCoachRequestResult,
   type CoachRequestItem,
   type CoachRequestState,
 } from '@/lib/coaches/coach-session';
@@ -22,6 +26,7 @@ export interface CoachRequestsListLabels {
   empty: string;
   acceptedNotice: string;
   rejectedNotice: string;
+  cancelledNotice: string;
   errorConflict: string;
   errorGeneric: string;
   card: CoachRequestCardLabels;
@@ -95,6 +100,23 @@ export function CoachRequestsList({
     if (result.status === 'conflict') router.refresh();
   }
 
+  async function cancel(id: string): Promise<CancelCoachRequestResult> {
+    setError(null);
+    setNotice(null);
+
+    const result = await cancelCoachRequest(id);
+
+    if (result.status === 'ok') {
+      setItems((current) => current.filter((item) => item.id !== id));
+      setNotice(labels.cancelledNotice);
+      router.refresh();
+    } else if (result.status === 'conflict') {
+      router.refresh();
+    }
+
+    return result;
+  }
+
   const visible = items.filter((item) => item.state === tab);
 
   return (
@@ -145,6 +167,7 @@ export function CoachRequestsList({
               labels={labels.card}
               onAccept={(id) => respond(id, 'accept')}
               onReject={(id) => respond(id, 'reject')}
+              onCancel={cancel}
             />
           ))}
         </ul>

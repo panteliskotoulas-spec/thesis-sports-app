@@ -1,8 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { Calendar, Clock, Users } from 'lucide-react';
 import { fillTemplate } from '@/lib/bookings/booking';
-import type { CoachRequestItem } from '@/lib/coaches/coach-session';
+import type {
+  CancelCoachRequestResult,
+  CoachRequestItem,
+} from '@/lib/coaches/coach-session';
 
 export interface CoachRequestCardLabels {
   individual: string;
@@ -12,6 +16,17 @@ export interface CoachRequestCardLabels {
   paid: string;
   awaitingPayment: string;
   paymentExpired: string;
+  cancel: string;
+  panelTitle: string;
+  panelBodyCard: string;
+  panelBodyMixed: string;
+  panelBodyCredit: string;
+  panelNote: string;
+  panelBack: string;
+  panelConfirm: string;
+  panelWorking: string;
+  errorConflict: string;
+  errorGeneric: string;
 }
 
 export interface CoachRequestCardProps {
@@ -21,6 +36,7 @@ export interface CoachRequestCardProps {
   labels: CoachRequestCardLabels;
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
+  onCancel: (id: string) => Promise<CancelCoachRequestResult>;
 }
 
 const badgeBase =
@@ -51,6 +67,24 @@ function paymentBadge(
   };
 }
 
+function refundTemplate(
+  item: CoachRequestItem,
+  labels: CoachRequestCardLabels,
+): string {
+  if (item.card && item.credit) {
+    return fillTemplate(labels.panelBodyMixed, {
+      card: item.card,
+      credit: item.credit,
+    });
+  }
+  if (item.card) {
+    return fillTemplate(labels.panelBodyCard, { amount: item.card });
+  }
+  return fillTemplate(labels.panelBodyCredit, {
+    amount: item.credit ?? item.price,
+  });
+}
+
 export function CoachRequestCard({
   item,
   busy,
@@ -58,8 +92,30 @@ export function CoachRequestCard({
   labels,
   onAccept,
   onReject,
+  onCancel,
 }: CoachRequestCardProps) {
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [cancelBusy, setCancelBusy] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+
   const badge = paymentBadge(item, labels);
+
+  async function handleCancel() {
+    if (cancelBusy) return;
+
+    setCancelBusy(true);
+    setCancelError(null);
+
+    const result = await onCancel(item.id);
+
+    setCancelBusy(false);
+
+    if (result.status === 'ok') return;
+
+    setCancelError(
+      result.status === 'conflict' ? labels.errorConflict : labels.errorGeneric,
+    );
+  }
 
   return (
     <li className="rounded-xl border-[0.5px] border-border bg-card p-4">
@@ -129,6 +185,54 @@ export function CoachRequestCard({
           <span className={`${badgeBase} ${badge.className}`}>
             {badge.text}
           </span>
+        </div>
+      ) : null}
+
+      {item.canCancel && !panelOpen ? (
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => setPanelOpen(true)}
+          className="mt-3 h-11 w-full rounded-full border-[0.5px] border-terracotta bg-card px-4 text-sm font-medium text-terracotta hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {labels.cancel}
+        </button>
+      ) : null}
+
+      {item.canCancel && panelOpen ? (
+        <div className="mt-3 border-t-[0.5px] border-border pt-3">
+          <p className="font-medium text-foreground">{labels.panelTitle}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {refundTemplate(item, labels)} {labels.panelNote}
+          </p>
+
+          {cancelError ? (
+            <p role="alert" className="mt-3 text-sm text-destructive">
+              {cancelError}
+            </p>
+          ) : null}
+
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              disabled={cancelBusy}
+              onClick={() => {
+                setPanelOpen(false);
+                setCancelError(null);
+              }}
+              className="h-11 rounded-full border-[0.5px] border-border bg-card px-4 text-sm font-medium text-foreground hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {labels.panelBack}
+            </button>
+            <button
+              type="button"
+              disabled={cancelBusy}
+              onClick={handleCancel}
+              className="h-11 rounded-full bg-destructive px-4 text-sm font-medium text-destructive-foreground disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {cancelBusy ? labels.panelWorking : labels.panelConfirm}
+            </button>
+          </div>
         </div>
       ) : null}
     </li>

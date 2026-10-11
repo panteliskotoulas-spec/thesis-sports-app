@@ -223,3 +223,23 @@
     }
   }
 }
+
+#embedimAccessibilityWidget .editorim-sidebox-open {
+  right: auto !important;
+  left: 30px !important;
+}
+
+#embedimAccessibilityWidget .editorim-sidebox {
+  right: auto !important;
+  left: 10px !important;
+}
+
+@media (max-width: 500px) {
+  #embedimAccessibilityWidget .editorim-sidebox-open {
+    left: 16px !important;
+  }
+
+  #embedimAccessibilityWidget .editorim-sidebox {
+    left: 0 !important;
+  }
+}
