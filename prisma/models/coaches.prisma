@@ -23,16 +23,27 @@ model CoachAvailabilitySlot {
   endTime   DateTime
   price     Decimal          @db.Decimal(10, 2)
   status    CoachSlotStatus  @default(OPEN)
-  session   CoachingSession?
+  sessions  CoachingSession[]
 }
 
 model CoachingSession {
-  id     String                @id @default(cuid())
-  slotId String                @unique
-  slot   CoachAvailabilitySlot @relation(fields: [slotId], references: [id])
-  userId String
-  user   User                  @relation(fields: [userId], references: [id])
-  teamId String?
-  team   Team?                 @relation(fields: [teamId], references: [id])
-  status SessionStatus         @default(PENDING)
+  id               String                @id @default(cuid())
+  slotId           String
+  slot             CoachAvailabilitySlot @relation(fields: [slotId], references: [id])
+  userId           String
+  user             User                  @relation(fields: [userId], references: [id])
+  teamId           String?
+  team             Team?                 @relation(fields: [teamId], references: [id])
+  status           SessionStatus         @default(PENDING)
+  price            Decimal               @default(0) @db.Decimal(10, 2)
+  createdAt        DateTime              @default(now())
+  respondedAt      DateTime?
+  payBy            DateTime?
+  paidAt           DateTime?
+  cancelledAt      DateTime?
+  compensationType CompensationType?
+
+  @@index([slotId])
+  @@index([userId])
+  @@index([status])
 }

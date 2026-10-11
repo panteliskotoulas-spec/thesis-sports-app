@@ -6,6 +6,10 @@ import {
   confirmCheckoutSession,
 } from '@/lib/server/booking-checkout';
 import {
+  abandonCoachPayment,
+  confirmCoachCheckoutSession,
+} from '@/lib/server/coach-session-payment';
+import {
   abandonSplitPayment,
   confirmSplitCheckoutSession,
 } from '@/lib/server/team-split-payment';
@@ -25,12 +29,32 @@ export async function GET(request: Request) {
   const lng = url.searchParams.get('lng') === 'en' ? 'en' : 'el';
   const status = url.searchParams.get('status');
   const isSplit = url.searchParams.get('kind') === 'split';
+  const isCoaching = url.searchParams.get('kind') === 'coaching';
   const teamId = safeId(url.searchParams.get('team'));
   const teamPath = teamId ? `/${lng}/teams/${teamId}` : `/${lng}/teams`;
 
   if (status === 'success') {
     const sessionId = url.searchParams.get('session_id');
     if (!sessionId) return redirectTo(request, `/${lng}/bookings`);
+
+    if (isCoaching) {
+      const sessionsPath = `/${lng}/coaching`;
+
+      try {
+        const result = await confirmCoachCheckoutSession(prisma, sessionId);
+
+        if (result.status === 'confirmed') {
+          return redirectTo(request, `${sessionsPath}?paid=1`);
+        }
+        if (result.status === 'pending') {
+          return redirectTo(request, sessionsPath);
+        }
+        return redirectTo(request, `${sessionsPath}?payment=failed`);
+      } catch (error) {
+        console.error('[stripe return]', error);
+        return redirectTo(request, sessionsPath);
+      }
+    }
 
     if (isSplit) {
       try {
@@ -61,6 +85,36 @@ export async function GET(request: Request) {
       console.error('[stripe return]', error);
       return redirectTo(request, `/${lng}/bookings`);
     }
+  }
+
+  if (status === 'cancelled' && isCoaching) {
+    const paymentId = safeId(url.searchParams.get('payment'));
+    const sessionsPath = `/${lng}/coaching`;
+
+    if (paymentId) {
+      try {
+        const session = await auth.api.getSession({
+          headers: request.headers,
+        });
+
+        const payment = await prisma.payment.findUnique({
+          where: { id: paymentId },
+          select: { id: true, userId: true, sessionId: true },
+        });
+
+        if (session && payment && payment.userId === session.user.id) {
+          const outcome = await abandonCoachPayment(prisma, payment);
+
+          if (outcome === 'confirmed') {
+            return redirectTo(request, `${sessionsPath}?paid=1`);
+          }
+        }
+      } catch (error) {
+        console.error('[stripe return]', error);
+      }
+    }
+
+    return redirectTo(request, sessionsPath);
   }
 
   if (status === 'cancelled' && isSplit) {

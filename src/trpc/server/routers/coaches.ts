@@ -15,6 +15,7 @@ import { dayWindow } from '@/lib/fields/detail';
 import { todayInAthens } from '@/lib/fields/filters';
 import { SPORT_TYPES } from '@/lib/fields/types';
 import type { LocalizedText } from '@/lib/i18n-content';
+import { expireStaleCoachSessions } from '@/lib/server/coach-session';
 import { toLocalized } from '@/lib/server/translate';
 
 const MS_PER_HOUR = 3_600_000;
@@ -84,6 +85,8 @@ export const coachesRouter = router({
   list: publicProcedure
     .input(listInput)
     .query(async ({ ctx, input }): Promise<CoachListRow[]> => {
+      await expireStaleCoachSessions(ctx.prisma);
+
       const now = new Date();
 
       const coaches = await ctx.prisma.coach.findMany({
@@ -129,6 +132,8 @@ export const coachesRouter = router({
   getById: publicProcedure
     .input(getByIdInput)
     .query(async ({ ctx, input }): Promise<CoachDetailRow> => {
+      await expireStaleCoachSessions(ctx.prisma);
+
       const coach = await ctx.prisma.coach.findUnique({
         where: { id: input.id },
         select: {

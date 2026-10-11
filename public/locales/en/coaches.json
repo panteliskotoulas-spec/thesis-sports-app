@@ -239,6 +239,11 @@
       "paid": "Paid",
       "awaitingPayment": "Awaiting payment · until {deadline}",
       "paymentExpired": "Payment expired"
+    },
+    "error": {
+      "title": "Requests could not be loaded",
+      "description": "Something went wrong. Please try again shortly.",
+      "retry": "Try again"
     }
   },
   "sessions": {
@@ -291,6 +296,12 @@
       "back": "Back",
       "confirm": "Cancel session",
       "working": "Just a moment…"
+    },
+    "paymentFailed": "The payment was not completed. If you were charged, it will be refunded automatically.",
+    "error": {
+      "title": "Sessions could not be loaded",
+      "description": "Something went wrong. Please try again shortly.",
+      "retry": "Try again"
     }
   }
 }

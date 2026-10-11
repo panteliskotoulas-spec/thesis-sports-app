@@ -5,6 +5,10 @@ import {
   confirmCheckoutSession,
   releaseHold,
 } from '@/lib/server/booking-checkout';
+import {
+  confirmCoachCheckoutSession,
+  releaseCoachPayment,
+} from '@/lib/server/coach-session-payment';
 import { getStripe, getWebhookSecret } from '@/lib/server/stripe';
 import { confirmSplitCheckoutSession } from '@/lib/server/team-split-payment';
 
@@ -35,14 +39,21 @@ export async function POST(request: Request) {
 
       if (session.metadata?.splitId) {
         await confirmSplitCheckoutSession(prisma, session.id);
+      } else if (session.metadata?.coachingSessionId) {
+        await confirmCoachCheckoutSession(prisma, session.id);
       } else {
         await confirmCheckoutSession(prisma, session.id);
       }
     }
 
     if (event.type === 'checkout.session.expired') {
-      const paymentId = event.data.object.metadata?.paymentId;
-      if (paymentId) await releaseHold(prisma, paymentId);
+      const metadata = event.data.object.metadata;
+      const paymentId = metadata?.paymentId;
+      if (paymentId && metadata?.coachingSessionId) {
+        await releaseCoachPayment(prisma, paymentId);
+      } else if (paymentId) {
+        await releaseHold(prisma, paymentId);
+      }
     }
   } catch (error) {
     console.error('[stripe webhook]', event.type, error);

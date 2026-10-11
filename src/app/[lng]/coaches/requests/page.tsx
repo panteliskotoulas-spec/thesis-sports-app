@@ -6,10 +6,13 @@ import { ArrowLeft } from 'lucide-react';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
+import { CoachFlowError } from '@/components/coaches/CoachFlowError';
 import { CoachRequestsList } from '@/components/coaches/requests/CoachRequestsList';
-import { toCoachRequestItem } from '@/lib/coaches/coach-session';
+import {
+  toCoachRequestItem,
+  type CoachRequestRow,
+} from '@/lib/coaches/coach-session';
 import { buildCoachRequestsLabels } from '@/lib/coaches/coach-session-labels';
-import { mockCoachRequestRows } from '@/lib/coaches/coach-session-mock';
 import { getCurrentUser } from '@/lib/session';
 import { getServerCaller } from '@/trpc/server/caller';
 
@@ -29,9 +32,17 @@ export default async function CoachRequestsPage() {
   const record = await caller.coaches.getMine();
   const approved = record?.status === 'APPROVED';
 
-  const items = mockCoachRequestRows().map((row) =>
-    toCoachRequestItem(row, lng),
-  );
+  let rows: CoachRequestRow[] | null = null;
+
+  if (approved) {
+    try {
+      rows = await caller.coachSessions.listIncoming();
+    } catch (error) {
+      console.error('[coach requests page]', error);
+    }
+  }
+
+  const items = rows ? rows.map((row) => toCoachRequestItem(row, lng)) : null;
 
   return (
     <>
@@ -62,6 +73,13 @@ export default async function CoachRequestsPage() {
                 {t('requests.notApproved.cta')}
               </Link>
             </div>
+          ) : !items ? (
+            <CoachFlowError
+              title={t('requests.error.title')}
+              description={t('requests.error.description')}
+              retry={t('requests.error.retry')}
+              href={`/${lng}/coaches/requests`}
+            />
           ) : (
             <CoachRequestsList
               lng={lng}

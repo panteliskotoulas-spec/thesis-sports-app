@@ -2,6 +2,7 @@ model Payment {
   id                    String        @id @default(cuid())
   reservationId         String?
   sessionId             String?
+  coachingSessionId     String?
   amount                Decimal       @db.Decimal(10, 2)
   platformFee           Decimal       @db.Decimal(10, 2)
   ownerPayout           Decimal       @db.Decimal(10, 2)
@@ -18,6 +19,7 @@ model Payment {
 
   @@index([reservationId])
   @@index([sessionId])
+  @@index([coachingSessionId])
   @@index([slotId])
   @@index([splitId])
 }
@@ -41,5 +43,6 @@ model CreditTransaction {
   amount               Decimal      @db.Decimal(10, 2)
   type                 CreditTxType
   relatedReservationId String?
+  relatedCoachingSessionId String?
   createdAt            DateTime     @default(now())
 }

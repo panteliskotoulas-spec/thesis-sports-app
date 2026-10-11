@@ -2,22 +2,31 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
-import { ArrowLeft } from 'lucide-react';
+import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
+import { CoachFlowError } from '@/components/coaches/CoachFlowError';
 import { CoachSessionsList } from '@/components/coaches/sessions/CoachSessionsList';
-import { toCoachSessionItem } from '@/lib/coaches/coach-session';
+import {
+  toCoachSessionItem,
+  type CoachSessionRow,
+} from '@/lib/coaches/coach-session';
 import { buildCoachSessionsLabels } from '@/lib/coaches/coach-session-labels';
-import { mockCoachSessionRows } from '@/lib/coaches/coach-session-mock';
 import { getCurrentUser } from '@/lib/session';
+import { getServerCaller } from '@/trpc/server/caller';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT('coaches');
   return { title: t('sessions.meta') };
 }
 
-export default async function CoachingSessionsPage() {
+export default async function CoachingSessionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ paid?: string; payment?: string }>;
+}) {
+  const query = await searchParams;
   const { t } = await getT('coaches');
   const { t: tf } = await getT('fields');
   const lng = await routeLanguage();
@@ -26,9 +35,24 @@ export default async function CoachingSessionsPage() {
   if (!user) redirect(`/${lng}/login`);
 
   const now = new Date();
-  const items = mockCoachSessionRows(now).map((row) =>
-    toCoachSessionItem(row, lng, tf(`sports.${row.sportType}`), now),
-  );
+  const caller = await getServerCaller();
+
+  let rows: CoachSessionRow[] | null = null;
+  let balance = 0;
+
+  try {
+    const result = await caller.coachSessions.listMine();
+    rows = result.rows;
+    balance = result.balance;
+  } catch (error) {
+    console.error('[coaching page]', error);
+  }
+
+  const items = rows
+    ? rows.map((row) =>
+        toCoachSessionItem(row, lng, tf(`sports.${row.sportType}`), now),
+      )
+    : null;
 
   return (
     <>
@@ -45,12 +69,37 @@ export default async function CoachingSessionsPage() {
         <h1 className="mt-2">{t('sessions.title')}</h1>
         <p className="mt-2 text-muted-foreground">{t('sessions.subtitle')}</p>
 
+        {query.payment === 'failed' ? (
+          <div
+            role="alert"
+            className="mt-6 flex items-start gap-2 rounded-xl border-[0.5px] border-terracotta bg-card p-4 text-sm text-foreground"
+          >
+            <AlertTriangle
+              className="mt-0.5 size-4 shrink-0 text-terracotta"
+              aria-hidden="true"
+            />
+            {t('sessions.paymentFailed')}
+          </div>
+        ) : null}
+
         <div className="mt-6">
-          <CoachSessionsList
-            items={items}
-            browseHref={`/${lng}/coaches`}
-            labels={buildCoachSessionsLabels(t)}
-          />
+          {items ? (
+            <CoachSessionsList
+              items={items}
+              lng={lng}
+              balance={balance}
+              justPaid={query.paid === '1'}
+              browseHref={`/${lng}/coaches`}
+              labels={buildCoachSessionsLabels(t, tf)}
+            />
+          ) : (
+            <CoachFlowError
+              title={t('sessions.error.title')}
+              description={t('sessions.error.description')}
+              retry={t('sessions.error.retry')}
+              href={`/${lng}/coaching`}
+            />
+          )}
         </div>
       </main>
       <BottomNav user={user} />

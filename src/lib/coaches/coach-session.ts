@@ -74,6 +74,8 @@ export interface CoachSessionItem {
   date: string;
   time: string;
   state: CoachSessionState;
+  price: number;
+  creditValue: number;
   total: string;
   card: string | null;
   credit: string | null;
@@ -152,6 +154,8 @@ export function toCoachSessionItem(
     date: formatDayChip(todayInAthens(row.startTime), lng).full,
     time: formatTimeRange(row.startTime, row.endTime, lng),
     state: row.state,
+    price: row.price,
+    creditValue: row.credit,
     total: formatAmount(row.price, lng),
     card: card > 0 ? formatAmount(card, lng) : null,
     credit: row.credit > 0 ? formatAmount(row.credit, lng) : null,

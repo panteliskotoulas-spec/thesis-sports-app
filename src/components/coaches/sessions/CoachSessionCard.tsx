@@ -4,11 +4,16 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Calendar, CalendarX, Clock, Info, Users } from 'lucide-react';
 import {
+  CreditToggle,
+  type CreditToggleLabels,
+} from '@/components/bookings/CreditToggle';
+import {
   CancelPanel,
   type CancelPanelLabels,
 } from '@/components/bookings/CancelPanel';
 import {
   fillTemplate,
+  formatAmount,
   type CancelBookingResult,
   type CompensationValue,
 } from '@/lib/bookings/booking';
@@ -17,6 +22,11 @@ import type {
   CoachSessionItem,
   CoachSessionState,
 } from '@/lib/coaches/coach-session';
+import {
+  computePaymentSplit,
+  fromCents,
+  toCents,
+} from '@/lib/bookings/payment-split';
 
 export interface CoachSessionCardLabels {
   statusRequested: string;
@@ -40,13 +50,19 @@ export interface CoachSessionCardLabels {
   errorTooLate: string;
   errorConflict: string;
   errorGeneric: string;
+  credit: CreditToggleLabels;
   panel: CancelPanelLabels;
 }
 
 export interface CoachSessionCardProps {
   item: CoachSessionItem;
   labels: CoachSessionCardLabels;
-  onPay: (id: string) => Promise<'ok' | 'conflict' | 'error'>;
+  lng: string;
+  balance: number;
+  onPay: (
+    id: string,
+    useCredit: boolean,
+  ) => Promise<'ok' | 'conflict' | 'error'>;
   onCancel: (
     id: string,
     compensation: CompensationValue | null,
@@ -130,14 +146,22 @@ function paidBreakdown(
 export function CoachSessionCard({
   item,
   labels,
+  lng,
+  balance,
   onPay,
   onCancel,
 }: CoachSessionCardProps) {
+  const [useCredit, setUseCredit] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [busy, setBusy] = useState<'pay' | 'cancel' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const badge = badgeFor(item.state, labels);
+  const split = computePaymentSplit(
+    toCents(item.price),
+    toCents(balance),
+    useCredit,
+  );
 
   function messageFor(status: CancelBookingResult['status'] | 'ok'): string {
     if (status === 'tooLate') return labels.errorTooLate;
@@ -151,7 +175,7 @@ export function CoachSessionCard({
     setBusy('pay');
     setError(null);
 
-    const status = await onPay(item.id);
+    const status = await onPay(item.id, useCredit);
 
     setBusy(null);
 
@@ -228,6 +252,16 @@ export function CoachSessionCard({
             <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
             {fillTemplate(labels.payNote, { deadline: item.payBy ?? '' })}
           </p>
+          <div className="mt-3">
+            <CreditToggle
+              balanceText={formatAmount(balance, lng)}
+              hasBalance={balance > 0}
+              checked={useCredit}
+              limited={split.limited}
+              labels={labels.credit}
+              onChange={setUseCredit}
+            />
+          </div>
           <button
             type="button"
             disabled={busy !== null}
@@ -236,7 +270,14 @@ export function CoachSessionCard({
           >
             {busy === 'pay'
               ? labels.paying
-              : fillTemplate(labels.pay, { amount: item.total })}
+              : fillTemplate(labels.pay, {
+                  amount: formatAmount(
+                    split.cardCents > 0
+                      ? fromCents(split.cardCents)
+                      : item.price,
+                    lng,
+                  ),
+                })}
           </button>
         </>
       ) : null}

@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { Prisma } from '@/generated/prisma/client';
 import { protectedProcedure, router } from '../init';
+import { expireStaleCoachSessions } from '@/lib/server/coach-session';
 import type { CoachSlotRow } from '@/lib/coaches/coach-public';
 import {
   athensDateTime,
@@ -27,6 +28,8 @@ export const coachSlotsRouter = router({
   list: protectedProcedure
     .input(listInput)
     .query(async ({ ctx, input }): Promise<CoachSlotRow[]> => {
+      await expireStaleCoachSessions(ctx.prisma);
+
       const coach = await ctx.prisma.coach.findUnique({
         where: { userId: ctx.session.user.id },
         select: { id: true },
@@ -129,7 +132,7 @@ export const coachSlotsRouter = router({
     };
 
     const deleted = await ctx.prisma.coachAvailabilitySlot.deleteMany({
-      where: { ...where, status: 'OPEN', session: { is: null } },
+      where: { ...where, status: 'OPEN', sessions: { none: {} } },
     });
 
     if (deleted.count > 0) return { id: input.id };

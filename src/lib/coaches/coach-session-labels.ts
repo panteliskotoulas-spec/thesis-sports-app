@@ -54,6 +54,7 @@ export function buildCoachRequestsLabels(
 
 export function buildCoachSessionsLabels(
   t: Translate,
+  tf: Translate,
 ): CoachSessionsListLabels {
   return {
     tabAll: t('sessions.tabAll'),
@@ -88,6 +89,13 @@ export function buildCoachSessionsLabels(
       errorTooLate: t('sessions.card.errorTooLate'),
       errorConflict: t('sessions.card.errorConflict'),
       errorGeneric: t('sessions.card.errorGeneric'),
+      credit: {
+        title: tf('booking.summary.credit.title'),
+        available: tf('booking.summary.credit.available'),
+        none: tf('booking.summary.credit.none'),
+        toggle: tf('booking.summary.credit.toggle'),
+        limited: tf('booking.summary.credit.limited'),
+      },
       panel: {
         title: t('sessions.cancel.title'),
         optionRefundTitle: t('sessions.cancel.optionRefundTitle'),

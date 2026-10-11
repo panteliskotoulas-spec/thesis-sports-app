@@ -4,8 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
+import {
+  computePaymentSplit,
+  toCents,
+  fromCents,
+} from '@/lib/bookings/payment-split';
 import { chipBase, chipOff, chipOn } from '@/components/fields/chipStyles';
-import type { CompensationValue } from '@/lib/bookings/booking';
+import { formatAmount, type CompensationValue } from '@/lib/bookings/booking';
 import {
   cancelCoachSession,
   payCoachSession,
@@ -36,6 +41,9 @@ export interface CoachSessionsListLabels {
 
 export interface CoachSessionsListProps {
   items: CoachSessionItem[];
+  lng: string;
+  balance: number;
+  justPaid: boolean;
   browseHref: string;
   labels: CoachSessionsListLabels;
 }
@@ -44,13 +52,19 @@ type Filter = 'ALL' | CoachSessionState;
 
 export function CoachSessionsList({
   items: initialItems,
+  lng,
+  balance: initialBalance,
+  justPaid,
   browseHref,
   labels,
 }: CoachSessionsListProps) {
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const [filter, setFilter] = useState<Filter>('ALL');
-  const [notice, setNotice] = useState<string | null>(null);
+  const [balance, setBalance] = useState(initialBalance);
+  const [notice, setNotice] = useState<string | null>(
+    justPaid ? labels.paidNotice : null,
+  );
 
   const filters: { value: Filter; label: string }[] = [
     { value: 'ALL', label: labels.tabAll },
@@ -59,8 +73,11 @@ export function CoachSessionsList({
     { value: 'CONFIRMED', label: labels.tabConfirmed },
   ];
 
-  async function handlePay(id: string): Promise<'ok' | 'conflict' | 'error'> {
-    const result = await payCoachSession(id);
+  async function handlePay(
+    id: string,
+    useCredit: boolean,
+  ): Promise<'ok' | 'conflict' | 'error'> {
+    const result = await payCoachSession(id, useCredit, lng);
 
     if (result.status === 'redirect') {
       window.location.assign(result.url);
@@ -68,13 +85,39 @@ export function CoachSessionsList({
     }
 
     if (result.status === 'ok') {
+      const target = items.find((item) => item.id === id);
+      const split = target
+        ? computePaymentSplit(
+            toCents(target.price),
+            toCents(balance),
+            useCredit,
+          )
+        : null;
+      const creditCents = split ? split.creditCents : 0;
+      const cardCents = split ? split.cardCents : 0;
+
       setItems((current) =>
         current.map((item) =>
           item.id === id
-            ? { ...item, state: 'CONFIRMED', wasPaid: true, payBy: null }
+            ? {
+                ...item,
+                state: 'CONFIRMED',
+                wasPaid: true,
+                payBy: null,
+                credit:
+                  creditCents > 0
+                    ? formatAmount(fromCents(creditCents), lng)
+                    : null,
+                card:
+                  cardCents > 0
+                    ? formatAmount(fromCents(cardCents), lng)
+                    : null,
+                creditValue: fromCents(creditCents),
+              }
             : item,
         ),
       );
+      setBalance((current) => Math.max(0, current - fromCents(creditCents)));
       setNotice(labels.paidNotice);
       router.refresh();
       return 'ok';
@@ -90,6 +133,13 @@ export function CoachSessionsList({
     const result = await cancelCoachSession({ sessionId: id, compensation });
 
     if (result.status === 'ok') {
+      const cancelled = items.find((item) => item.id === id);
+      if (cancelled && cancelled.state === 'CONFIRMED') {
+        const back =
+          compensation === 'CREDIT' ? cancelled.price : cancelled.creditValue;
+        setBalance((current) => current + back);
+      }
+
       setItems((current) =>
         current.map((item) =>
           item.id === id
@@ -162,6 +212,8 @@ export function CoachSessionsList({
               key={item.id}
               item={item}
               labels={labels.card}
+              lng={lng}
+              balance={balance}
               onPay={handlePay}
               onCancel={handleCancel}
             />

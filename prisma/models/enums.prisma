@@ -59,6 +59,8 @@ enum SessionStatus {
   ACCEPTED
   REJECTED
   CANCELLED
+  CONFIRMED
+  EXPIRED
 }
 
 enum TournamentStatus {

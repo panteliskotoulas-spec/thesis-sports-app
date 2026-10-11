@@ -1,51 +1,99 @@
-import {
-  paymentDeadline,
-  type CancelSessionInput,
-  type CancelSessionResult,
-  type PaySessionResult,
-  type RequestSessionInput,
-  type RequestSessionResult,
-  type RespondRequestResult,
+import { createTRPCClient, httpBatchLink, TRPCClientError } from '@trpc/client';
+import superjson from 'superjson';
+import type { AppRouter } from '@/trpc/server/routers/_app';
+import type {
+  CancelSessionInput,
+  CancelSessionResult,
+  PaySessionResult,
+  RequestSessionInput,
+  RequestSessionResult,
+  RespondRequestResult,
 } from '@/lib/coaches/coach-session';
 
-function wait(): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, 500));
+const client = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: '/api/trpc',
+      transformer: superjson,
+      fetch(url, options) {
+        return fetch(url, { ...options, credentials: 'include' });
+      },
+    }),
+  ],
+});
+
+function errorCode(error: unknown): string | null {
+  if (error instanceof TRPCClientError) {
+    return (error.data as { code?: string } | null | undefined)?.code ?? null;
+  }
+  return null;
 }
 
 export async function requestCoachSession(
   input: RequestSessionInput,
 ): Promise<RequestSessionResult> {
-  void input;
-  await wait();
-  return 'ok';
+  try {
+    await client.coachSessions.request.mutate({
+      slotId: input.slotId,
+      teamId: input.teamId,
+    });
+    return 'ok';
+  } catch (error) {
+    const code = errorCode(error);
+    if (code === 'CONFLICT') return 'conflict';
+    if (code === 'UNAUTHORIZED') return 'unauthorized';
+    return 'error';
+  }
 }
 
 export async function respondCoachRequest(
   requestId: string,
   decision: 'accept' | 'reject',
 ): Promise<RespondRequestResult> {
-  void requestId;
-  await wait();
-  if (decision === 'reject') return { status: 'ok', payBy: null };
-  const now = new Date();
-  return {
-    status: 'ok',
-    payBy: paymentDeadline(now, new Date(now.getTime() + 7 * 86_400_000)),
-  };
+  try {
+    const result = await client.coachSessions.respond.mutate({
+      id: requestId,
+      decision,
+    });
+    return { status: 'ok', payBy: result.payBy };
+  } catch (error) {
+    if (errorCode(error) === 'CONFLICT') return { status: 'conflict' };
+    return { status: 'error' };
+  }
 }
 
 export async function payCoachSession(
   sessionId: string,
+  useCredit: boolean,
+  lng: string,
 ): Promise<PaySessionResult> {
-  void sessionId;
-  await wait();
-  return { status: 'ok' };
+  try {
+    const result = await client.coachSessions.pay.mutate({
+      sessionId,
+      useCredit,
+      lng: lng === 'en' ? 'en' : 'el',
+    });
+    if (result.url) return { status: 'redirect', url: result.url };
+    return { status: 'ok' };
+  } catch (error) {
+    if (errorCode(error) === 'CONFLICT') return { status: 'conflict' };
+    return { status: 'error' };
+  }
 }
 
 export async function cancelCoachSession(
   input: CancelSessionInput,
 ): Promise<CancelSessionResult> {
-  void input;
-  await wait();
-  return { status: 'ok' };
+  try {
+    await client.coachSessions.cancel.mutate({
+      sessionId: input.sessionId,
+      compensation: input.compensation,
+    });
+    return { status: 'ok' };
+  } catch (error) {
+    const code = errorCode(error);
+    if (code === 'PRECONDITION_FAILED') return { status: 'tooLate' };
+    if (code === 'CONFLICT') return { status: 'conflict' };
+    return { status: 'error' };
+  }
 }
