@@ -42,6 +42,7 @@ model CoachingSession {
   paidAt           DateTime?
   cancelledAt      DateTime?
   compensationType CompensationType?
+  cancelledByCoach Boolean               @default(false)
   review           CoachReview?
 
   @@index([slotId])

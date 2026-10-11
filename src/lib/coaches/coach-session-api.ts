@@ -102,6 +102,11 @@ export async function cancelCoachSession(
 export async function cancelCoachRequest(
   requestId: string,
 ): Promise<CancelCoachRequestResult> {
-  void requestId;
-  return { status: 'error' };
+  try {
+    await client.coachSessions.cancelByCoach.mutate({ sessionId: requestId });
+    return { status: 'ok' };
+  } catch (error) {
+    if (errorCode(error) === 'CONFLICT') return { status: 'conflict' };
+    return { status: 'error' };
+  }
 }

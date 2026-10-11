@@ -165,3 +165,32 @@ export function sessionCancelledCoachMessage(
     en: `${playerName} cancelled the session on ${slot.en}. The slot is open again.`,
   };
 }
+
+export function sessionCancelledByCoachMessage(
+  coachName: string,
+  startTime: Date,
+  endTime: Date,
+  outcome: SessionCancellationOutcome,
+): LocalizedText {
+  const slot = when(startTime, endTime);
+  const tail = tails[outcome];
+
+  return {
+    el: `Ο προπονητής ${coachName} ακύρωσε τη συνεδρία σου για ${slot.el}. ${tail.el}`.trim(),
+    en: `Coach ${coachName} cancelled your session for ${slot.en}. ${tail.en}`.trim(),
+  };
+}
+
+export function sessionCancelledByCoachTeamMessage(
+  coachName: string,
+  teamName: string,
+  startTime: Date,
+  endTime: Date,
+): LocalizedText {
+  const slot = when(startTime, endTime);
+
+  return {
+    el: `Ο προπονητής ${coachName} ακύρωσε τη συνεδρία της ομάδας ${teamName} για ${slot.el}.`,
+    en: `Coach ${coachName} cancelled the session of ${teamName} for ${slot.en}.`,
+  };
+}

@@ -70,7 +70,7 @@ export interface CoachSessionRow {
   wasPaid: boolean;
   compensation: CompensationValue | null;
   teamName: string | null;
-  cancelledByCoach?: boolean;
+  cancelledByCoach: boolean;
   review?: SessionReview | null;
 }
 
@@ -108,7 +108,7 @@ export interface CoachRequestRow {
   state: CoachRequestState;
   payment: CoachRequestPayment | null;
   payBy: Date | null;
-  credit?: number;
+  credit: number;
 }
 
 export interface CoachRequestItem {
@@ -186,7 +186,7 @@ export function toCoachSessionItem(
     reviewable: row.state === 'CONFIRMED' && row.endTime <= now,
     review: row.review ?? null,
     teamName: row.teamName,
-    cancelledByCoach: row.cancelledByCoach ?? false,
+    cancelledByCoach: row.cancelledByCoach,
   };
 }
 
@@ -195,7 +195,7 @@ export function toCoachRequestItem(
   lng: string,
   now: Date = new Date(),
 ): CoachRequestItem {
-  const credit = row.credit ?? 0;
+  const credit = row.credit;
   const card = Math.max(0, Math.round((row.price - credit) * 100) / 100);
 
   return {

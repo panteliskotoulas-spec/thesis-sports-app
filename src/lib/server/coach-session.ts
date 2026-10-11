@@ -16,6 +16,8 @@ import {
 import { decimalToCents, money } from '@/lib/server/booking-shared';
 import {
   sessionAcceptedMessage,
+  sessionCancelledByCoachMessage,
+  sessionCancelledByCoachTeamMessage,
   sessionCancelledCoachMessage,
   sessionCancelledMessage,
   sessionExpiredCoachMessage,
@@ -474,6 +476,153 @@ export async function cancelSession(
   return { id: session.id };
 }
 
+export interface CancelSessionByCoachParams {
+  coachUserId: string;
+  sessionId: string;
+}
+
+export async function cancelSessionByCoach(
+  prisma: PrismaClient,
+  params: CancelSessionByCoachParams,
+): Promise<{ id: string }> {
+  const now = new Date();
+
+  const session = await prisma.coachingSession.findFirst({
+    where: {
+      id: params.sessionId,
+      slot: { coach: { userId: params.coachUserId } },
+    },
+    select: {
+      id: true,
+      status: true,
+      userId: true,
+      teamId: true,
+      team: { select: { name: true } },
+      slot: {
+        select: {
+          startTime: true,
+          endTime: true,
+          coach: { select: { user: { select: { name: true } } } },
+        },
+      },
+    },
+  });
+
+  if (!session) throw new TRPCError({ code: 'NOT_FOUND' });
+  if (session.status !== 'CONFIRMED') throw new TRPCError({ code: 'CONFLICT' });
+  if (session.slot.endTime <= now) throw new TRPCError({ code: 'CONFLICT' });
+
+  const payment = await prisma.payment.findFirst({
+    where: { coachingSessionId: session.id, status: 'SUCCEEDED' },
+  });
+  if (!payment) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+
+  const totalCents = decimalToCents(payment.amount);
+  const creditCents = decimalToCents(payment.creditApplied);
+  const cardCents = totalCents - creditCents;
+
+  if (cardCents > 0 && !payment.stripePaymentIntentId) {
+    throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+  }
+
+  const compensation: CompensationValue = cardCents > 0 ? 'REFUND' : 'CREDIT';
+  const refundCents = cardCents;
+  const creditBackCents = creditCents;
+  const outcome: SessionCancellationOutcome =
+    refundCents === 0 ? 'credit' : creditBackCents > 0 ? 'mixed' : 'card';
+
+  const coachName = session.slot.coach.user.name;
+  const { startTime, endTime } = session.slot;
+
+  await prisma.$transaction(
+    async (tx) => {
+      const cancelled = await tx.coachingSession.updateMany({
+        where: { id: session.id, status: 'CONFIRMED' },
+        data: {
+          status: 'CANCELLED',
+          cancelledAt: now,
+          compensationType: compensation,
+          cancelledByCoach: true,
+        },
+      });
+      if (cancelled.count === 0) throw new TRPCError({ code: 'CONFLICT' });
+
+      if (creditBackCents > 0) {
+        await tx.user.update({
+          where: { id: session.userId },
+          data: { creditBalance: { increment: money(creditBackCents) } },
+        });
+
+        await tx.creditTransaction.create({
+          data: {
+            userId: session.userId,
+            amount: money(creditBackCents),
+            type: 'EARNED_FROM_CANCELLATION',
+            relatedCoachingSessionId: session.id,
+          },
+        });
+      }
+
+      await tx.payment.update({
+        where: { id: payment.id },
+        data: { status: 'REFUNDED' },
+      });
+
+      await tx.notification.create({
+        data: {
+          userId: session.userId,
+          type: 'RESERVATION_CANCELLED',
+          message: sessionCancelledByCoachMessage(
+            coachName,
+            startTime,
+            endTime,
+            outcome,
+          ),
+          linkUrl: '/coaching',
+        },
+      });
+
+      if (session.teamId && session.team) {
+        const members = await tx.teamMembership.findMany({
+          where: { teamId: session.teamId, userId: { not: session.userId } },
+          select: { userId: true },
+        });
+
+        if (members.length > 0) {
+          const message = sessionCancelledByCoachTeamMessage(
+            coachName,
+            session.team.name,
+            startTime,
+            endTime,
+          );
+
+          await tx.notification.createMany({
+            data: members.map((member) => ({
+              userId: member.userId,
+              type: 'RESERVATION_CANCELLED' as const,
+              message,
+              linkUrl: `/teams/${session.teamId}`,
+            })),
+          });
+        }
+      }
+
+      if (refundCents > 0 && payment.stripePaymentIntentId) {
+        await getStripe().refunds.create(
+          {
+            payment_intent: payment.stripePaymentIntentId,
+            amount: refundCents,
+          },
+          { idempotencyKey: `refund-coaching-${session.id}` },
+        );
+      }
+    },
+    { timeout: 15_000 },
+  );
+
+  return { id: session.id };
+}
+
 function toSessionState(status: string): CoachSessionState {
   switch (status) {
     case 'PENDING':
@@ -508,6 +657,7 @@ export async function listUserSessions(
         payBy: true,
         paidAt: true,
         compensationType: true,
+        cancelledByCoach: true,
         team: { select: { name: true } },
         review: { select: { rating: true, comment: true } },
         slot: {
@@ -563,6 +713,7 @@ export async function listUserSessions(
     wasPaid: entry.paidAt !== null,
     compensation: entry.compensationType,
     teamName: entry.team?.name ?? null,
+    cancelledByCoach: entry.cancelledByCoach,
     review: entry.review ?? null,
   }));
 
@@ -598,6 +749,28 @@ export async function listCoachRequests(
     },
   });
 
+  const confirmedIds = sessions
+    .filter((entry) => entry.status === 'CONFIRMED')
+    .map((entry) => entry.id);
+
+  const payments =
+    confirmedIds.length === 0
+      ? []
+      : await prisma.payment.findMany({
+          where: {
+            coachingSessionId: { in: confirmedIds },
+            status: 'SUCCEEDED',
+          },
+          select: { coachingSessionId: true, creditApplied: true },
+        });
+
+  const creditBySession = new Map(
+    payments.map((entry) => [
+      entry.coachingSessionId,
+      entry.creditApplied.toNumber(),
+    ]),
+  );
+
   return sessions.map((entry) => {
     const payment: CoachRequestPayment | null =
       entry.status === 'ACCEPTED'
@@ -623,6 +796,7 @@ export async function listCoachRequests(
             : 'ACCEPTED',
       payment,
       payBy: entry.status === 'ACCEPTED' ? entry.payBy : null,
+      credit: creditBySession.get(entry.id) ?? 0,
     };
   });
 }

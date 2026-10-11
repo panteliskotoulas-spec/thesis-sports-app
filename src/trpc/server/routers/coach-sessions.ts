@@ -6,6 +6,7 @@ import type {
 } from '@/lib/coaches/coach-session';
 import {
   cancelSession,
+  cancelSessionByCoach,
   listCoachRequests,
   listUserSessions,
   requestSession,
@@ -32,6 +33,10 @@ const payInput = z.object({
 const cancelInput = z.object({
   sessionId: z.string().min(1),
   compensation: z.enum(['REFUND', 'CREDIT']).nullable(),
+});
+
+const cancelByCoachInput = z.object({
+  sessionId: z.string().min(1),
 });
 
 export const coachSessionsRouter = router({
@@ -78,4 +83,13 @@ export const coachSessionsRouter = router({
       compensation: input.compensation,
     }),
   ),
+
+  cancelByCoach: protectedProcedure
+    .input(cancelByCoachInput)
+    .mutation(({ ctx, input }) =>
+      cancelSessionByCoach(ctx.prisma, {
+        coachUserId: ctx.session.user.id,
+        sessionId: input.sessionId,
+      }),
+    ),
 });
