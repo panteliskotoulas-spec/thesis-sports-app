@@ -8,6 +8,7 @@ model Reservation {
   team             Team?             @relation(fields: [teamId], references: [id])
   status           ReservationStatus @default(CONFIRMED)
   compensationType CompensationType?
+  cancelledBy      CancelledBy?
   createdAt        DateTime          @default(now())
   cancelledAt      DateTime?
 

@@ -3,6 +3,7 @@ export const CANCEL_WINDOW_HOURS = 24;
 
 export type CompensationValue = 'REFUND' | 'CREDIT';
 export type ReservationStatusValue = 'CONFIRMED' | 'CANCELLED';
+export type CancelledByValue = 'PLAYER' | 'OWNER';
 export type BookingPhase = 'upcoming' | 'past';
 
 export interface BookingItem {
@@ -19,6 +20,7 @@ export interface BookingItem {
   card: string | null;
   credit: string | null;
   compensation: CompensationValue | null;
+  cancelledBy: CancelledByValue | null;
 }
 
 export interface StartCheckoutInput {

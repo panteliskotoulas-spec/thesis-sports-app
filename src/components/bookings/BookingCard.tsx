@@ -15,6 +15,7 @@ export interface BookingCardLabels {
   statusConfirmed: string;
   statusCompleted: string;
   statusCancelled: string;
+  statusCancelledByOwner: string;
   paid: string;
   paidCard: string;
   paidCredit: string;
@@ -48,7 +49,10 @@ function badgeFor(
 ): { text: string; className: string } {
   if (item.status === 'CANCELLED') {
     return {
-      text: labels.statusCancelled,
+      text:
+        item.cancelledBy === 'OWNER'
+          ? labels.statusCancelledByOwner
+          : labels.statusCancelled,
       className: 'bg-secondary text-muted-foreground',
     };
   }

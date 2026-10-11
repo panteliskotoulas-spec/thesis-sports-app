@@ -1,4 +1,3 @@
-
 enum AccountType {
   INDIVIDUAL
   BUSINESS
@@ -31,6 +30,11 @@ enum ReservationStatus {
 enum CompensationType {
   REFUND
   CREDIT
+}
+
+enum CancelledBy {
+  PLAYER
+  OWNER
 }
 
 enum TeamRole {

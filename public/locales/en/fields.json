@@ -224,7 +224,8 @@
       "archive": "Archive",
       "pendingNote": "It won't be public until it's approved. You can still edit it.",
       "archivedNote": "It's not shown anywhere. Past bookings are kept.",
-      "rejectedReason": "Reason for rejection"
+      "rejectedReason": "Reason for rejection",
+      "bookings": "Bookings"
     },
     "archive": {
       "title": "Archive this field?",
@@ -236,7 +237,8 @@
       "blockedOne": "There is 1 upcoming booking. Archive the field once it's over or cancelled.",
       "blockedOther": "There are {count} upcoming bookings. Archive the field once they're over or cancelled.",
       "ok": "OK",
-      "errorGeneric": "Something went wrong. Please try again."
+      "errorGeneric": "Something went wrong. Please try again.",
+      "blockedAction": "View bookings"
     },
     "empty": {
       "title": "You don't have any fields yet",
@@ -369,7 +371,8 @@
       "refundedCredit": "{amount} was added to your credit.",
       "errorTooLate": "Cancellation is no longer possible, because less than 24 hours remain.",
       "errorConflict": "This booking has already changed. Refresh the page.",
-      "errorGeneric": "The booking could not be cancelled. Please try again."
+      "errorGeneric": "The booking could not be cancelled. Please try again.",
+      "statusCancelledByOwner": "Cancelled by the owner"
     },
     "cancel": {
       "title": "What should happen to your money?",
@@ -401,5 +404,47 @@
     "loadMore": "Load more",
     "justNow": "just now",
     "unread": "Unread"
+  },
+  "ownerBookings": {
+    "meta": "Field bookings",
+    "title": "Bookings",
+    "subtitle": "Bookings at your fields.",
+    "filterAll": "All fields",
+    "filterLabel": "Field filter",
+    "tabUpcoming": "Upcoming",
+    "tabPast": "History",
+    "emptyUpcomingTitle": "No upcoming bookings",
+    "emptyUpcomingDescription": "When someone books a time at your field, you'll see it here.",
+    "emptyPastTitle": "No history yet",
+    "emptyPastDescription": "Completed and cancelled bookings will show up here.",
+    "cancelledNotice": "The booking was cancelled and the player got a full refund.",
+    "error": {
+      "title": "Couldn't load the bookings",
+      "description": "Try refreshing the page in a moment."
+    },
+    "card": {
+      "statusConfirmed": "Confirmed",
+      "statusCompleted": "Completed",
+      "statusCancelledByOwner": "Cancelled by you",
+      "statusCancelledByPlayer": "Cancelled by the player",
+      "paid": "Paid {amount}",
+      "paidCard": "Card {amount}",
+      "paidCredit": "Credit {amount}",
+      "cancel": "Cancel booking",
+      "refundedCard": "{amount} was refunded to the player's card.",
+      "refundedMixed": "{card} was refunded to the card and {credit} to the player's credit.",
+      "refundedCredit": "{amount} was refunded to the player's credit.",
+      "errorConflict": "The booking changed or was already cancelled. Refresh the page.",
+      "errorGeneric": "The cancellation didn't go through. Try again."
+    },
+    "cancel": {
+      "title": "Cancel as the owner",
+      "bodyCard": "The player gets a full refund: {amount} to their card. The time won't reopen for bookings and the player will be notified.",
+      "bodyMixed": "The player gets a full refund: {card} to their card and {credit} to their credit. The time won't reopen for bookings and the player will be notified.",
+      "bodyCredit": "The player gets a full refund: {amount} to their credit. The time won't reopen for bookings and the player will be notified.",
+      "back": "Back",
+      "confirm": "Confirm cancellation",
+      "working": "Cancelling…"
+    }
   }
 }

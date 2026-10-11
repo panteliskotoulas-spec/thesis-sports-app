@@ -20,6 +20,7 @@ export interface OwnerFieldCardLabels {
   rejectedReason: string;
   view: string;
   availability: string;
+  bookings: string;
   edit: string;
   resubmit: string;
   archive: string;
@@ -31,6 +32,7 @@ export interface OwnerFieldCardLabels {
   blockedTitle: string;
   blockedOne: string;
   blockedOther: string;
+  blockedAction: string;
   ok: string;
   errorGeneric: string;
 }
@@ -69,6 +71,7 @@ export function OwnerFieldCard({
 
   const editHref = `/${lng}/owner/fields/${field.id}/edit`;
   const slotsHref = `/${lng}/owner/fields/${field.id}/slots`;
+  const bookingsHref = `/${lng}/owner/bookings?field=${field.id}`;
   const canArchive = field.status !== 'PENDING';
 
   async function handleArchive() {
@@ -212,6 +215,11 @@ export function OwnerFieldCard({
             </Link>
           ) : null}
           {field.status === 'APPROVED' ? (
+            <Link href={bookingsHref} className={outlineButton}>
+              {labels.bookings}
+            </Link>
+          ) : null}
+          {field.status === 'APPROVED' ? (
             <Link href={`/${lng}/fields/${field.id}`} className={outlineButton}>
               {labels.view}
             </Link>
@@ -270,7 +278,10 @@ export function OwnerFieldCard({
         <div className="mt-4 border-t-[0.5px] border-border pt-4">
           <h4 className="font-medium text-foreground">{labels.blockedTitle}</h4>
           <p className="mt-1 text-sm text-muted-foreground">{blockedText}</p>
-          <div className="mt-3 flex">
+          <div className="mt-3 flex gap-2">
+            <Link href={bookingsHref} className={primaryButton}>
+              {labels.blockedAction}
+            </Link>
             <button
               type="button"
               onClick={() => setPanel('idle')}

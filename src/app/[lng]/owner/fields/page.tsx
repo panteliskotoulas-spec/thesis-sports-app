@@ -46,6 +46,7 @@ export default async function OwnerFieldsPage() {
     rejectedReason: t('owner.card.rejectedReason'),
     view: t('owner.card.view'),
     availability: t('owner.card.availability'),
+    bookings: t('owner.card.bookings'),
     edit: t('owner.card.edit'),
     resubmit: t('owner.card.resubmit'),
     archive: t('owner.card.archive'),
@@ -57,6 +58,7 @@ export default async function OwnerFieldsPage() {
     blockedTitle: t('owner.archive.blockedTitle'),
     blockedOne: t('owner.archive.blockedOne'),
     blockedOther: t('owner.archive.blockedOther'),
+    blockedAction: t('owner.archive.blockedAction'),
     ok: t('owner.archive.ok'),
     errorGeneric: t('owner.archive.errorGeneric'),
   };

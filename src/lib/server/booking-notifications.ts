@@ -49,6 +49,44 @@ export function reservationCancelledMessage(
   };
 }
 
+export function reservationCancelledByOwnerMessage(
+  fieldName: LocalizedText,
+  startTime: Date,
+  endTime: Date,
+  outcome: CancellationOutcome,
+): LocalizedText {
+  const tail = cancellationTails[outcome];
+
+  return {
+    el: `Ο ιδιοκτήτης ακύρωσε την κράτησή σου στο «${fieldName.el}» για ${describeSlot(startTime, endTime, 'el')}. ${tail.el}`,
+    en: `The owner cancelled your booking at "${fieldName.en}" for ${describeSlot(startTime, endTime, 'en')}. ${tail.en}`,
+  };
+}
+
+export function ownerBookingReceivedMessage(
+  fieldName: LocalizedText,
+  playerName: string,
+  startTime: Date,
+  endTime: Date,
+): LocalizedText {
+  return {
+    el: `Νέα κράτηση στο «${fieldName.el}» για ${describeSlot(startTime, endTime, 'el')} (παίκτης: ${playerName}).`,
+    en: `New booking at "${fieldName.en}" for ${describeSlot(startTime, endTime, 'en')} (player: ${playerName}).`,
+  };
+}
+
+export function ownerBookingCancelledMessage(
+  fieldName: LocalizedText,
+  playerName: string,
+  startTime: Date,
+  endTime: Date,
+): LocalizedText {
+  return {
+    el: `Ακυρώθηκε η κράτηση στο «${fieldName.el}» για ${describeSlot(startTime, endTime, 'el')} (παίκτης: ${playerName}).`,
+    en: `A booking at "${fieldName.en}" for ${describeSlot(startTime, endTime, 'en')} was cancelled (player: ${playerName}).`,
+  };
+}
+
 export function reservationConfirmedMessage(
   fieldName: LocalizedText,
   startTime: Date,

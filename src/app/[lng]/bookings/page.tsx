@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function BookingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ booked?: string; payment?: string }>;
+  searchParams: Promise<{ booked?: string; payment?: string; focus?: string }>;
 }) {
   const query = await searchParams;
   const { t } = await getT('fields');
@@ -53,6 +53,7 @@ export default async function BookingsPage({
       statusConfirmed: t('booking.card.statusConfirmed'),
       statusCompleted: t('booking.card.statusCompleted'),
       statusCancelled: t('booking.card.statusCancelled'),
+      statusCancelledByOwner: t('booking.card.statusCancelledByOwner'),
       paid: t('booking.card.paid'),
       paidCard: t('booking.card.paidCard'),
       paidCredit: t('booking.card.paidCredit'),
@@ -107,6 +108,7 @@ export default async function BookingsPage({
             past={past.map(toItem)}
             browseHref={`/${lng}/fields`}
             justBooked={query.booked === '1'}
+            focusId={query.focus ?? null}
             labels={labels}
           />
         </div>

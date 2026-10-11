@@ -17,7 +17,10 @@ import {
   money,
   SLOT_HOLD_MINUTES,
 } from '@/lib/server/booking-shared';
-import { reservationConfirmedMessage } from '@/lib/server/booking-notifications';
+import {
+  ownerBookingReceivedMessage,
+  reservationConfirmedMessage,
+} from '@/lib/server/booking-notifications';
 import { getAppUrl, getStripe } from '@/lib/server/stripe';
 
 export interface StartCheckoutParams {
@@ -125,7 +128,7 @@ export async function confirmCheckoutSession(
     select: {
       startTime: true,
       endTime: true,
-      field: { select: { name: true } },
+      field: { select: { name: true, ownerId: true } },
     },
   });
 
@@ -203,6 +206,27 @@ export async function confirmCheckoutSession(
           linkUrl: `/bookings?focus=${reservation.id}`,
         },
       });
+
+      if (slot.field.ownerId !== userId) {
+        const player = await tx.user.findUnique({
+          where: { id: userId },
+          select: { name: true },
+        });
+
+        await tx.notification.create({
+          data: {
+            userId: slot.field.ownerId,
+            type: 'RESERVATION_CONFIRMED',
+            message: ownerBookingReceivedMessage(
+              asLocalized(slot.field.name),
+              player?.name ?? '',
+              slot.startTime,
+              slot.endTime,
+            ),
+            linkUrl: '/owner/bookings',
+          },
+        });
+      }
     });
 
     return { status: 'confirmed' };
@@ -260,7 +284,13 @@ export async function startCheckout(
       endTime: true,
       price: true,
       field: {
-        select: { id: true, name: true, status: true, archivedAt: true },
+        select: {
+          id: true,
+          name: true,
+          ownerId: true,
+          status: true,
+          archivedAt: true,
+        },
       },
     },
   });
@@ -272,7 +302,7 @@ export async function startCheckout(
 
   const user = await prisma.user.findUnique({
     where: { id: params.userId },
-    select: { creditBalance: true },
+    select: { creditBalance: true, name: true },
   });
 
   if (!user) throw new TRPCError({ code: 'UNAUTHORIZED' });
@@ -353,6 +383,22 @@ export async function startCheckout(
           linkUrl: `/bookings?focus=${reservation.id}`,
         },
       });
+
+      if (slot.field.ownerId !== params.userId) {
+        await tx.notification.create({
+          data: {
+            userId: slot.field.ownerId,
+            type: 'RESERVATION_CONFIRMED',
+            message: ownerBookingReceivedMessage(
+              asLocalized(slot.field.name),
+              user.name,
+              slot.startTime,
+              slot.endTime,
+            ),
+            linkUrl: '/owner/bookings',
+          },
+        });
+      }
     });
 
     return { url: null };

@@ -2,6 +2,7 @@ import {
   canCancelBooking,
   formatAmount,
   type BookingItem,
+  type CancelledByValue,
   type CompensationValue,
   type ReservationStatusValue,
 } from '@/lib/bookings/booking';
@@ -32,6 +33,7 @@ export interface BookingRow {
   endTime: Date;
   status: ReservationStatusValue;
   compensation: CompensationValue | null;
+  cancelledBy: CancelledByValue | null;
   total: number;
   credit: number;
 }
@@ -78,5 +80,6 @@ export function toBookingItem(
     card: card > 0 ? formatAmount(card, lng) : null,
     credit: row.credit > 0 ? formatAmount(row.credit, lng) : null,
     compensation: row.compensation,
+    cancelledBy: row.cancelledBy,
   };
 }
