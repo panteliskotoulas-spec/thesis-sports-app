@@ -11,6 +11,7 @@ model Payment {
   stripePaymentIntentId String?
   userId                String?
   slotId                String?
+  teamId                String?
   holdExpiresAt         DateTime?
   createdAt             DateTime      @default(now())
 

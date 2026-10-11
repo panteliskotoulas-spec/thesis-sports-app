@@ -18,6 +18,7 @@ import {
   money,
 } from '@/lib/server/booking-shared';
 import { getStripe } from '@/lib/server/stripe';
+import { notifyTeamOfCancellation } from '@/lib/server/team-booking';
 
 export interface CancelReservationParams {
   userId: string;
@@ -35,6 +36,8 @@ const reservationSelect = {
   slotId: true,
   status: true,
   userId: true,
+  teamId: true,
+  team: { select: { name: true } },
   user: { select: { name: true } },
   slot: {
     select: {
@@ -152,6 +155,17 @@ async function executeCancellation(
             ),
             linkUrl: '/owner/bookings',
           },
+        });
+      }
+
+      if (reservation.teamId && reservation.team) {
+        await notifyTeamOfCancellation(tx, {
+          teamId: reservation.teamId,
+          teamName: reservation.team.name,
+          excludeUserId: reservation.userId,
+          fieldName,
+          startTime: reservation.slot.startTime,
+          endTime: reservation.slot.endTime,
         });
       }
 

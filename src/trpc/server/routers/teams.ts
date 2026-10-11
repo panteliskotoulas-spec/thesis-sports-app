@@ -18,6 +18,10 @@ import {
   type TeamListRow,
   type TeamViewerState,
 } from '@/lib/teams/team';
+import type {
+  TeamBookingOption,
+  TeamReservationRow,
+} from '@/lib/teams/team-booking';
 import { asLocalized } from '@/lib/server/booking-shared';
 import { createUploadSignature, isOwnImageUrl } from '@/lib/server/cloudinary';
 import {
@@ -278,6 +282,73 @@ export const teamsRouter = router({
 
     return memberships.map((item) => item.sportType);
   }),
+
+  bookableTeams: protectedProcedure
+    .input(z.object({ sportType: z.enum(SPORT_TYPES) }))
+    .query(async ({ ctx, input }): Promise<TeamBookingOption[]> => {
+      const memberships = await ctx.prisma.teamMembership.findMany({
+        where: {
+          userId: ctx.session.user.id,
+          role: 'LEADER',
+          team: { sportType: input.sportType },
+        },
+        orderBy: { joinedAt: 'asc' },
+        select: { team: { select: listSelect } },
+      });
+
+      return memberships.map(({ team }) => ({
+        id: team.id,
+        name: team.name,
+        logoUrl: team.logoUrl,
+        sportType: team.sportType,
+        memberCount: team._count.members,
+        maxMembers: team.maxMembers,
+      }));
+    }),
+
+  upcomingReservations: protectedProcedure
+    .input(teamIdInput)
+    .query(async ({ ctx, input }): Promise<TeamReservationRow[]> => {
+      const membership = await ctx.prisma.teamMembership.findUnique({
+        where: {
+          teamId_userId: {
+            teamId: input.teamId,
+            userId: ctx.session.user.id,
+          },
+        },
+        select: { id: true },
+      });
+      if (!membership) throw new TRPCError({ code: 'FORBIDDEN' });
+
+      const reservations = await ctx.prisma.reservation.findMany({
+        where: {
+          teamId: input.teamId,
+          status: 'CONFIRMED',
+          slot: { endTime: { gt: new Date() } },
+        },
+        orderBy: { slot: { startTime: 'asc' } },
+        select: {
+          id: true,
+          user: { select: { name: true } },
+          slot: {
+            select: {
+              startTime: true,
+              endTime: true,
+              field: { select: { id: true, name: true } },
+            },
+          },
+        },
+      });
+
+      return reservations.map((reservation) => ({
+        id: reservation.id,
+        fieldId: reservation.slot.field.id,
+        fieldName: asLocalized(reservation.slot.field.name),
+        startTime: reservation.slot.startTime,
+        endTime: reservation.slot.endTime,
+        bookedBy: reservation.user.name,
+      }));
+    }),
 
   uploadSignature: protectedProcedure.mutation(() => createUploadSignature()),
 

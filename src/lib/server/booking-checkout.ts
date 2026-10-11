@@ -22,12 +22,18 @@ import {
   reservationConfirmedMessage,
 } from '@/lib/server/booking-notifications';
 import { getAppUrl, getStripe } from '@/lib/server/stripe';
+import {
+  findLeaderTeam,
+  notifyTeamOfReservation,
+  resolveBookingTeam,
+} from '@/lib/server/team-booking';
 
 export interface StartCheckoutParams {
   userId: string;
   userEmail: string;
   slotId: string;
   useCredit: boolean;
+  teamId?: string | null;
   lng: 'el' | 'en';
 }
 
@@ -173,8 +179,12 @@ export async function confirmCheckoutSession(
         if (charged.count === 0) throw new BookingAbort('credit_short');
       }
 
+      const team = payment.teamId
+        ? await findLeaderTeam(tx, payment.teamId, userId)
+        : null;
+
       const reservation = await tx.reservation.create({
-        data: { slotId, userId },
+        data: { slotId, userId, teamId: team?.id ?? null },
         select: { id: true },
       });
 
@@ -207,12 +217,12 @@ export async function confirmCheckoutSession(
         },
       });
 
-      if (slot.field.ownerId !== userId) {
-        const player = await tx.user.findUnique({
-          where: { id: userId },
-          select: { name: true },
-        });
+      const player = await tx.user.findUnique({
+        where: { id: userId },
+        select: { name: true },
+      });
 
+      if (slot.field.ownerId !== userId) {
         await tx.notification.create({
           data: {
             userId: slot.field.ownerId,
@@ -225,6 +235,18 @@ export async function confirmCheckoutSession(
             ),
             linkUrl: '/owner/bookings',
           },
+        });
+      }
+
+      if (team) {
+        await notifyTeamOfReservation(tx, {
+          teamId: team.id,
+          teamName: team.name,
+          excludeUserId: userId,
+          bookerName: player?.name ?? '',
+          fieldName: asLocalized(slot.field.name),
+          startTime: slot.startTime,
+          endTime: slot.endTime,
         });
       }
     });
@@ -283,6 +305,7 @@ export async function startCheckout(
       startTime: true,
       endTime: true,
       price: true,
+      sportType: true,
       field: {
         select: {
           id: true,
@@ -306,6 +329,14 @@ export async function startCheckout(
   });
 
   if (!user) throw new TRPCError({ code: 'UNAUTHORIZED' });
+
+  const team = params.teamId
+    ? await resolveBookingTeam(prisma, {
+        teamId: params.teamId,
+        userId: params.userId,
+        sportType: slot.sportType,
+      })
+    : null;
 
   const priceCents = decimalToCents(slot.price);
   const split = computePaymentSplit(
@@ -344,7 +375,11 @@ export async function startCheckout(
       if (charged.count === 0) throw new TRPCError({ code: 'BAD_REQUEST' });
 
       const reservation = await tx.reservation.create({
-        data: { slotId: slot.id, userId: params.userId },
+        data: {
+          slotId: slot.id,
+          userId: params.userId,
+          teamId: team?.id ?? null,
+        },
         select: { id: true },
       });
 
@@ -353,6 +388,7 @@ export async function startCheckout(
           reservationId: reservation.id,
           userId: params.userId,
           slotId: slot.id,
+          teamId: team?.id ?? null,
           amount: money(priceCents),
           platformFee: 0,
           ownerPayout: money(priceCents),
@@ -399,6 +435,18 @@ export async function startCheckout(
           },
         });
       }
+
+      if (team) {
+        await notifyTeamOfReservation(tx, {
+          teamId: team.id,
+          teamName: team.name,
+          excludeUserId: params.userId,
+          bookerName: user.name,
+          fieldName: asLocalized(slot.field.name),
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+        });
+      }
     });
 
     return { url: null };
@@ -417,6 +465,7 @@ export async function startCheckout(
       data: {
         userId: params.userId,
         slotId: slot.id,
+        teamId: team?.id ?? null,
         holdExpiresAt,
         amount: money(priceCents),
         platformFee: 0,
@@ -460,6 +509,7 @@ export async function startCheckout(
         paymentId: payment.id,
         slotId: slot.id,
         userId: params.userId,
+        ...(team ? { teamId: team.id } : {}),
       },
       success_url: `${base}/api/stripe/return?status=success&session_id={CHECKOUT_SESSION_ID}&lng=${params.lng}`,
       cancel_url: `${base}/api/stripe/return?status=cancelled&payment=${payment.id}&lng=${params.lng}`,

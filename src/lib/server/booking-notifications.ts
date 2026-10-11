@@ -97,3 +97,28 @@ export function reservationConfirmedMessage(
     en: `Your booking at "${fieldName.en}" for ${describeSlot(startTime, endTime, 'en')} is confirmed.`,
   };
 }
+
+export function teamReservationCreatedMessage(
+  teamName: string,
+  fieldName: LocalizedText,
+  bookerName: string,
+  startTime: Date,
+  endTime: Date,
+): LocalizedText {
+  return {
+    el: `Νέα κράτηση για την ομάδα «${teamName}»: «${fieldName.el}», ${describeSlot(startTime, endTime, 'el')} (την έκλεισε ο αρχηγός ${bookerName}).`,
+    en: `New booking for your team "${teamName}": "${fieldName.en}", ${describeSlot(startTime, endTime, 'en')} (booked by leader ${bookerName}).`,
+  };
+}
+
+export function teamReservationCancelledMessage(
+  teamName: string,
+  fieldName: LocalizedText,
+  startTime: Date,
+  endTime: Date,
+): LocalizedText {
+  return {
+    el: `Η κράτηση της ομάδας «${teamName}» στο «${fieldName.el}» για ${describeSlot(startTime, endTime, 'el')} ακυρώθηκε.`,
+    en: `The booking for team "${teamName}" at "${fieldName.en}" for ${describeSlot(startTime, endTime, 'en')} was cancelled.`,
+  };
+}

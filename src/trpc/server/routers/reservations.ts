@@ -12,6 +12,7 @@ import { asLocalized, decimalToCents } from '@/lib/server/booking-shared';
 const startCheckoutInput = z.object({
   slotId: z.string().min(1),
   useCredit: z.boolean(),
+  teamId: z.string().min(1).nullish(),
   lng: z.enum(['el', 'en']),
 });
 
@@ -87,6 +88,7 @@ export const reservationsRouter = router({
         userEmail: ctx.session.user.email,
         slotId: input.slotId,
         useCredit: input.useCredit,
+        teamId: input.teamId ?? null,
         lng: input.lng,
       }),
     ),
@@ -107,6 +109,7 @@ export const reservationsRouter = router({
         status: true,
         compensationType: true,
         cancelledBy: true,
+        team: { select: { name: true } },
         slot: {
           select: {
             startTime: true,
@@ -144,6 +147,7 @@ export const reservationsRouter = router({
           status: reservation.status,
           compensation: reservation.compensationType,
           cancelledBy: reservation.cancelledBy,
+          teamName: reservation.team?.name ?? null,
           total: decimalToCents(payment.amount) / 100,
           credit: decimalToCents(payment.creditApplied) / 100,
         },
