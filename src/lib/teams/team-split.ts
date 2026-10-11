@@ -46,6 +46,14 @@ export function splitPayHref(
   return `/${lng}/teams/${teamId}/split/${reservationId}`;
 }
 
+export function sessionSplitPayHref(
+  lng: string,
+  teamId: string,
+  sessionId: string,
+): string {
+  return `/${lng}/teams/${teamId}/session-split/${sessionId}`;
+}
+
 export function memberInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   const letters = parts.slice(0, 2).map((part) => part.charAt(0));
@@ -56,6 +64,17 @@ export interface TeamSplitPayRow {
   splitId: string;
   fieldId: string;
   fieldName: LocalizedText;
+  startTime: Date;
+  endTime: Date;
+  leaderName: string;
+  share: number;
+  balance: number;
+}
+
+export interface SessionSplitPayRow {
+  splitId: string;
+  coachId: string;
+  coachName: string;
   startTime: Date;
   endTime: Date;
   leaderName: string;

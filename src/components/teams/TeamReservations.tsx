@@ -6,6 +6,7 @@ import {
 } from '@/components/teams/TeamSplitProgress';
 import { fillTemplate } from '@/lib/bookings/booking';
 import type { TeamReservationItem } from '@/lib/teams/team-booking';
+import { splitPayHref } from '@/lib/teams/team-split';
 
 export interface TeamReservationsLabels {
   title: string;
@@ -69,8 +70,7 @@ export function TeamReservations({
                 <TeamSplitProgress
                   split={item.split}
                   lng={lng}
-                  teamId={teamId}
-                  reservationId={item.id}
+                  payHref={splitPayHref(lng, teamId, item.id)}
                   labels={labels.split}
                 />
               ) : null}

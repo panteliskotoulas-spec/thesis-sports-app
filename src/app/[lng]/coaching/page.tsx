@@ -30,6 +30,7 @@ export default async function CoachingSessionsPage({
   const { t } = await getT('coaches');
   const { t: tf } = await getT('fields');
   const { t: tr } = await getT('reviews');
+  const { t: tt } = await getT('teams');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
 
@@ -91,7 +92,7 @@ export default async function CoachingSessionsPage({
               balance={balance}
               justPaid={query.paid === '1'}
               browseHref={`/${lng}/coaches`}
-              labels={buildCoachSessionsLabels(t, tf, tr)}
+              labels={buildCoachSessionsLabels(t, tf, tr, tt)}
             />
           ) : (
             <CoachFlowError

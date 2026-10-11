@@ -13,7 +13,11 @@ import {
   fromCents,
   toCents,
 } from '@/lib/bookings/payment-split';
-import { startSplitCheckout } from '@/lib/teams/team-split-api';
+import {
+  startSessionSplitCheckout,
+  startSplitCheckout,
+  type SplitTarget,
+} from '@/lib/teams/team-split-api';
 
 export interface TeamSplitPaymentLabels {
   credit: CreditToggleLabels;
@@ -33,8 +37,8 @@ export interface TeamSplitPaymentLabels {
 
 export interface TeamSplitPaymentProps {
   lng: string;
-  reservationId: string;
-  fieldName: string;
+  target: SplitTarget;
+  title: string;
   date: string;
   time: string;
   leaderName: string;
@@ -46,8 +50,8 @@ export interface TeamSplitPaymentProps {
 
 export function TeamSplitPayment({
   lng,
-  reservationId,
-  fieldName,
+  target,
+  title,
   date,
   time,
   leaderName,
@@ -81,7 +85,18 @@ export function TeamSplitPayment({
     setBusy(true);
     setError(null);
 
-    const result = await startSplitCheckout({ reservationId, useCredit, lng });
+    const result =
+      target.kind === 'session'
+        ? await startSessionSplitCheckout({
+            sessionId: target.id,
+            useCredit,
+            lng,
+          })
+        : await startSplitCheckout({
+            reservationId: target.id,
+            useCredit,
+            lng,
+          });
 
     if (result.status === 'redirect') {
       window.location.assign(result.url);
@@ -109,7 +124,7 @@ export function TeamSplitPayment({
   return (
     <div className="flex flex-col gap-4">
       <section className="rounded-xl border-[0.5px] border-border bg-card p-4">
-        <h2 className="text-lg">{fieldName}</h2>
+        <h2 className="text-lg">{title}</h2>
         <ul className="mt-3 flex flex-col gap-1.5 text-sm text-muted-foreground">
           <li className="flex items-center gap-2">
             <Calendar className="size-4 shrink-0" aria-hidden="true" />

@@ -7,6 +7,7 @@ import { formatDayChip, formatTimeRange } from '@/lib/fields/detail-format';
 import { todayInAthens } from '@/lib/fields/filters';
 import type { SportType } from '@/lib/fields/types';
 import type { SessionReview } from '@/lib/reviews/review';
+import type { TeamSplitSummary } from '@/lib/teams/team-split';
 
 export const SESSION_PAYMENT_WINDOW_HOURS = 24;
 
@@ -71,6 +72,7 @@ export interface CoachSessionRow {
   compensation: CompensationValue | null;
   teamName: string | null;
   cancelledByCoach: boolean;
+  split?: TeamSplitSummary | null;
   review?: SessionReview | null;
 }
 
@@ -96,6 +98,7 @@ export interface CoachSessionItem {
   review: SessionReview | null;
   teamName: string | null;
   cancelledByCoach: boolean;
+  split: TeamSplitSummary | null;
 }
 
 export interface CoachRequestRow {
@@ -187,6 +190,7 @@ export function toCoachSessionItem(
     review: row.review ?? null,
     teamName: row.teamName,
     cancelledByCoach: row.cancelledByCoach,
+    split: row.split ?? null,
   };
 }
 

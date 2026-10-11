@@ -3,7 +3,10 @@ import type { CoachSlotRequestLabels } from '@/components/coaches/CoachSlotReque
 import type { CoachRequestsListLabels } from '@/components/coaches/requests/CoachRequestsList';
 import type { CoachSessionsListLabels } from '@/components/coaches/sessions/CoachSessionsList';
 import { buildReviewFormLabels } from '@/lib/reviews/review-labels';
-import { buildTeamBookingLabels } from '@/lib/teams/team-labels';
+import {
+  buildTeamBookingLabels,
+  buildTeamSplitLabels,
+} from '@/lib/teams/team-labels';
 
 type Translate = Awaited<ReturnType<typeof getT>>['t'];
 
@@ -69,6 +72,7 @@ export function buildCoachSessionsLabels(
   t: Translate,
   tf: Translate,
   tr: Translate,
+  tt: Translate,
 ): CoachSessionsListLabels {
   return {
     tabAll: t('sessions.tabAll'),
@@ -105,6 +109,7 @@ export function buildCoachSessionsLabels(
       errorTooLate: t('sessions.card.errorTooLate'),
       errorConflict: t('sessions.card.errorConflict'),
       errorGeneric: t('sessions.card.errorGeneric'),
+      split: buildTeamSplitLabels(tt),
       review: {
         write: tr('session.write'),
         yourReview: tr('session.yourReview'),

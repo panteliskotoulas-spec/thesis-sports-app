@@ -3,7 +3,6 @@ import { fillTemplate, formatAmount } from '@/lib/bookings/booking';
 import {
   computeSplitProgress,
   memberInitials,
-  splitPayHref,
   type TeamSplitStatus,
   type TeamSplitSummary,
 } from '@/lib/teams/team-split';
@@ -24,8 +23,7 @@ export interface TeamSplitLabels {
 export interface TeamSplitProgressProps {
   split: TeamSplitSummary;
   lng: string;
-  teamId: string;
-  reservationId: string;
+  payHref?: string;
   labels: TeamSplitLabels;
 }
 
@@ -53,8 +51,7 @@ function StatusChip({
 export function TeamSplitProgress({
   split,
   lng,
-  teamId,
-  reservationId,
+  payHref,
   labels,
 }: TeamSplitProgressProps) {
   if (split.viewer === 'member') {
@@ -78,14 +75,14 @@ export function TeamSplitProgress({
             <p className="mt-3 text-sm text-muted-foreground">
               {labels.youPaid}
             </p>
-          ) : (
+          ) : payHref ? (
             <Link
-              href={splitPayHref(lng, teamId, reservationId)}
+              href={payHref}
               className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground"
             >
               {labels.pay}
             </Link>
-          )}
+          ) : null}
         </div>
       </div>
     );

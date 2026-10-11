@@ -8,6 +8,16 @@ export interface StartSplitCheckoutInput {
   lng: string;
 }
 
+export interface StartSessionSplitCheckoutInput {
+  sessionId: string;
+  useCredit: boolean;
+  lng: string;
+}
+
+export type SplitTarget =
+  | { kind: 'reservation'; id: string }
+  | { kind: 'session'; id: string };
+
 export type StartSplitCheckoutResult =
   | { status: 'redirect'; url: string }
   | { status: 'paid' }
@@ -53,4 +63,11 @@ export async function startSplitCheckout(
     if (code === 'UNAUTHORIZED') return { status: 'unauthorized' };
     return { status: 'error' };
   }
+}
+
+export async function startSessionSplitCheckout(
+  input: StartSessionSplitCheckoutInput,
+): Promise<StartSplitCheckoutResult> {
+  void input;
+  return { status: 'error' };
 }

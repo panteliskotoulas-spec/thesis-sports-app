@@ -32,6 +32,10 @@ import {
   type ReviewFormLabels,
 } from '@/components/reviews/ReviewForm';
 import { StarRating } from '@/components/reviews/StarRating';
+import {
+  TeamSplitProgress,
+  type TeamSplitLabels,
+} from '@/components/teams/TeamSplitProgress';
 
 export interface SessionReviewLabels {
   write: string;
@@ -64,6 +68,7 @@ export interface CoachSessionCardLabels {
   errorConflict: string;
   errorGeneric: string;
   review: SessionReviewLabels;
+  split: TeamSplitLabels;
   credit: CreditToggleLabels;
   panel: CancelPanelLabels;
 }
@@ -260,6 +265,10 @@ export function CoachSessionCard({
           {item.total}
         </p>
       )}
+
+      {item.state === 'CONFIRMED' && item.split ? (
+        <TeamSplitProgress split={item.split} lng={lng} labels={labels.split} />
+      ) : null}
 
       {item.reviewable ? (
         item.review ? (

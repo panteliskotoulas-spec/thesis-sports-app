@@ -173,3 +173,14 @@ export function buildTeamSplitPaymentLabels(
     errorGeneric: tf('booking.summary.errorGeneric'),
   };
 }
+
+export function buildSessionSplitPaymentLabels(
+  t: Translate,
+  tf: Translate,
+): TeamSplitPaymentLabels {
+  return {
+    ...buildTeamSplitPaymentLabels(t, tf),
+    refundNote: t('sessionSplitPay.refundNote'),
+    errorUnavailable: t('sessionSplitPay.errorUnavailable'),
+  };
+}

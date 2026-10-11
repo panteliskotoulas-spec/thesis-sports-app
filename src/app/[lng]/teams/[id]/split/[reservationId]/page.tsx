@@ -64,8 +64,8 @@ export default async function TeamSplitPayPage({
         <div className="mt-6">
           <TeamSplitPayment
             lng={lng}
-            reservationId={reservationId}
-            fieldName={localized(row.fieldName, lng)}
+            target={{ kind: 'reservation', id: reservationId }}
+            title={localized(row.fieldName, lng)}
             date={formatDayChip(todayInAthens(row.startTime), lng).full}
             time={formatTimeRange(row.startTime, row.endTime, lng)}
             leaderName={row.leaderName}
