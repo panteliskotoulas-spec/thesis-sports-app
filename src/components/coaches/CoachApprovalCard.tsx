@@ -1,14 +1,14 @@
 'use client';
 
 import { useId, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Award, Check, Clock, Mail } from 'lucide-react';
+import { approveCoach, rejectCoach } from '@/lib/coaches/coach-api';
 import {
   COACH_REJECTION_REASON_MAX,
+  type CoachActionResult,
   type CoachApprovalCardData,
-  type CoachApprovalResult,
-  type CoachStatusValue,
 } from '@/lib/coaches/coach';
-import { mockApproveCoach, mockRejectCoach } from '@/lib/coaches/coach-mock';
 
 export interface CoachApprovalCardLabels {
   badgeApproved: string;
@@ -26,6 +26,7 @@ export interface CoachApprovalCardLabels {
 }
 
 export interface CoachApprovalCardProps {
+  lng: string;
   coach: CoachApprovalCardData;
   labels: CoachApprovalCardLabels;
 }
@@ -37,11 +38,14 @@ const outlineButton = `${buttonBase} flex-1 border-[0.5px] border-border bg-card
 const dangerOutlineButton = `${buttonBase} flex-1 border-[0.5px] border-border bg-card text-destructive hover:bg-secondary`;
 const dangerButton = `${buttonBase} flex-[2] bg-destructive text-destructive-foreground hover:opacity-90`;
 
-export function CoachApprovalCard({ coach, labels }: CoachApprovalCardProps) {
+export function CoachApprovalCard({
+  lng,
+  coach,
+  labels,
+}: CoachApprovalCardProps) {
+  const router = useRouter();
   const reasonId = useId();
 
-  const [status, setStatus] = useState<CoachStatusValue>(coach.status);
-  const [rejectionReason, setRejectionReason] = useState(coach.rejectionReason);
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState<'approve' | 'reject' | null>(null);
@@ -49,8 +53,7 @@ export function CoachApprovalCard({ coach, labels }: CoachApprovalCardProps) {
 
   async function run(
     kind: 'approve' | 'reject',
-    action: () => Promise<CoachApprovalResult>,
-    next: CoachStatusValue,
+    action: () => Promise<CoachActionResult>,
   ) {
     setBusy(kind);
     setError(null);
@@ -63,10 +66,7 @@ export function CoachApprovalCard({ coach, labels }: CoachApprovalCardProps) {
       return;
     }
 
-    setStatus(next);
-    setRejectionReason(kind === 'reject' ? reason.trim() || null : null);
-    setRejecting(false);
-    setBusy(null);
+    router.refresh();
   }
 
   return (
@@ -82,13 +82,13 @@ export function CoachApprovalCard({ coach, labels }: CoachApprovalCardProps) {
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <h3 className="min-w-0 wrap-break-word">{coach.name}</h3>
-            {status === 'APPROVED' ? (
+            {coach.status === 'APPROVED' ? (
               <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">
                 <Check className="size-3.5" aria-hidden="true" />
                 {labels.badgeApproved}
               </span>
             ) : null}
-            {status === 'REJECTED' ? (
+            {coach.status === 'REJECTED' ? (
               <span className="inline-flex shrink-0 items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-destructive">
                 {labels.badgeRejected}
               </span>
@@ -128,18 +128,18 @@ export function CoachApprovalCard({ coach, labels }: CoachApprovalCardProps) {
         </p>
       </div>
 
-      {status === 'REJECTED' && rejectionReason ? (
+      {coach.status === 'REJECTED' && coach.rejectionReason ? (
         <div className="mt-3 rounded-xl bg-secondary px-3 py-2">
           <h4 className="text-xs font-medium text-muted-foreground">
             {labels.rejectedReason}
           </h4>
           <p className="mt-0.5 whitespace-pre-line text-foreground">
-            {rejectionReason}
+            {coach.rejectionReason}
           </p>
         </div>
       ) : null}
 
-      {status === 'PENDING' ? (
+      {coach.status === 'PENDING' ? (
         rejecting ? (
           <div className="mt-4 border-t-[0.5px] border-border pt-4">
             <label htmlFor={reasonId}>{labels.reasonLabel}</label>
@@ -160,11 +160,7 @@ export function CoachApprovalCard({ coach, labels }: CoachApprovalCardProps) {
                 type="button"
                 disabled={busy !== null}
                 onClick={() =>
-                  run(
-                    'reject',
-                    () => mockRejectCoach(coach.id, reason),
-                    'REJECTED',
-                  )
+                  run('reject', () => rejectCoach(coach.id, reason, lng))
                 }
                 className={dangerButton}
               >
@@ -189,9 +185,7 @@ export function CoachApprovalCard({ coach, labels }: CoachApprovalCardProps) {
             <button
               type="button"
               disabled={busy !== null}
-              onClick={() =>
-                run('approve', () => mockApproveCoach(coach.id), 'APPROVED')
-              }
+              onClick={() => run('approve', () => approveCoach(coach.id))}
               className={primaryButton}
             >
               {busy === 'approve' ? (

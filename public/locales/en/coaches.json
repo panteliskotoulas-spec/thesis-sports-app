@@ -87,6 +87,10 @@
       "rejectedReason": "Reason for rejection",
       "working": "Saving…",
       "errorGeneric": "Something went wrong. Try again."
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "We couldn't load the applications. Try again in a moment."
     }
   }
 }

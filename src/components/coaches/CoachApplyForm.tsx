@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { chipBase, chipOff, chipOn } from '@/components/fields/chipStyles';
 import { NewFieldSection } from '@/components/fields/new/NewFieldSection';
 import { FormField } from '@/components/shared/FormField';
@@ -16,7 +17,7 @@ import {
   type CoachFormErrors,
   type CoachFormInitial,
 } from '@/lib/coaches/coach';
-import { mockSubmitCoachApplication } from '@/lib/coaches/coach-mock';
+import { saveCoachProfile } from '@/lib/coaches/coach-api';
 import type { SportType } from '@/lib/fields/types';
 
 export interface CoachApplyFormLabels {
@@ -38,16 +39,20 @@ export interface CoachApplyFormLabels {
 }
 
 export interface CoachApplyFormProps {
+  lng: string;
   initial?: CoachFormInitial;
   sports: { value: SportType; label: string }[];
   labels: CoachApplyFormLabels;
 }
 
 export function CoachApplyForm({
+  lng,
   initial,
   sports,
   labels,
 }: CoachApplyFormProps) {
+  const router = useRouter();
+
   const [sportType, setSportType] = useState<SportType | null>(
     initial?.sportType ?? null,
   );
@@ -98,19 +103,23 @@ export function CoachApplyForm({
     setFormError(null);
     setSaved(false);
 
-    try {
-      await mockSubmitCoachApplication({
+    const result = await saveCoachProfile(
+      {
         sportType,
         bio: bio.trim(),
         hourlyRate,
         certifications: certifications.trim(),
-      });
+      },
+      lng,
+    );
+
+    if (result === 'ok') {
       setSaved(true);
-    } catch {
+      router.refresh();
+    } else {
       setFormError(labels.errorGeneric);
-    } finally {
-      setPending(false);
     }
+    setPending(false);
   }
 
   return (

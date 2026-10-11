@@ -13,11 +13,13 @@ import {
   formatRate,
   getInitials,
   parseCoachStatus,
+  toCoachApprovalRow,
   type CoachApprovalCardData,
+  type CoachApprovalRecordList,
 } from '@/lib/coaches/coach';
 import { buildCoachApprovalLabels } from '@/lib/coaches/coach-labels';
-import { getMockCoachApprovalList } from '@/lib/coaches/coach-mock';
 import { getCurrentUser } from '@/lib/session';
+import { getServerCaller } from '@/trpc/server/caller';
 
 const TIME_ZONE = 'Europe/Athens';
 
@@ -40,7 +42,14 @@ export default async function AdminCoachesPage({
   if (!user.isAdmin) notFound();
 
   const status = parseCoachStatus((await searchParams).status);
-  const data = getMockCoachApprovalList(status);
+
+  let data: CoachApprovalRecordList | null = null;
+  try {
+    const caller = await getServerCaller();
+    data = await caller.coachApproval.list({ status });
+  } catch (error) {
+    console.error('[AdminCoachesPage]', error);
+  }
 
   const basePath = `/${lng}/admin/coaches`;
   const dateFormatter = new Intl.DateTimeFormat(lng, {
@@ -49,21 +58,27 @@ export default async function AdminCoachesPage({
     timeZone: TIME_ZONE,
   });
 
-  const cards: CoachApprovalCardData[] = data.coaches.map((row) => ({
-    id: row.id,
-    name: row.name,
-    initials: getInitials(row.name),
-    email: row.email,
-    sport: { value: row.sportType, label: tf(`sports.${row.sportType}`) },
-    rate: t('admin.card.rate', { rate: formatRate(row.hourlyRate, lng) }),
-    bio: row.bio,
-    certifications: row.certifications,
-    submitted: t('admin.card.submitted', {
-      date: dateFormatter.format(row.createdAt),
-    }),
-    status: row.status,
-    rejectionReason: row.rejectionReason,
-  }));
+  const cards: CoachApprovalCardData[] = (data?.coaches ?? []).map((record) => {
+    const row = toCoachApprovalRow(record, lng);
+
+    return {
+      id: row.id,
+      name: row.name,
+      initials: getInitials(row.name),
+      email: row.email,
+      sport: { value: row.sportType, label: tf(`sports.${row.sportType}`) },
+      rate: t('admin.card.rate', { rate: formatRate(row.hourlyRate, lng) }),
+      bio: row.bio,
+      certifications: row.certifications,
+      submitted: t('admin.card.submitted', {
+        date: dateFormatter.format(row.createdAt),
+      }),
+      status: row.status,
+      rejectionReason: row.rejectionReason,
+    };
+  });
+
+  const labels = buildCoachApprovalLabels(t);
 
   return (
     <>
@@ -78,6 +93,7 @@ export default async function AdminCoachesPage({
         >
           {COACH_STATUSES.map((value) => {
             const active = value === status;
+            const count = data?.counts[value];
 
             return (
               <Link
@@ -90,14 +106,22 @@ export default async function AdminCoachesPage({
                 aria-current={active ? 'page' : undefined}
                 className={`${chipBase} ${active ? chipOn : chipOff}`}
               >
-                {t(`admin.status.${value}`)} {data.counts[value]}
+                {t(`admin.status.${value}`)}
+                {count !== undefined ? ` ${count}` : ''}
               </Link>
             );
           })}
         </nav>
 
         <div className="mt-6">
-          {cards.length === 0 ? (
+          {data === null ? (
+            <div className="rounded-xl border-[0.5px] border-border bg-card p-6 text-center">
+              <h2 className="text-lg">{t('admin.error.title')}</h2>
+              <p className="mt-2 text-muted-foreground">
+                {t('admin.error.description')}
+              </p>
+            </div>
+          ) : cards.length === 0 ? (
             <div className="rounded-xl border-[0.5px] border-border bg-card p-6 text-center">
               <h2 className="text-lg">{t(`admin.empty.${status}.title`)}</h2>
               <p className="mt-2 text-muted-foreground">
@@ -109,8 +133,9 @@ export default async function AdminCoachesPage({
               {cards.map((card) => (
                 <CoachApprovalCard
                   key={card.id}
+                  lng={lng}
                   coach={card}
-                  labels={buildCoachApprovalLabels(t)}
+                  labels={labels}
                 />
               ))}
             </div>

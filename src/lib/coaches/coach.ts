@@ -12,7 +12,7 @@ export const COACH_RATE_MIN = 1;
 export const COACH_RATE_MAX = 500;
 export const COACH_REJECTION_REASON_MAX = 500;
 
-export type CoachApprovalResult = 'ok' | 'error';
+export type CoachActionResult = 'ok' | 'conflict' | 'error';
 
 export interface CoachFormValues {
   sportType: SportType;
@@ -42,11 +42,6 @@ export interface CoachApprovalRow {
   status: CoachStatusValue;
   rejectionReason: string | null;
   createdAt: Date;
-}
-
-export interface CoachApprovalList {
-  coaches: CoachApprovalRow[];
-  counts: Record<CoachStatusValue, number>;
 }
 
 export interface CoachApprovalRecord {

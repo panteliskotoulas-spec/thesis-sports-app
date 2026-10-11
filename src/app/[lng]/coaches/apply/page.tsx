@@ -8,27 +8,22 @@ import { CoachApplyForm } from '@/components/coaches/CoachApplyForm';
 import { CoachStatusBanner } from '@/components/coaches/CoachStatusBanner';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
+import type { CoachFormInitial } from '@/lib/coaches/coach';
 import {
   buildCoachFormLabels,
   buildCoachStatusLabels,
 } from '@/lib/coaches/coach-labels';
-import {
-  getMockCoachApplication,
-  parseMockCoachState,
-} from '@/lib/coaches/coach-mock';
 import { SPORT_TYPES } from '@/lib/fields/types';
+import { localized } from '@/lib/i18n-content';
 import { getCurrentUser } from '@/lib/session';
+import { getServerCaller } from '@/trpc/server/caller';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT('coaches');
   return { title: t('meta.apply') };
 }
 
-export default async function CoachApplyPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ state?: string | string[] }>;
-}) {
+export default async function CoachApplyPage() {
   const { t } = await getT('coaches');
   const { t: tf } = await getT('fields');
   const lng = await routeLanguage();
@@ -36,14 +31,28 @@ export default async function CoachApplyPage({
 
   if (!user) redirect(`/${lng}/login`);
 
-  const state = parseMockCoachState((await searchParams).state);
-  const application = getMockCoachApplication(state);
+  const caller = await getServerCaller();
+  const record = await caller.coaches.getMine();
+
+  const status = record?.status ?? null;
+  const rejectionReason = record?.rejectionReason
+    ? localized(record.rejectionReason, lng)
+    : null;
+  const initial: CoachFormInitial | undefined = record
+    ? {
+        sportType: record.sportType,
+        bio: localized(record.bio, lng),
+        hourlyRate: String(record.hourlyRate),
+        certifications: record.certifications ?? '',
+      }
+    : undefined;
+
   const statusLabels = buildCoachStatusLabels(t);
 
   const submit =
-    application.status === null
+    status === null
       ? t('form.submitCreate')
-      : application.status === 'REJECTED'
+      : status === 'REJECTED'
         ? t('form.submitResubmit')
         : t('form.submitUpdate');
 
@@ -62,12 +71,12 @@ export default async function CoachApplyPage({
         <h1 className="mt-2">{t('apply.title')}</h1>
         <p className="mt-2 text-muted-foreground">{t('apply.subtitle')}</p>
 
-        {application.status ? (
+        {status ? (
           <div className="mt-6">
             <CoachStatusBanner
-              status={application.status}
-              rejectionReason={application.rejectionReason}
-              labels={statusLabels[application.status]}
+              status={status}
+              rejectionReason={rejectionReason}
+              labels={statusLabels[status]}
             />
           </div>
         ) : (
@@ -78,8 +87,8 @@ export default async function CoachApplyPage({
 
         <div className="mt-6">
           <CoachApplyForm
-            key={state}
-            initial={application.initial}
+            lng={lng}
+            initial={initial}
             sports={SPORT_TYPES.map((value) => ({
               value,
               label: tf(`sports.${value}`),
