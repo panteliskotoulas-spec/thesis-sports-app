@@ -1,32 +1,61 @@
+enum TeamLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum JoinRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
 
 model Team {
   id               String            @id @default(cuid())
   name             String
   sportType        SportType
+  level            TeamLevel         @default(INTERMEDIATE)
+  area             Json?
+  description      Json?
+  logoUrl          String?
+  maxMembers       Int               @default(12)
   isRecruiting     Boolean           @default(false)
   neededPosition   String?
+  createdAt        DateTime          @default(now())
   members          TeamMembership[]
   joinRequests     JoinRequest[]
   reservations     Reservation[]
   coachingSessions CoachingSession[]
   tournamentTeams  TournamentTeam[]
+
+  @@index([sportType, isRecruiting])
 }
 
 model TeamMembership {
-  id     String   @id @default(cuid())
-  teamId String
-  team   Team     @relation(fields: [teamId], references: [id])
-  userId String
-  user   User     @relation(fields: [userId], references: [id])
-  role   TeamRole @default(MEMBER)
+  id        String    @id @default(cuid())
+  teamId    String
+  team      Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  sportType SportType
+  role      TeamRole  @default(MEMBER)
+  joinedAt  DateTime  @default(now())
+
+  @@unique([teamId, userId])
+  @@unique([userId, sportType])
+  @@index([teamId])
 }
 
 model JoinRequest {
-  id        String   @id @default(cuid())
+  id        String            @id @default(cuid())
   teamId    String
-  team      Team     @relation(fields: [teamId], references: [id])
+  team      Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  status    String
-  createdAt DateTime @default(now())
+  user      User              @relation(fields: [userId], references: [id])
+  status    JoinRequestStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+
+  @@index([teamId, status])
+  @@index([userId, teamId])
 }

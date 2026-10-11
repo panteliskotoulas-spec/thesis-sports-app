@@ -6,6 +6,7 @@ import { fieldsRouter } from './fields';
 import { notificationsRouter } from './notifications';
 import { ownerBookingsRouter } from './owner-bookings';
 import { reservationsRouter } from './reservations';
+import { teamsRouter } from './teams';
 
 export const appRouter = router({
   fields: fieldsRouter,
@@ -15,6 +16,7 @@ export const appRouter = router({
   reservations: reservationsRouter,
   notifications: notificationsRouter,
   ownerBookings: ownerBookingsRouter,
+  teams: teamsRouter,
 });
 
 export type AppRouter = typeof appRouter;
