@@ -2,15 +2,36 @@ import Link from 'next/link';
 import { lng as routeLanguage } from 'next/root-params';
 import { getT } from '@/i18n.server';
 import { FieldDayStrip } from '@/components/fields/FieldDayStrip';
+import { formatAmount } from '@/lib/bookings/booking';
 import type { CoachDetail } from '@/lib/coaches/coach-public';
+import type { CoachRequestSlotItem } from '@/lib/coaches/coach-session';
+import { buildCoachSlotRequestLabels } from '@/lib/coaches/coach-session-labels';
 import { formatDayShort, formatTimeRange } from '@/lib/fields/detail-format';
 import { todayInAthens } from '@/lib/fields/filters';
 import { formatPricePerHour } from '@/lib/fields/format';
+import type { TeamBookingOption } from '@/lib/teams/team-booking';
+import { CoachSlotRequest } from './CoachSlotRequest';
 
-export async function CoachAvailability({ coach }: { coach: CoachDetail }) {
+export async function CoachAvailability({
+  coach,
+  teams,
+  loginHref,
+}: {
+  coach: CoachDetail;
+  teams: TeamBookingOption[];
+  loginHref: string | null;
+}) {
   const { t } = await getT('coaches');
+  const { t: tt } = await getT('teams');
   const lng = await routeLanguage();
   const hrefBase = `/${lng}/coaches/${coach.id}`;
+  const requestLabels = buildCoachSlotRequestLabels(t, tt);
+
+  const slotItems: CoachRequestSlotItem[] = coach.slots.map((slot) => ({
+    id: slot.id,
+    time: formatTimeRange(slot.startTime, slot.endTime, lng),
+    price: formatAmount(slot.price, lng),
+  }));
 
   return (
     <section
@@ -61,36 +82,13 @@ export async function CoachAvailability({ coach }: { coach: CoachDetail }) {
 
           <div className="mt-4">
             {coach.slots.length > 0 ? (
-              <div>
-                <h3 className="sr-only">{t('detail.availability.slots')}</h3>
-                <ul className="flex flex-col gap-2">
-                  {coach.slots.map((slot) => (
-                    <li
-                      key={slot.id}
-                      className="flex items-center justify-between gap-3 rounded-xl border-[0.5px] border-border bg-card px-3 py-3"
-                    >
-                      <span className="flex flex-col">
-                        <span className="font-medium">
-                          {formatTimeRange(slot.startTime, slot.endTime, lng)}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          {formatPricePerHour(slot.price, lng)}
-                        </span>
-                      </span>
-                      <button
-                        type="button"
-                        disabled
-                        className="h-11 shrink-0 cursor-not-allowed rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground opacity-50"
-                      >
-                        {t('detail.availability.request')}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-3 text-xs text-muted-foreground">
-                  {t('detail.availability.requestSoon')}
-                </p>
-              </div>
+              <CoachSlotRequest
+                lng={lng}
+                slots={slotItems}
+                teams={teams}
+                loginHref={loginHref}
+                labels={requestLabels}
+              />
             ) : (
               <div className="rounded-xl bg-secondary p-4 text-sm">
                 <p className="text-secondary-foreground">

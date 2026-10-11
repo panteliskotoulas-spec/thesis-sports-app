@@ -1,0 +1,105 @@
+import type { getT } from '@/i18n.server';
+import type { CoachSlotRequestLabels } from '@/components/coaches/CoachSlotRequest';
+import type { CoachRequestsListLabels } from '@/components/coaches/requests/CoachRequestsList';
+import type { CoachSessionsListLabels } from '@/components/coaches/sessions/CoachSessionsList';
+import { buildTeamBookingLabels } from '@/lib/teams/team-labels';
+
+type Translate = Awaited<ReturnType<typeof getT>>['t'];
+
+export function buildCoachSlotRequestLabels(
+  t: Translate,
+  tt: Translate,
+): CoachSlotRequestLabels {
+  return {
+    heading: t('detail.availability.slots'),
+    perSession: t('detail.availability.perSession'),
+    request: t('detail.availability.request'),
+    pending: t('detail.request.pending'),
+    panelTitle: t('detail.request.panelTitle'),
+    priceRow: t('detail.request.priceRow'),
+    payNote: t('detail.request.payNote'),
+    send: t('detail.request.send'),
+    sending: t('detail.request.sending'),
+    cancel: t('detail.request.cancel'),
+    sent: t('detail.request.sent'),
+    errorConflict: t('detail.request.errorConflict'),
+    errorGeneric: t('detail.request.errorGeneric'),
+    team: buildTeamBookingLabels(tt),
+  };
+}
+
+export function buildCoachRequestsLabels(
+  t: Translate,
+): CoachRequestsListLabels {
+  return {
+    tabPending: t('requests.tabPending'),
+    tabAccepted: t('requests.tabAccepted'),
+    tabRejected: t('requests.tabRejected'),
+    empty: t('requests.empty'),
+    acceptedNotice: t('requests.acceptedNotice'),
+    rejectedNotice: t('requests.rejectedNotice'),
+    errorConflict: t('requests.errorConflict'),
+    errorGeneric: t('requests.errorGeneric'),
+    card: {
+      individual: t('requests.card.individual'),
+      accept: t('requests.card.accept'),
+      reject: t('requests.card.reject'),
+      working: t('requests.card.working'),
+      paid: t('requests.card.paid'),
+      awaitingPayment: t('requests.card.awaitingPayment'),
+      paymentExpired: t('requests.card.paymentExpired'),
+    },
+  };
+}
+
+export function buildCoachSessionsLabels(
+  t: Translate,
+): CoachSessionsListLabels {
+  return {
+    tabAll: t('sessions.tabAll'),
+    tabWaiting: t('sessions.tabWaiting'),
+    tabPay: t('sessions.tabPay'),
+    tabConfirmed: t('sessions.tabConfirmed'),
+    emptyTitle: t('sessions.emptyTitle'),
+    emptyDescription: t('sessions.emptyDescription'),
+    emptyAction: t('sessions.emptyAction'),
+    paidNotice: t('sessions.paidNotice'),
+    cancelledNotice: t('sessions.cancelledNotice'),
+    requestCancelledNotice: t('sessions.requestCancelledNotice'),
+    card: {
+      statusRequested: t('sessions.card.statusRequested'),
+      statusAwaitingPayment: t('sessions.card.statusAwaitingPayment'),
+      statusConfirmed: t('sessions.card.statusConfirmed'),
+      statusRejected: t('sessions.card.statusRejected'),
+      statusCancelled: t('sessions.card.statusCancelled'),
+      statusExpired: t('sessions.card.statusExpired'),
+      payNote: t('sessions.card.payNote'),
+      pay: t('sessions.card.pay'),
+      paying: t('sessions.card.paying'),
+      cancelRequest: t('sessions.card.cancelRequest'),
+      cancel: t('sessions.card.cancel'),
+      cancelLocked: t('sessions.card.cancelLocked'),
+      paid: t('sessions.card.paid'),
+      paidCard: t('sessions.card.paidCard'),
+      paidCredit: t('sessions.card.paidCredit'),
+      refundedCard: t('sessions.card.refundedCard'),
+      refundedMixed: t('sessions.card.refundedMixed'),
+      refundedCredit: t('sessions.card.refundedCredit'),
+      errorTooLate: t('sessions.card.errorTooLate'),
+      errorConflict: t('sessions.card.errorConflict'),
+      errorGeneric: t('sessions.card.errorGeneric'),
+      panel: {
+        title: t('sessions.cancel.title'),
+        optionRefundTitle: t('sessions.cancel.optionRefundTitle'),
+        optionRefundCard: t('sessions.cancel.optionRefundCard'),
+        optionRefundMixed: t('sessions.cancel.optionRefundMixed'),
+        optionCredit: t('sessions.cancel.optionCredit'),
+        optionCreditTitle: t('sessions.cancel.optionCreditTitle'),
+        warning: t('sessions.cancel.warning'),
+        back: t('sessions.cancel.back'),
+        confirm: t('sessions.cancel.confirm'),
+        working: t('sessions.cancel.working'),
+      },
+    },
+  };
+}

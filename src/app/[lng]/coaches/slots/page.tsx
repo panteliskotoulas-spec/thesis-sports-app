@@ -109,6 +109,14 @@ export default async function CoachSlotsPage({
 
         <h1 className="mt-2">{t('slots.title')}</h1>
         <p className="mt-2 text-muted-foreground">{t('slots.subtitle')}</p>
+        {approved ? (
+          <Link
+            href={`/${lng}/coaches/requests`}
+            className="mt-3 inline-flex h-11 items-center rounded-full border-[0.5px] border-border bg-card px-5 text-sm font-medium text-foreground hover:bg-secondary"
+          >
+            {t('slots.requestsLink')}
+          </Link>
+        ) : null}
 
         <div className="mt-6 md:mt-8">
           {!record || !approved ? (

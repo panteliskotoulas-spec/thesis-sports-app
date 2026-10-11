@@ -140,9 +140,21 @@
       "emptyDay": "There are no available times on this day.",
       "nextDay": "Next available day: {{day}}",
       "request": "Request",
-      "requestSoon": "Sending a request will be available soon.",
       "ownProfile": "This is your own profile, so you can't request a session from yourself.",
-      "manageSlots": "Manage slots"
+      "manageSlots": "Manage slots",
+      "perSession": "per session"
+    },
+    "request": {
+      "pending": "Pending",
+      "panelTitle": "Request for {time}",
+      "priceRow": "Session price",
+      "payNote": "You don't pay now. If the coach accepts, you have 24 hours to pay.",
+      "send": "Send request",
+      "sending": "Sending…",
+      "cancel": "Cancel",
+      "sent": "Request sent. You'll be notified when the coach replies.",
+      "errorConflict": "This slot is no longer available. Pick another one.",
+      "errorGeneric": "Something went wrong. Try again."
     }
   },
   "slots": {
@@ -193,11 +205,92 @@
     "error": {
       "title": "Something went wrong",
       "description": "We could not load your times. Try again in a moment."
-    }
+    },
+    "requestsLink": "Session requests"
   },
   "error": {
     "title": "Something went wrong",
     "description": "We could not load the coaches. Try again in a moment.",
     "retry": "Try again"
+  },
+  "requests": {
+    "meta": "Session requests",
+    "title": "Session requests",
+    "subtitle": "Accept or decline requests for your slots.",
+    "back": "My slots",
+    "notApproved": {
+      "title": "Your profile isn't approved",
+      "description": "You'll receive requests once your profile is approved.",
+      "cta": "Go to my profile"
+    },
+    "tabPending": "Pending",
+    "tabAccepted": "Accepted",
+    "tabRejected": "Declined",
+    "empty": "No requests here.",
+    "acceptedNotice": "Request accepted. The player has 24 hours to pay.",
+    "rejectedNotice": "Request declined. The slot is open again.",
+    "errorConflict": "The request changed or the slot is no longer available.",
+    "errorGeneric": "Something went wrong. Try again.",
+    "card": {
+      "individual": "Individual session",
+      "accept": "Accept",
+      "reject": "Decline",
+      "working": "Just a moment…",
+      "paid": "Paid",
+      "awaitingPayment": "Awaiting payment · until {deadline}",
+      "paymentExpired": "Payment expired"
+    }
+  },
+  "sessions": {
+    "meta": "My sessions",
+    "title": "My sessions",
+    "subtitle": "Your requests to coaches and your booked sessions.",
+    "back": "My bookings",
+    "link": "My sessions",
+    "tabAll": "All",
+    "tabWaiting": "Waiting",
+    "tabPay": "Payment",
+    "tabConfirmed": "Confirmed",
+    "emptyTitle": "No sessions here",
+    "emptyDescription": "Find a coach and send a request for a time slot.",
+    "emptyAction": "Find a coach",
+    "paidNotice": "Payment complete. Your session is confirmed.",
+    "cancelledNotice": "Session cancelled.",
+    "requestCancelledNotice": "Request cancelled.",
+    "card": {
+      "statusRequested": "Awaiting reply",
+      "statusAwaitingPayment": "Awaiting payment",
+      "statusConfirmed": "Confirmed",
+      "statusRejected": "Declined",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "payNote": "The coach accepted. Pay by {deadline}, or the slot will be released.",
+      "pay": "Pay {amount}",
+      "paying": "Just a moment…",
+      "cancelRequest": "Cancel request",
+      "cancel": "Cancel session",
+      "cancelLocked": "Cancelling is no longer possible, since there are less than 24 hours left.",
+      "paid": "Paid {amount}",
+      "paidCard": "{amount} by card",
+      "paidCredit": "{amount} from credit",
+      "refundedCard": "{amount} refunded to your card.",
+      "refundedMixed": "{card} refunded to your card and {credit} to your credit.",
+      "refundedCredit": "{amount} added to your credit.",
+      "errorTooLate": "Cancelling is no longer possible.",
+      "errorConflict": "The session changed. Refresh the page.",
+      "errorGeneric": "Something went wrong. Try again."
+    },
+    "cancel": {
+      "title": "What should happen to your money?",
+      "optionRefundTitle": "Refund to card",
+      "optionRefundCard": "{amount} will be refunded to your card.",
+      "optionRefundMixed": "{card} will be refunded to your card and {credit} to your credit.",
+      "optionCreditTitle": "Credit on your account",
+      "optionCredit": "{amount} will be added to your credit for future bookings.",
+      "warning": "Cancelling can't be undone.",
+      "back": "Back",
+      "confirm": "Cancel session",
+      "working": "Just a moment…"
+    }
   }
 }

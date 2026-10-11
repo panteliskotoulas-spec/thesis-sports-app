@@ -13,6 +13,7 @@ import { toCoachDetail } from '@/lib/coaches/coach-public';
 import { parseDetailDate } from '@/lib/fields/detail';
 import type { SearchParams } from '@/lib/fields/filters';
 import { getCurrentUser } from '@/lib/session';
+import type { TeamBookingOption } from '@/lib/teams/team-booking';
 import { getServerCaller } from '@/trpc/server/caller';
 
 interface CoachPageProps {
@@ -52,6 +53,16 @@ export default async function CoachPage({
   const row = await loadCoach(id, parseDetailDate(await searchParams));
   if (!row) notFound();
   const coach = toCoachDetail(row, lng);
+
+  let teams: TeamBookingOption[] = [];
+  if (user && !coach.isSelf) {
+    try {
+      const caller = await getServerCaller();
+      teams = await caller.teams.bookableTeams({ sportType: coach.sportType });
+    } catch (error) {
+      console.error('[CoachPage] bookableTeams', error);
+    }
+  }
 
   return (
     <>
@@ -119,7 +130,11 @@ export default async function CoachPage({
           </div>
 
           <aside className="min-w-0 lg:sticky lg:top-24">
-            <CoachAvailability coach={coach} />
+            <CoachAvailability
+              coach={coach}
+              teams={teams}
+              loginHref={user ? null : `/${lng}/login`}
+            />
           </aside>
         </div>
       </main>
