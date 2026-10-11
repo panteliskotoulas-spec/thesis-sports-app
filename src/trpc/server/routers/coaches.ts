@@ -194,6 +194,7 @@ export const coachesRouter = router({
         bio: asLocalized(coach.bio),
         certifications: coach.certifications,
         hourlyRate: Number(coach.hourlyRate),
+        isSelf: isOwner,
         pricePerHourFrom: cheapestPerHour(slots),
         days,
         selectedDay,

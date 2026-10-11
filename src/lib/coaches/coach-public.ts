@@ -75,6 +75,7 @@ export interface CoachDetailRow {
   bio: LocalizedText;
   certifications: string | null;
   hourlyRate: number;
+  isSelf: boolean;
   pricePerHourFrom: number | null;
   days: FieldAvailabilityDay[];
   selectedDay: string | null;

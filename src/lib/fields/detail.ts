@@ -40,6 +40,7 @@ export interface FieldDetailRow {
   rating: { average: number; count: number } | null;
   pricePerHourFrom: number | null;
   businessName: string | null;
+  isOwner: boolean;
   days: FieldAvailabilityDay[];
   selectedDay: string | null;
   slots: FieldDetailSlot[];

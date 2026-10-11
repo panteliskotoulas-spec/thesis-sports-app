@@ -335,6 +335,9 @@ export async function startCheckout(
   if (!slot || slot.field.status !== 'APPROVED' || slot.field.archivedAt) {
     throw new TRPCError({ code: 'NOT_FOUND' });
   }
+  if (slot.field.ownerId === params.userId) {
+    throw new TRPCError({ code: 'FORBIDDEN' });
+  }
   if (slot.startTime <= now) throw new TRPCError({ code: 'BAD_REQUEST' });
 
   const user = await prisma.user.findUnique({

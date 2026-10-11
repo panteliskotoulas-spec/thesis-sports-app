@@ -81,7 +81,9 @@
       "emptyDay": "There are no available times on this day.",
       "nextDay": "Next available day: {{day}}",
       "book": "Continue to booking",
-      "pickSlot": "Pick a time to continue."
+      "pickSlot": "Pick a time to continue.",
+      "ownField": "This is your own field, so you can't book it.",
+      "manageSlots": "Manage slots"
     },
     "location": {
       "title": "Location",

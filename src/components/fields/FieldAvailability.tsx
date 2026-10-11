@@ -38,52 +38,68 @@ export async function FieldAvailability({ field }: { field: FieldDetail }) {
         </p>
       ) : null}
 
-      <div className="mt-4">
-        <FieldDayStrip
-          days={field.days}
-          selectedDay={field.selectedDay}
-          today={todayInAthens()}
-          lng={lng}
-          hrefBase={hrefBase}
-          labels={{
-            list: t('detail.availability.days'),
-            unavailable: t('detail.availability.dayUnavailable'),
-            pickDate: t('detail.availability.pickDate'),
-          }}
-        />
-      </div>
-
-      <div className="mt-4">
-        {slotItems.length > 0 ? (
-          <FieldSlots
-            key={field.selectedDay ?? 'none'}
-            slots={slotItems}
-            heading={t('detail.availability.slots')}
-            bookLabel={t('detail.availability.book')}
-            pickHint={t('detail.availability.pickSlot')}
-            bookHref={`${hrefBase}/book`}
-          />
-        ) : (
-          <div className="rounded-xl bg-secondary p-4 text-sm">
-            <p className="text-secondary-foreground">
-              {field.selectedDay === null
-                ? t('detail.availability.none')
-                : t('detail.availability.emptyDay')}
-            </p>
-            {field.nextAvailableDay ? (
-              <Link
-                href={`${hrefBase}?date=${field.nextAvailableDay}`}
-                scroll={false}
-                className="mt-2 inline-block font-medium text-primary underline underline-offset-4"
-              >
-                {t('detail.availability.nextDay', {
-                  day: formatDayShort(field.nextAvailableDay, lng),
-                })}
-              </Link>
-            ) : null}
+      {field.isOwner ? (
+        <div className="mt-4 rounded-xl bg-secondary p-4 text-sm">
+          <p className="text-secondary-foreground">
+            {t('detail.availability.ownField')}
+          </p>
+          <Link
+            href={`/${lng}/owner/fields/${field.id}/slots`}
+            className="mt-2 inline-block font-medium text-primary underline underline-offset-4"
+          >
+            {t('detail.availability.manageSlots')}
+          </Link>
+        </div>
+      ) : (
+        <>
+          <div className="mt-4">
+            <FieldDayStrip
+              days={field.days}
+              selectedDay={field.selectedDay}
+              today={todayInAthens()}
+              lng={lng}
+              hrefBase={hrefBase}
+              labels={{
+                list: t('detail.availability.days'),
+                unavailable: t('detail.availability.dayUnavailable'),
+                pickDate: t('detail.availability.pickDate'),
+              }}
+            />
           </div>
-        )}
-      </div>
+
+          <div className="mt-4">
+            {slotItems.length > 0 ? (
+              <FieldSlots
+                key={field.selectedDay ?? 'none'}
+                slots={slotItems}
+                heading={t('detail.availability.slots')}
+                bookLabel={t('detail.availability.book')}
+                pickHint={t('detail.availability.pickSlot')}
+                bookHref={`${hrefBase}/book`}
+              />
+            ) : (
+              <div className="rounded-xl bg-secondary p-4 text-sm">
+                <p className="text-secondary-foreground">
+                  {field.selectedDay === null
+                    ? t('detail.availability.none')
+                    : t('detail.availability.emptyDay')}
+                </p>
+                {field.nextAvailableDay ? (
+                  <Link
+                    href={`${hrefBase}?date=${field.nextAvailableDay}`}
+                    scroll={false}
+                    className="mt-2 inline-block font-medium text-primary underline underline-offset-4"
+                  >
+                    {t('detail.availability.nextDay', {
+                      day: formatDayShort(field.nextAvailableDay, lng),
+                    })}
+                  </Link>
+                ) : null}
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </section>
   );
 }

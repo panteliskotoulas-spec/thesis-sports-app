@@ -50,6 +50,9 @@ export default async function BookingPage({
     row = await caller.reservations.getSummary({ slotId });
   } catch (error) {
     if (error instanceof TRPCError && error.code === 'NOT_FOUND') notFound();
+    if (error instanceof TRPCError && error.code === 'FORBIDDEN') {
+      redirect(`/${lng}/fields/${id}`);
+    }
     throw error;
   }
 

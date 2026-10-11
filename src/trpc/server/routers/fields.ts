@@ -312,6 +312,7 @@ export const fieldsRouter = router({
               }
             : null,
         pricePerHourFrom: cheapestPerHour(slots),
+        isOwner,
         businessName:
           field.owner.accountType === 'BUSINESS'
             ? field.owner.businessName

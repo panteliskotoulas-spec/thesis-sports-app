@@ -140,7 +140,9 @@
       "emptyDay": "There are no available times on this day.",
       "nextDay": "Next available day: {{day}}",
       "request": "Request",
-      "requestSoon": "Sending a request will be available soon."
+      "requestSoon": "Sending a request will be available soon.",
+      "ownProfile": "This is your own profile, so you can't request a session from yourself.",
+      "manageSlots": "Manage slots"
     }
   },
   "slots": {

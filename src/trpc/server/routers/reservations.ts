@@ -42,6 +42,7 @@ export const reservationsRouter = router({
           field: {
             select: {
               id: true,
+              ownerId: true,
               name: true,
               address: true,
               status: true,
@@ -53,6 +54,9 @@ export const reservationsRouter = router({
 
       if (!slot || slot.field.status !== 'APPROVED' || slot.field.archivedAt) {
         throw new TRPCError({ code: 'NOT_FOUND' });
+      }
+      if (slot.field.ownerId === ctx.session.user.id) {
+        throw new TRPCError({ code: 'FORBIDDEN' });
       }
 
       const user = await ctx.prisma.user.findUnique({
