@@ -12,6 +12,8 @@ export function buildCoachFormLabels(
   return {
     sectionTitle: t('form.sectionTitle'),
     sport: t('form.sport'),
+    area: t('form.area'),
+    areaPlaceholder: t('form.areaPlaceholder'),
     bio: t('form.bio'),
     translationHint: t('form.translationHint'),
     rate: t('form.rate'),

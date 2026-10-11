@@ -10,8 +10,7 @@ import {
   CoachSlotsManager,
   type CoachSlotsManagerLabels,
 } from '@/components/coaches/slots/CoachSlotsManager';
-import { mockMySlots } from '@/lib/coaches/coach-mock';
-import { toCoachSlotItem } from '@/lib/coaches/coach-public';
+import { toCoachSlotItem, type CoachSlotRow } from '@/lib/coaches/coach-public';
 import { formatDayChip } from '@/lib/fields/detail-format';
 import {
   parseFieldFilters,
@@ -47,9 +46,16 @@ export default async function CoachSlotsPage({
   const tomorrow = tomorrowInAthens();
   const selectedDay = parseFieldFilters({ date: query.date }).date ?? today;
 
-  const slots = approved
-    ? mockMySlots(selectedDay).map((row) => toCoachSlotItem(row, lng))
-    : [];
+  let rows: CoachSlotRow[] | null = null;
+  if (approved) {
+    try {
+      rows = await caller.coachSlots.list({ date: selectedDay });
+    } catch (error) {
+      console.error('[CoachSlotsPage]', error);
+    }
+  }
+
+  const slots = (rows ?? []).map((row) => toCoachSlotItem(row, lng));
 
   const labels: CoachSlotsManagerLabels = {
     dateBar: {
@@ -105,19 +111,7 @@ export default async function CoachSlotsPage({
         <p className="mt-2 text-muted-foreground">{t('slots.subtitle')}</p>
 
         <div className="mt-6 md:mt-8">
-          {record && approved ? (
-            <CoachSlotsManager
-              key={selectedDay}
-              lng={lng}
-              sportType={record.sportType}
-              selectedDay={selectedDay}
-              today={today}
-              tomorrow={tomorrow}
-              dayLabel={formatDayChip(selectedDay, lng).full}
-              slots={slots}
-              labels={labels}
-            />
-          ) : (
+          {!record || !approved ? (
             <div className="rounded-xl border-[0.5px] border-border bg-card p-6 text-center">
               <h2 className="text-lg">{t('slots.notApproved.title')}</h2>
               <p className="mt-1 text-muted-foreground">
@@ -130,6 +124,24 @@ export default async function CoachSlotsPage({
                 {t('slots.notApproved.cta')}
               </Link>
             </div>
+          ) : rows === null ? (
+            <div className="rounded-xl border-[0.5px] border-border bg-card p-6 text-center">
+              <h2 className="text-lg">{t('slots.error.title')}</h2>
+              <p className="mt-1 text-muted-foreground">
+                {t('slots.error.description')}
+              </p>
+            </div>
+          ) : (
+            <CoachSlotsManager
+              key={selectedDay}
+              sportType={record.sportType}
+              selectedDay={selectedDay}
+              today={today}
+              tomorrow={tomorrow}
+              dayLabel={formatDayChip(selectedDay, lng).full}
+              slots={slots}
+              labels={labels}
+            />
           )}
         </div>
       </main>

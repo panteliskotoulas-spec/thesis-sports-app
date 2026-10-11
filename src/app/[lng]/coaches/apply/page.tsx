@@ -41,6 +41,7 @@ export default async function CoachApplyPage() {
   const initial: CoachFormInitial | undefined = record
     ? {
         sportType: record.sportType,
+        area: localized(record.area, lng),
         bio: localized(record.bio, lng),
         hourlyRate: String(record.hourlyRate),
         certifications: record.certifications ?? '',

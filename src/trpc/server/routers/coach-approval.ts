@@ -37,6 +37,7 @@ export const coachApprovalRouter = router({
           select: {
             id: true,
             sportType: true,
+            area: true,
             bio: true,
             certifications: true,
             hourlyRate: true,
@@ -68,6 +69,7 @@ export const coachApprovalRouter = router({
           name: coach.user.name,
           email: coach.user.email,
           sportType: coach.sportType,
+          area: asLocalized(coach.area),
           bio: asLocalized(coach.bio),
           certifications: coach.certifications,
           hourlyRate: Number(coach.hourlyRate),

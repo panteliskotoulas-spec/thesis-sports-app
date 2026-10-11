@@ -1,29 +1,41 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
 import { ArrowLeft, Award, MapPin } from 'lucide-react';
+import { TRPCError } from '@trpc/server';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
 import { CoachAvailability } from '@/components/coaches/CoachAvailability';
-import { mockGetCoach } from '@/lib/coaches/coach-mock';
 import { toCoachDetail } from '@/lib/coaches/coach-public';
 import { parseDetailDate } from '@/lib/fields/detail';
 import type { SearchParams } from '@/lib/fields/filters';
 import { getCurrentUser } from '@/lib/session';
+import { getServerCaller } from '@/trpc/server/caller';
 
 interface CoachPageProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<SearchParams>;
 }
 
+const loadCoach = cache(async (id: string, date: string | null) => {
+  try {
+    const caller = await getServerCaller();
+    return await caller.coaches.getById({ id, date });
+  } catch (error) {
+    if (error instanceof TRPCError && error.code === 'NOT_FOUND') return null;
+    throw error;
+  }
+});
+
 export async function generateMetadata({
   params,
   searchParams,
 }: CoachPageProps): Promise<Metadata> {
   const { id } = await params;
-  const row = mockGetCoach(id, parseDetailDate(await searchParams));
+  const row = await loadCoach(id, parseDetailDate(await searchParams));
   return row ? { title: row.name } : {};
 }
 
@@ -37,7 +49,7 @@ export default async function CoachPage({
   const lng = await routeLanguage();
   const user = await getCurrentUser();
 
-  const row = mockGetCoach(id, parseDetailDate(await searchParams));
+  const row = await loadCoach(id, parseDetailDate(await searchParams));
   if (!row) notFound();
   const coach = toCoachDetail(row, lng);
 
@@ -68,10 +80,15 @@ export default async function CoachPage({
                   <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">
                     {tf(`sports.${coach.sportType}`)}
                   </span>
-                  <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
-                    {coach.area}
-                  </span>
+                  {coach.area ? (
+                    <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <MapPin
+                        className="size-3.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      {coach.area}
+                    </span>
+                  ) : null}
                 </div>
               </div>
             </div>

@@ -7,6 +7,7 @@ export type CoachStatusValue = (typeof COACH_STATUSES)[number];
 export const DEFAULT_COACH_STATUS: CoachStatusValue = 'PENDING';
 
 export const COACH_BIO_MAX = 1000;
+export const COACH_AREA_MAX = 100;
 export const COACH_CERTIFICATIONS_MAX = 300;
 export const COACH_RATE_MIN = 1;
 export const COACH_RATE_MAX = 500;
@@ -16,6 +17,7 @@ export type CoachActionResult = 'ok' | 'conflict' | 'error';
 
 export interface CoachFormValues {
   sportType: SportType;
+  area: string;
   bio: string;
   hourlyRate: number;
   certifications: string;
@@ -23,12 +25,13 @@ export interface CoachFormValues {
 
 export interface CoachFormInitial {
   sportType: SportType;
+  area: string;
   bio: string;
   hourlyRate: string;
   certifications: string;
 }
 
-export type CoachFormErrorKey = 'sportType' | 'bio' | 'hourlyRate';
+export type CoachFormErrorKey = 'sportType' | 'area' | 'bio' | 'hourlyRate';
 export type CoachFormErrors = Partial<Record<CoachFormErrorKey, string>>;
 
 export interface CoachApprovalRow {
@@ -36,6 +39,7 @@ export interface CoachApprovalRow {
   name: string;
   email: string;
   sportType: SportType;
+  area: string;
   bio: string;
   certifications: string | null;
   hourlyRate: number;
@@ -49,6 +53,7 @@ export interface CoachApprovalRecord {
   name: string;
   email: string;
   sportType: SportType;
+  area: LocalizedText;
   bio: LocalizedText;
   certifications: string | null;
   hourlyRate: number;
@@ -66,6 +71,7 @@ export interface CoachMineRecord {
   status: CoachStatusValue;
   rejectionReason: LocalizedText | null;
   sportType: SportType;
+  area: LocalizedText;
   bio: LocalizedText;
   hourlyRate: number;
   certifications: string | null;
@@ -77,6 +83,7 @@ export interface CoachApprovalCardData {
   initials: string;
   email: string;
   sport: { value: SportType; label: string };
+  area: string;
   rate: string;
   bio: string;
   certifications: string | null;
@@ -126,6 +133,7 @@ export function toCoachApprovalRow(
 ): CoachApprovalRow {
   return {
     ...record,
+    area: localized(record.area, lng),
     bio: localized(record.bio, lng),
     rejectionReason: record.rejectionReason
       ? localized(record.rejectionReason, lng)

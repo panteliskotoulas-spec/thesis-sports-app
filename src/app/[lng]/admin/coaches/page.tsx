@@ -67,6 +67,7 @@ export default async function AdminCoachesPage({
       initials: getInitials(row.name),
       email: row.email,
       sport: { value: row.sportType, label: tf(`sports.${row.sportType}`) },
+      area: row.area,
       rate: t('admin.card.rate', { rate: formatRate(row.hourlyRate, lng) }),
       bio: row.bio,
       certifications: row.certifications,

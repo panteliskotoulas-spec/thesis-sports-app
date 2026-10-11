@@ -34,10 +34,12 @@ export async function CoachCard({ coach }: { coach: CoachListItem }) {
           </div>
         </div>
 
-        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
-          {coach.area}
-        </p>
+        {coach.area ? (
+          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
+            {coach.area}
+          </p>
+        ) : null}
 
         <p className="line-clamp-2 text-sm text-muted-foreground">
           {coach.bio}

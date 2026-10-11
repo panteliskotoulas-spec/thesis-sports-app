@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Award, Check, Clock, Mail } from 'lucide-react';
+import { Award, Check, Clock, Mail, MapPin } from 'lucide-react';
 import { approveCoach, rejectCoach } from '@/lib/coaches/coach-api';
 import {
   COACH_REJECTION_REASON_MAX,
@@ -99,6 +99,12 @@ export function CoachApprovalCard({
             <Mail className="size-3.5 shrink-0" aria-hidden="true" />
             <span className="min-w-0 wrap-break-word">{coach.email}</span>
           </p>
+          {coach.area ? (
+            <p className="mt-0.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+              <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
+              <span className="min-w-0 wrap-break-word">{coach.area}</span>
+            </p>
+          ) : null}
 
           <ul className="mt-2 flex flex-wrap gap-1.5">
             <li className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">

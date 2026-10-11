@@ -1,5 +1,6 @@
 import { router } from '../init';
 import { coachApprovalRouter } from './coach-approval';
+import { coachSlotsRouter } from './coach-slots';
 import { coachesRouter } from './coaches';
 import { fieldApprovalRouter } from './field-approval';
 import { fieldOwnerRouter } from './field-owner';
@@ -23,6 +24,7 @@ export const appRouter = router({
   splits: splitsRouter,
   coaches: coachesRouter,
   coachApproval: coachApprovalRouter,
+  coachSlots: coachSlotsRouter,
 });
 
 export type AppRouter = typeof appRouter;

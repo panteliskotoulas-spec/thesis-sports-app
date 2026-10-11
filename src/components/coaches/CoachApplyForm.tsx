@@ -8,6 +8,7 @@ import { FormField } from '@/components/shared/FormField';
 import { FormTextArea } from '@/components/shared/FormTextArea';
 import { fillTemplate } from '@/lib/bookings/booking';
 import {
+  COACH_AREA_MAX,
   COACH_BIO_MAX,
   COACH_CERTIFICATIONS_MAX,
   COACH_RATE_MAX,
@@ -23,6 +24,8 @@ import type { SportType } from '@/lib/fields/types';
 export interface CoachApplyFormLabels {
   sectionTitle: string;
   sport: string;
+  area: string;
+  areaPlaceholder: string;
   bio: string;
   translationHint: string;
   rate: string;
@@ -56,6 +59,7 @@ export function CoachApplyForm({
   const [sportType, setSportType] = useState<SportType | null>(
     initial?.sportType ?? null,
   );
+  const [area, setArea] = useState(initial?.area ?? '');
   const [bio, setBio] = useState(initial?.bio ?? '');
   const [rate, setRate] = useState(initial?.hourlyRate ?? '');
   const [certifications, setCertifications] = useState(
@@ -79,6 +83,7 @@ export function CoachApplyForm({
   function validate(): CoachFormErrors {
     const next: CoachFormErrors = {};
     if (!sportType) next.sportType = labels.errorSport;
+    if (!area.trim()) next.area = labels.errorRequired;
     if (!bio.trim()) next.bio = labels.errorRequired;
     if (parseHourlyRate(rate) === null) {
       next.hourlyRate = fillTemplate(labels.errorRate, {
@@ -106,6 +111,7 @@ export function CoachApplyForm({
     const result = await saveCoachProfile(
       {
         sportType,
+        area: area.trim(),
         bio: bio.trim(),
         hourlyRate,
         certifications: certifications.trim(),
@@ -161,6 +167,22 @@ export function CoachApplyForm({
             </p>
           ) : null}
         </div>
+
+        <FormField
+          id="area"
+          type="text"
+          label={labels.area}
+          placeholder={labels.areaPlaceholder}
+          value={area}
+          onChange={(event) => {
+            setArea(event.target.value);
+            clearError('area');
+          }}
+          maxLength={COACH_AREA_MAX}
+          autoComplete="off"
+          hint={labels.translationHint}
+          error={errors.area}
+        />
 
         <FormTextArea
           id="bio"

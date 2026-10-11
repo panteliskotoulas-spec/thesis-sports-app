@@ -45,7 +45,9 @@
       "sport": "Choose a sport.",
       "rate": "Enter a rate from {min} to {max} €.",
       "generic": "Something went wrong. Try again."
-    }
+    },
+    "area": "Area",
+    "areaPlaceholder": "e.g. Glyfada, Athens"
   },
   "admin": {
     "meta": "Coach approval",
@@ -185,6 +187,15 @@
       "errorGeneric": "Something went wrong. Try again."
     },
     "deleteConflict": "This time cannot be deleted because its status has changed.",
-    "deleteError": "The time was not deleted. Try again."
+    "deleteError": "The time was not deleted. Try again.",
+    "error": {
+      "title": "Something went wrong",
+      "description": "We could not load your times. Try again in a moment."
+    }
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "We could not load the coaches. Try again in a moment.",
+    "retry": "Try again"
   }
 }

@@ -4,6 +4,7 @@ model Coach {
   user            User                    @relation(fields: [userId], references: [id])
   sportType       SportType
   bio             Json
+  area            Json                    @default("{}")
   hourlyRate      Decimal                 @db.Decimal(10, 2)
   certifications  String?
   status          CoachStatus             @default(PENDING)
