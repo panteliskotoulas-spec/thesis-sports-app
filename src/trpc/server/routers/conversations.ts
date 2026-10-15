@@ -7,6 +7,7 @@ import {
   type ChatThreadData,
 } from '@/lib/chat/chat';
 import {
+  countUnreadMessages,
   getThread,
   listConversations,
   markConversationRead,
@@ -45,6 +46,11 @@ export const conversationsRouter = router({
       ({ ctx, input }): Promise<ChatConversation[]> =>
         listConversations(ctx.prisma, ctx.session.user.id, input.lng),
     ),
+
+  unreadCount: protectedProcedure.query(
+    ({ ctx }): Promise<number> =>
+      countUnreadMessages(ctx.prisma, ctx.session.user.id),
+  ),
 
   getThread: protectedProcedure
     .input(threadInput)

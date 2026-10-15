@@ -3,6 +3,8 @@ export const CHAT_THREAD_PAGE_SIZE = 30;
 export const CHAT_POLL_ACTIVE_MS = 4000;
 export const CHAT_POLL_IDLE_MS = 20000;
 export const CHAT_INBOX_POLL_MS = 10000;
+export const CHAT_UNREAD_POLL_MS = 30000;
+export const CHAT_UNREAD_EVENT = 'chat-unread-changed';
 
 export type ChatKind = 'TEAM' | 'COACH';
 

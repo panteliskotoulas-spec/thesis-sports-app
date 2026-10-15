@@ -263,11 +263,10 @@ function toConversation(
   };
 }
 
-export async function listConversations(
+async function loadCandidateRows(
   db: Db,
   userId: string,
-  lng: Lng,
-): Promise<ChatConversation[]> {
+): Promise<ConversationRow[]> {
   const [memberships, sessions] = await Promise.all([
     db.teamMembership.findMany({
       where: { userId },
@@ -279,7 +278,7 @@ export async function listConversations(
     }),
   ]);
 
-  const rows = await db.conversation.findMany({
+  return db.conversation.findMany({
     where: {
       OR: [
         {
@@ -294,6 +293,26 @@ export async function listConversations(
     },
     select: conversationSelect,
   });
+}
+
+export async function countUnreadMessages(
+  db: Db,
+  userId: string,
+): Promise<number> {
+  const rows = await loadCandidateRows(db, userId);
+  const counts = await Promise.all(
+    rows.map((row) => countUnread(db, row.id, userId)),
+  );
+
+  return counts.reduce((sum, value) => sum + value, 0);
+}
+
+export async function listConversations(
+  db: Db,
+  userId: string,
+  lng: Lng,
+): Promise<ChatConversation[]> {
+  const rows = await loadCandidateRows(db, userId);
 
   const built = await Promise.all(
     rows.map(async (row) => {

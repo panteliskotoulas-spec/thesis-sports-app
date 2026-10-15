@@ -1,6 +1,7 @@
 import { createTRPCClient, httpBatchLink, TRPCClientError } from '@trpc/client';
 import superjson from 'superjson';
 import type { AppRouter } from '@/trpc/server/routers/_app';
+import { CHAT_UNREAD_EVENT } from '@/lib/chat/chat';
 import type {
   FetchConversationsResult,
   FetchThreadInput,
@@ -74,8 +75,17 @@ export async function markConversationRead(
 ): Promise<void> {
   try {
     await client.conversations.markRead.mutate({ conversationId });
+    window.dispatchEvent(new Event(CHAT_UNREAD_EVENT));
   } catch {
     return;
+  }
+}
+
+export async function fetchChatUnreadCount(): Promise<number | null> {
+  try {
+    return await client.conversations.unreadCount.query();
+  } catch {
+    return null;
   }
 }
 

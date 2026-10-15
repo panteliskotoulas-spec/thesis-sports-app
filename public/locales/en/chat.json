@@ -45,12 +45,17 @@
     "errorRateLimited": "You're sending too fast. Wait a moment.",
     "errorReadOnly": "This conversation is now read-only.",
     "errorUnauthorized": "Sign in again to send a message.",
-    "errorGeneric": "The message wasn't sent. Try again."
+    "errorGeneric": "The message wasn't sent. Try again.",
+    "backPrevious": "Back"
   },
   "open": {
     "label": "Open conversation",
     "opening": "Opening…",
     "errorUnavailable": "This conversation isn't available.",
     "errorGeneric": "The conversation didn't open. Try again."
+  },
+  "nav": {
+    "messages": "Messages",
+    "messagesUnread": "Messages, {count} unread"
   }
 }

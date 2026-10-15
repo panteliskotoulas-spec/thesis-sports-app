@@ -15,12 +15,21 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('meta.thread') };
 }
 
+function resolveFrom(value: string | string[] | undefined, lng: string) {
+  if (typeof value !== 'string') return null;
+  if (!value.startsWith(`/${lng}/`) || value.startsWith('//')) return null;
+  return value;
+}
+
 export default async function MessageThreadPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string | string[] }>;
 }) {
   const { id } = await params;
+  const query = await searchParams;
   const { t } = await getT('chat');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
@@ -28,7 +37,9 @@ export default async function MessageThreadPage({
   if (!user) redirect(`/${lng}/login`);
 
   const language = lng === 'en' ? 'en' : 'el';
-  const backHref = `/${lng}/messages`;
+  const from = resolveFrom(query.from, lng);
+  const backHref = from ?? `/${lng}/messages`;
+  const backLabel = from ? t('thread.backPrevious') : t('thread.back');
 
   return (
     <>
@@ -39,7 +50,7 @@ export default async function MessageThreadPage({
           className="inline-flex h-10 items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
-          {t('thread.back')}
+          {backLabel}
         </Link>
 
         <div className="mt-2">
@@ -47,7 +58,7 @@ export default async function MessageThreadPage({
             lng={language}
             conversationId={id}
             backHref={backHref}
-            labels={buildChatThreadLabels(t)}
+            labels={{ ...buildChatThreadLabels(t), back: backLabel }}
           />
         </div>
       </main>

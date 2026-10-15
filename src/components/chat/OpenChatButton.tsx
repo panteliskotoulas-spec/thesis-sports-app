@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 import { openConversation } from '@/lib/chat/chat-api';
 import type { OpenConversationInput } from '@/lib/chat/chat';
@@ -21,6 +21,7 @@ export interface OpenChatButtonProps {
 export function OpenChatButton({ target, labels }: OpenChatButtonProps) {
   const router = useRouter();
   const params = useParams<{ lng: string }>();
+  const pathname = usePathname();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +34,9 @@ export function OpenChatButton({ target, labels }: OpenChatButtonProps) {
     const result = await openConversation(target);
 
     if (result.status === 'ok') {
-      router.push(`/${params.lng}/messages/${result.conversationId}`);
+      router.push(
+        `/${params.lng}/messages/${result.conversationId}?from=${encodeURIComponent(pathname)}`,
+      );
       return;
     }
 

@@ -5,6 +5,7 @@ import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { SignOutButton } from '@/components/shared/SignOutButton';
 import { NavLink } from '@/components/shared/NavLink';
+import { MessagesLink } from '@/components/chat/MessagesLink';
 import {
   NotificationBell,
   type NotificationBellLabels,
@@ -25,6 +26,15 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
+async function loadMessagesUnread(): Promise<number> {
+  try {
+    const caller = await getServerCaller();
+    return await caller.conversations.unreadCount();
+  } catch {
+    return 0;
+  }
+}
+
 async function loadUnreadCount(): Promise<number> {
   try {
     const caller = await getServerCaller();
@@ -37,9 +47,12 @@ async function loadUnreadCount(): Promise<number> {
 export async function Header({ user }: HeaderProps) {
   const { t } = await getT('common');
   const { t: tn } = await getT('fields');
+  const { t: tc } = await getT('chat');
   const lng = await routeLanguage();
   const language = lng === 'en' ? 'en' : 'el';
-  const unread = user ? await loadUnreadCount() : 0;
+  const [unread, messagesUnread] = user
+    ? await Promise.all([loadUnreadCount(), loadMessagesUnread()])
+    : [0, 0];
 
   const bellLabels: NotificationBellLabels = {
     bell: tn('notifications.bell'),
@@ -103,6 +116,15 @@ export async function Header({ user }: HeaderProps) {
 
           {user ? (
             <div className="flex items-center gap-1">
+              <MessagesLink
+                key={`messages-${messagesUnread}`}
+                href={`/${lng}/messages`}
+                initialUnread={messagesUnread}
+                labels={{
+                  messages: tc('nav.messages'),
+                  messagesUnread: tc('nav.messagesUnread'),
+                }}
+              />
               <NotificationBell
                 key={unread}
                 lng={language}
