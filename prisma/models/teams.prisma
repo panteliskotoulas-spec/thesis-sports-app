@@ -28,6 +28,9 @@ model Team {
   reservations     Reservation[]
   coachingSessions CoachingSession[]
   tournamentTeams  TournamentTeam[]
+  homeMatches      Match[]           @relation("MatchHome")
+  awayMatches      Match[]           @relation("MatchAway")
+  matchStats       MatchPlayerStat[]
 
   @@index([sportType, isRecruiting])
 }

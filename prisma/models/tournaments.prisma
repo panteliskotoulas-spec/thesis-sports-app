@@ -1,17 +1,21 @@
-
 model Tournament {
   id          String           @id @default(cuid())
   name        String
+  sportType   SportType
   hostFieldId String
   hostField   Field            @relation(fields: [hostFieldId], references: [id])
   organizerId String
   organizer   User             @relation(fields: [organizerId], references: [id])
   startDate   DateTime
   endDate     DateTime
-  description String
+  maxTeams    Int              @default(8)
+  description Json
   status      TournamentStatus @default(UPCOMING)
+  createdAt   DateTime         @default(now())
   teams       TournamentTeam[]
   matches     Match[]
+
+  @@index([sportType, status])
 }
 
 model TournamentTeam {
@@ -25,14 +29,35 @@ model TournamentTeam {
 }
 
 model Match {
-  id           String      @id @default(cuid())
+  id           String            @id @default(cuid())
   tournamentId String
-  tournament   Tournament  @relation(fields: [tournamentId], references: [id])
+  tournament   Tournament        @relation(fields: [tournamentId], references: [id])
+  round        Int
   homeTeamId   String
+  homeTeam     Team              @relation("MatchHome", fields: [homeTeamId], references: [id])
   awayTeamId   String
-  slotId       String?
+  awayTeam     Team              @relation("MatchAway", fields: [awayTeamId], references: [id])
+  scheduledAt  DateTime?
   homeScore    Int?
   awayScore    Int?
-  playerStats  Json?
-  status       MatchStatus @default(SCHEDULED)
+  sets         Json?
+  status       MatchStatus       @default(SCHEDULED)
+  playerStats  MatchPlayerStat[]
+
+  @@index([tournamentId, round])
+}
+
+model MatchPlayerStat {
+  id      String @id @default(cuid())
+  matchId String
+  match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  teamId  String
+  team    Team   @relation(fields: [teamId], references: [id])
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  stats   Json
+
+  @@unique([matchId, userId])
+  @@index([userId])
+  @@index([teamId])
 }

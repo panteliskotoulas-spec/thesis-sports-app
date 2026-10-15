@@ -1,4 +1,3 @@
-
 model User {
   id                     String            @id @default(cuid())
   email                  String            @unique
@@ -21,6 +20,7 @@ model User {
   coach                  Coach?
   coachingSessions       CoachingSession[]
   organizedTournaments   Tournament[]
+  matchStats             MatchPlayerStat[]
   fieldReviews           FieldReview[]
   coachReviews           CoachReview[]
   reviewsReceived        UserReview[]      @relation("ReviewsReceived")
