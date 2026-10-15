@@ -1,0 +1,223 @@
+{
+  "meta": {
+    "title": "Tournaments",
+    "description": "Browse tournaments, standings, matches and player stats."
+  },
+  "page": {
+    "title": "Tournaments",
+    "subtitle": "Standings, matches and player stats for each tournament."
+  },
+  "filters": {
+    "sportLabel": "Sport",
+    "sportAll": "All sports",
+    "statusLabel": "Status",
+    "statusAll": "All statuses"
+  },
+  "empty": {
+    "title": "No tournaments found",
+    "description": "There are no tournaments right now. Check back soon.",
+    "descriptionFiltered": "No tournament matches your filters.",
+    "clear": "Clear filters"
+  },
+  "card": {
+    "teams": "{{current}} of {{max}} teams"
+  },
+  "status": {
+    "UPCOMING": "Upcoming",
+    "ONGOING": "Ongoing",
+    "COMPLETED": "Completed"
+  },
+  "detail": {
+    "back": "All tournaments",
+    "teams": "{{current}} of {{max}} teams"
+  },
+  "standings": {
+    "title": "Standings",
+    "caption": "Teams are ranked by points.",
+    "empty": "No teams have registered yet.",
+    "team": "Team",
+    "rank": {
+      "short": "#",
+      "full": "Position"
+    },
+    "columns": {
+      "played": {
+        "short": "P",
+        "full": "Played"
+      },
+      "won": {
+        "short": "W",
+        "full": "Won"
+      },
+      "drawn": {
+        "short": "D",
+        "full": "Drawn"
+      },
+      "lost": {
+        "short": "L",
+        "full": "Lost"
+      },
+      "diffGoals": {
+        "short": "GD",
+        "full": "Goal difference"
+      },
+      "diffPoints": {
+        "short": "PD",
+        "full": "Point difference"
+      },
+      "sets": {
+        "short": "Sets",
+        "full": "Sets (for-against)"
+      },
+      "points": {
+        "short": "Pts",
+        "full": "Points"
+      }
+    }
+  },
+  "trend": {
+    "title": "Points progression",
+    "caption": "The top four teams by round.",
+    "aria": "Chart of the top teams’ points by round",
+    "round": "R{n}"
+  },
+  "matches": {
+    "title": "Matches",
+    "caption": "Tap a completed match to compare the teams.",
+    "empty": "No schedule has been set yet.",
+    "round": "Round {n}",
+    "scheduled": "Scheduled",
+    "tbd": "Time to be announced",
+    "completed": "Completed",
+    "compareShow": "Show team comparison",
+    "compareHide": "Hide team comparison"
+  },
+  "players": {
+    "title": "Player stats",
+    "caption": "Pick a stat to rank players. Percentages are calculated from made over attempted.",
+    "empty": "Stats will appear after the first match.",
+    "player": "Player",
+    "games": {
+      "short": "GP",
+      "full": "Games played"
+    },
+    "chipsLabel": "Stat",
+    "fullShow": "Full table",
+    "fullHide": "Hide table",
+    "tableAria": "Player stats table",
+    "perGame": "{value} per game",
+    "lowSample": "Small sample",
+    "sampleNote": "Percentages are ranked from {{n}} attempts and up.",
+    "noData": "There is not enough data for this stat yet."
+  },
+  "metrics": {
+    "goals": {
+      "name": "Goals",
+      "short": "G"
+    },
+    "assists": {
+      "name": "Assists",
+      "short": "A"
+    },
+    "shots": {
+      "name": "Shots",
+      "short": "Sh"
+    },
+    "shotsOnTarget": {
+      "name": "Shots on target",
+      "short": "SoT"
+    },
+    "shotAccuracy": {
+      "name": "Shot accuracy",
+      "short": "Acc"
+    },
+    "conversion": {
+      "name": "Shot conversion",
+      "short": "Conv"
+    },
+    "saves": {
+      "name": "Saves",
+      "short": "Sv"
+    },
+    "yellowCards": {
+      "name": "Yellow cards",
+      "short": "YC"
+    },
+    "redCards": {
+      "name": "Red cards",
+      "short": "RC"
+    },
+    "fouls": {
+      "name": "Fouls",
+      "short": "F"
+    },
+    "points": {
+      "name": "Points",
+      "short": "Pts"
+    },
+    "twoPct": {
+      "name": "2-point %",
+      "short": "2P%"
+    },
+    "threePct": {
+      "name": "3-point %",
+      "short": "3P%"
+    },
+    "ftPct": {
+      "name": "Free throws %",
+      "short": "FT%"
+    },
+    "fgPct": {
+      "name": "Field goal %",
+      "short": "FG%"
+    },
+    "rebounds": {
+      "name": "Rebounds",
+      "short": "Reb"
+    },
+    "steals": {
+      "name": "Steals",
+      "short": "Stl"
+    },
+    "blocks": {
+      "name": "Blocks",
+      "short": "Blk"
+    },
+    "turnovers": {
+      "name": "Turnovers",
+      "short": "TO"
+    },
+    "kills": {
+      "name": "Kills",
+      "short": "K"
+    },
+    "killPct": {
+      "name": "Kill %",
+      "short": "K%"
+    },
+    "hittingPct": {
+      "name": "Attack efficiency",
+      "short": "Eff"
+    },
+    "attackAttempts": {
+      "name": "Attack attempts",
+      "short": "Att"
+    },
+    "attackErrors": {
+      "name": "Attack errors",
+      "short": "Err"
+    },
+    "aces": {
+      "name": "Aces",
+      "short": "Ace"
+    },
+    "serveErrors": {
+      "name": "Serve errors",
+      "short": "SE"
+    },
+    "digs": {
+      "name": "Digs",
+      "short": "Dig"
+    }
+  }
+}
