@@ -64,7 +64,7 @@ interface CancellationPlan {
   now: Date;
 }
 
-function netCompensation(params: {
+export function netCompensation(params: {
   compensation: CompensationValue;
   cardCents: number;
   creditCents: number;

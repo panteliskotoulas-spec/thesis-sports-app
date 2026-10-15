@@ -72,7 +72,7 @@ export interface CoachSessionRow {
   compensation: CompensationValue | null;
   teamName: string | null;
   cancelledByCoach: boolean;
-  split?: TeamSplitSummary | null;
+  split: TeamSplitSummary | null;
   review?: SessionReview | null;
 }
 
@@ -190,7 +190,7 @@ export function toCoachSessionItem(
     review: row.review ?? null,
     teamName: row.teamName,
     cancelledByCoach: row.cancelledByCoach,
-    split: row.split ?? null,
+    split: row.split,
   };
 }
 

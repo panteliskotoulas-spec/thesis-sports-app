@@ -202,20 +202,34 @@ export async function cancelPendingSplitsForMember(
   teamId: string,
   userId: string,
 ): Promise<void> {
-  const reservations = await db.reservation.findMany({
-    where: { teamId },
-    select: { id: true },
-  });
-  if (reservations.length === 0) return;
+  const [reservations, sessions] = await Promise.all([
+    db.reservation.findMany({ where: { teamId }, select: { id: true } }),
+    db.coachingSession.findMany({ where: { teamId }, select: { id: true } }),
+  ]);
 
-  await db.paymentSplit.updateMany({
-    where: {
-      userId,
-      status: 'PENDING',
-      reservationId: { in: reservations.map((reservation) => reservation.id) },
-    },
-    data: { status: 'CANCELLED' },
-  });
+  if (reservations.length > 0) {
+    await db.paymentSplit.updateMany({
+      where: {
+        userId,
+        status: 'PENDING',
+        reservationId: {
+          in: reservations.map((reservation) => reservation.id),
+        },
+      },
+      data: { status: 'CANCELLED' },
+    });
+  }
+
+  if (sessions.length > 0) {
+    await db.sessionSplit.updateMany({
+      where: {
+        userId,
+        status: 'PENDING',
+        coachingSessionId: { in: sessions.map((session) => session.id) },
+      },
+      data: { status: 'CANCELLED' },
+    });
+  }
 }
 
 export interface SplitSummaryInput {

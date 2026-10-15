@@ -193,6 +193,22 @@ export function sessionCancelledMessage(
   };
 }
 
+export function sessionSplitRefundedMessage(
+  teamName: string,
+  coachName: string,
+  startTime: Date,
+  endTime: Date,
+  outcome: Exclude<SessionCancellationOutcome, 'none'>,
+): LocalizedText {
+  const slot = when(startTime, endTime);
+  const tail = tails[outcome];
+
+  return {
+    el: `Η συνεδρία της ομάδας «${teamName}» με τον προπονητή ${coachName} για ${slot.el} ακυρώθηκε και το μερίδιό σου επιστράφηκε. ${tail.el}`,
+    en: `The session of team "${teamName}" with coach ${coachName} for ${slot.en} was cancelled and your share was returned. ${tail.en}`,
+  };
+}
+
 export function sessionCancelledCoachMessage(
   playerName: string,
   startTime: Date,

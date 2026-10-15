@@ -13,6 +13,7 @@ import {
   type CoachSessionRow,
   type CoachSessionState,
 } from '@/lib/coaches/coach-session';
+import { netCompensation } from '@/lib/server/booking-cancel';
 import { decimalToCents, money } from '@/lib/server/booking-shared';
 import {
   sessionAcceptedMessage,
@@ -26,6 +27,10 @@ import {
   sessionRequestedMessage,
   type SessionCancellationOutcome,
 } from '@/lib/server/coach-session-notifications';
+import {
+  buildSessionSplitSummaries,
+  settleSessionSplitsOnCancel,
+} from '@/lib/server/session-split';
 import { getStripe } from '@/lib/server/stripe';
 import { resolveBookingTeam } from '@/lib/server/team-booking';
 
@@ -313,6 +318,8 @@ export async function cancelSession(
       id: true,
       status: true,
       slotId: true,
+      teamId: true,
+      team: { select: { name: true } },
       user: { select: { name: true } },
       slot: {
         select: {
@@ -373,7 +380,8 @@ export async function cancelSession(
   if (!canCancelBooking(startTime, now)) {
     throw new TRPCError({ code: 'PRECONDITION_FAILED' });
   }
-  if (!params.compensation) throw new TRPCError({ code: 'BAD_REQUEST' });
+  const compensation = params.compensation;
+  if (!compensation) throw new TRPCError({ code: 'BAD_REQUEST' });
 
   const payment = await prisma.payment.findFirst({
     where: { coachingSessionId: session.id, status: 'SUCCEEDED' },
@@ -384,16 +392,11 @@ export async function cancelSession(
   const creditCents = decimalToCents(payment.creditApplied);
   const cardCents = totalCents - creditCents;
 
-  const refund = params.compensation === 'REFUND';
+  const refund = compensation === 'REFUND';
   if (refund && cardCents <= 0) throw new TRPCError({ code: 'BAD_REQUEST' });
   if (refund && !payment.stripePaymentIntentId) {
     throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
   }
-
-  const refundCents = refund ? cardCents : 0;
-  const creditBackCents = refund ? creditCents : cardCents + creditCents;
-  const outcome: SessionCancellationOutcome =
-    refundCents === 0 ? 'credit' : creditBackCents > 0 ? 'mixed' : 'card';
 
   await prisma.$transaction(
     async (tx) => {
@@ -402,7 +405,7 @@ export async function cancelSession(
         data: {
           status: 'CANCELLED',
           cancelledAt: now,
-          compensationType: params.compensation,
+          compensationType: compensation,
         },
       });
       if (cancelled.count === 0) throw new TRPCError({ code: 'CONFLICT' });
@@ -412,16 +415,46 @@ export async function cancelSession(
         data: { status: 'OPEN' },
       });
 
-      if (creditBackCents > 0) {
+      const settled =
+        session.teamId && session.team
+          ? await settleSessionSplitsOnCancel(tx, {
+              coachingSessionId: session.id,
+              teamId: session.teamId,
+              teamName: session.team.name,
+              coachName,
+              startTime,
+              endTime,
+            })
+          : { receivedCents: 0, refundedUserIds: [] as string[] };
+
+      const net = netCompensation({
+        compensation,
+        cardCents,
+        creditCents,
+        splitCents: settled.receivedCents,
+      });
+
+      if (net.refundCents > 0 && !payment.stripePaymentIntentId) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      }
+
+      const outcome: SessionCancellationOutcome =
+        net.refundCents === 0
+          ? 'credit'
+          : net.creditBackCents > 0
+            ? 'mixed'
+            : 'card';
+
+      if (net.creditBackCents > 0) {
         await tx.user.update({
           where: { id: params.userId },
-          data: { creditBalance: { increment: money(creditBackCents) } },
+          data: { creditBalance: { increment: money(net.creditBackCents) } },
         });
 
         await tx.creditTransaction.create({
           data: {
             userId: params.userId,
-            amount: money(creditBackCents),
+            amount: money(net.creditBackCents),
             type: 'EARNED_FROM_CANCELLATION',
             relatedCoachingSessionId: session.id,
           },
@@ -460,11 +493,11 @@ export async function cancelSession(
         },
       });
 
-      if (refundCents > 0 && payment.stripePaymentIntentId) {
+      if (net.refundCents > 0 && payment.stripePaymentIntentId) {
         await getStripe().refunds.create(
           {
             payment_intent: payment.stripePaymentIntentId,
-            amount: refundCents,
+            amount: net.refundCents,
           },
           { idempotencyKey: `refund-coaching-${session.id}` },
         );
@@ -526,10 +559,6 @@ export async function cancelSessionByCoach(
   }
 
   const compensation: CompensationValue = cardCents > 0 ? 'REFUND' : 'CREDIT';
-  const refundCents = cardCents;
-  const creditBackCents = creditCents;
-  const outcome: SessionCancellationOutcome =
-    refundCents === 0 ? 'credit' : creditBackCents > 0 ? 'mixed' : 'card';
 
   const coachName = session.slot.coach.user.name;
   const { startTime, endTime } = session.slot;
@@ -547,16 +576,42 @@ export async function cancelSessionByCoach(
       });
       if (cancelled.count === 0) throw new TRPCError({ code: 'CONFLICT' });
 
-      if (creditBackCents > 0) {
+      const settled =
+        session.teamId && session.team
+          ? await settleSessionSplitsOnCancel(tx, {
+              coachingSessionId: session.id,
+              teamId: session.teamId,
+              teamName: session.team.name,
+              coachName,
+              startTime,
+              endTime,
+            })
+          : { receivedCents: 0, refundedUserIds: [] as string[] };
+
+      const net = netCompensation({
+        compensation,
+        cardCents,
+        creditCents,
+        splitCents: settled.receivedCents,
+      });
+
+      const outcome: SessionCancellationOutcome =
+        net.refundCents === 0
+          ? 'credit'
+          : net.creditBackCents > 0
+            ? 'mixed'
+            : 'card';
+
+      if (net.creditBackCents > 0) {
         await tx.user.update({
           where: { id: session.userId },
-          data: { creditBalance: { increment: money(creditBackCents) } },
+          data: { creditBalance: { increment: money(net.creditBackCents) } },
         });
 
         await tx.creditTransaction.create({
           data: {
             userId: session.userId,
-            amount: money(creditBackCents),
+            amount: money(net.creditBackCents),
             type: 'EARNED_FROM_CANCELLATION',
             relatedCoachingSessionId: session.id,
           },
@@ -584,7 +639,10 @@ export async function cancelSessionByCoach(
 
       if (session.teamId && session.team) {
         const members = await tx.teamMembership.findMany({
-          where: { teamId: session.teamId, userId: { not: session.userId } },
+          where: {
+            teamId: session.teamId,
+            userId: { notIn: [session.userId, ...settled.refundedUserIds] },
+          },
           select: { userId: true },
         });
 
@@ -607,11 +665,11 @@ export async function cancelSessionByCoach(
         }
       }
 
-      if (refundCents > 0 && payment.stripePaymentIntentId) {
+      if (net.refundCents > 0 && payment.stripePaymentIntentId) {
         await getStripe().refunds.create(
           {
             payment_intent: payment.stripePaymentIntentId,
-            amount: refundCents,
+            amount: net.refundCents,
           },
           { idempotencyKey: `refund-coaching-${session.id}` },
         );
@@ -658,6 +716,7 @@ export async function listUserSessions(
         paidAt: true,
         compensationType: true,
         cancelledByCoach: true,
+        user: { select: { name: true } },
         team: { select: { name: true } },
         review: { select: { rating: true, comment: true } },
         slot: {
@@ -699,7 +758,19 @@ export async function listUserSessions(
     ]),
   );
 
-  const rows = sessions.map((entry) => ({
+  const summaries = await buildSessionSplitSummaries(prisma, {
+    viewerId: userId,
+    sessions: sessions
+      .filter((entry) => entry.status === 'CONFIRMED' && entry.team)
+      .map((entry) => ({
+        id: entry.id,
+        userId,
+        payerName: entry.user.name,
+        total: entry.price.toNumber(),
+      })),
+  });
+
+  const rows: CoachSessionRow[] = sessions.map((entry) => ({
     id: entry.id,
     coachId: entry.slot.coach.id,
     coachName: entry.slot.coach.user.name,
@@ -714,6 +785,7 @@ export async function listUserSessions(
     compensation: entry.compensationType,
     teamName: entry.team?.name ?? null,
     cancelledByCoach: entry.cancelledByCoach,
+    split: summaries.get(entry.id) ?? null,
     review: entry.review ?? null,
   }));
 
