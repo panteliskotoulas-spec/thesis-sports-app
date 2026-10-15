@@ -106,7 +106,7 @@
       },
       "PENDING_SPLITS": {
         "title": "Unpaid shares",
-        "hint": "Pay them or wait until they expire."
+        "hint": "Pay them or leave the team."
       }
     },
     "creditWarning": "You have {amount} in credit. It will be lost when you delete your account.",

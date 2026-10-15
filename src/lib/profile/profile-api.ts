@@ -1,3 +1,6 @@
+import { createTRPCClient, httpBatchLink, TRPCClientError } from '@trpc/client';
+import superjson from 'superjson';
+import type { AppRouter } from '@/trpc/server/routers/_app';
 import { authClient } from '@/lib/auth-client';
 import type {
   ChangePasswordInput,
@@ -10,6 +13,29 @@ import type {
   ProfileActionResult,
   UploadAvatarResult,
 } from '@/lib/profile/profile';
+
+const client = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: '/api/trpc',
+      transformer: superjson,
+      fetch(url, options) {
+        return fetch(url, { ...options, credentials: 'include' });
+      },
+    }),
+  ],
+});
+
+interface CloudinaryUploadResponse {
+  secure_url?: string;
+}
+
+function errorCode(error: unknown): string | null {
+  if (error instanceof TRPCClientError) {
+    return (error.data as { code?: string } | null | undefined)?.code ?? null;
+  }
+  return null;
+}
 
 export async function updateProfileName(
   name: string,
@@ -51,17 +77,62 @@ export async function changePassword(
   }
 }
 
-export const uploadAvatar: (
-  file: File,
-) => Promise<UploadAvatarResult> = async () => ({ status: 'error' });
+export async function uploadAvatar(file: File): Promise<UploadAvatarResult> {
+  try {
+    const signature = await client.profile.uploadAvatarSignature.mutate();
 
-export const fetchCreditHistory: (
+    const body = new FormData();
+    body.append('file', file);
+    body.append('api_key', signature.apiKey);
+    body.append('timestamp', String(signature.timestamp));
+    body.append('folder', signature.folder);
+    body.append('allowed_formats', signature.allowedFormats);
+    body.append('signature', signature.signature);
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${signature.cloudName}/image/upload`,
+      { method: 'POST', body },
+    );
+    if (!response.ok) return { status: 'error' };
+
+    const result = (await response.json()) as CloudinaryUploadResponse;
+    if (!result.secure_url) return { status: 'error' };
+
+    return { status: 'ok', url: result.secure_url };
+  } catch {
+    return { status: 'error' };
+  }
+}
+
+export async function fetchCreditHistory(
   input: CreditHistoryInput,
-) => Promise<CreditHistoryResult> = async () => ({ status: 'error' });
+): Promise<CreditHistoryResult> {
+  try {
+    return await client.profile.creditHistory.query(input);
+  } catch {
+    return { status: 'error' };
+  }
+}
 
-export const fetchDeletionStatus: () => Promise<DeletionStatusResult> =
-  async () => ({ status: 'error' });
+export async function fetchDeletionStatus(): Promise<DeletionStatusResult> {
+  try {
+    return await client.profile.deletionStatus.query();
+  } catch {
+    return { status: 'error' };
+  }
+}
 
-export const deleteAccount: (
+export async function deleteAccount(
   input: DeleteAccountInput,
-) => Promise<DeleteAccountResult> = async () => ({ status: 'error' });
+): Promise<DeleteAccountResult> {
+  try {
+    await client.profile.deleteAccount.mutate(input);
+    return { status: 'ok' };
+  } catch (error) {
+    const code = errorCode(error);
+    if (code === 'FORBIDDEN') return { status: 'wrongPassword' };
+    if (code === 'CONFLICT') return { status: 'blocked' };
+    if (code === 'UNAUTHORIZED') return { status: 'unauthorized' };
+    return { status: 'error' };
+  }
+}

@@ -3,6 +3,7 @@ import 'server-only';
 import { createHash } from 'node:crypto';
 
 export const CLOUDINARY_FOLDER = 'sports-app/fields';
+export const CLOUDINARY_AVATAR_FOLDER = 'sports-app/avatars';
 export const CLOUDINARY_ALLOWED_FORMATS = 'jpg,png,webp';
 
 export interface UploadSignature {
@@ -38,14 +39,16 @@ export function signUploadParams(
   return createHash('sha1').update(`${payload}${apiSecret}`).digest('hex');
 }
 
-export function createUploadSignature(): UploadSignature {
+export function createUploadSignature(
+  folder: string = CLOUDINARY_FOLDER,
+): UploadSignature {
   const { cloudName, apiKey, apiSecret } = readConfig();
   const timestamp = Math.floor(Date.now() / 1000);
 
   const signature = signUploadParams(
     {
       allowed_formats: CLOUDINARY_ALLOWED_FORMATS,
-      folder: CLOUDINARY_FOLDER,
+      folder,
       timestamp,
     },
     apiSecret,
@@ -55,7 +58,7 @@ export function createUploadSignature(): UploadSignature {
     cloudName,
     apiKey,
     timestamp,
-    folder: CLOUDINARY_FOLDER,
+    folder,
     allowedFormats: CLOUDINARY_ALLOWED_FORMATS,
     signature,
   };

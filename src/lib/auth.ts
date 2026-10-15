@@ -53,6 +53,21 @@ export const auth = betterAuth({
       },
       update: {
         before: async (data) => {
+          if (typeof data.name === 'string') {
+            const length = data.name.trim().length;
+            if (length < 2 || length > 100) {
+              throw new APIError('BAD_REQUEST', { message: 'INVALID_NAME' });
+            }
+          }
+
+          if (typeof data.image === 'string') {
+            const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+            const prefix = `https://res.cloudinary.com/${cloudName}/image/upload/`;
+            if (!cloudName || !data.image.startsWith(prefix)) {
+              throw new APIError('BAD_REQUEST', { message: 'INVALID_IMAGE' });
+            }
+          }
+
           if (
             'accountType' in data ||
             'businessName' in data ||

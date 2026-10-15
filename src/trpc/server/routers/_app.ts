@@ -12,6 +12,7 @@ import { fieldSubmissionRouter } from './field-submission';
 import { fieldsRouter } from './fields';
 import { notificationsRouter } from './notifications';
 import { ownerBookingsRouter } from './owner-bookings';
+import { profileRouter } from './profile';
 import { reservationsRouter } from './reservations';
 import { sessionSplitsRouter } from './session-splits';
 import { splitsRouter } from './splits';
@@ -35,6 +36,7 @@ export const appRouter = router({
   coachSessions: coachSessionsRouter,
   coachReviews: coachReviewsRouter,
   conversations: conversationsRouter,
+  profile: profileRouter,
 });
 
 export type AppRouter = typeof appRouter;
