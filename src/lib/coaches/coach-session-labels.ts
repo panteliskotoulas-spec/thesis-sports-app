@@ -2,6 +2,7 @@ import type { getT } from '@/i18n.server';
 import type { CoachSlotRequestLabels } from '@/components/coaches/CoachSlotRequest';
 import type { CoachRequestsListLabels } from '@/components/coaches/requests/CoachRequestsList';
 import type { CoachSessionsListLabels } from '@/components/coaches/sessions/CoachSessionsList';
+import { buildOpenChatLabels } from '@/lib/chat/chat-labels';
 import { buildReviewFormLabels } from '@/lib/reviews/review-labels';
 import {
   buildTeamBookingLabels,
@@ -34,6 +35,7 @@ export function buildCoachSlotRequestLabels(
 
 export function buildCoachRequestsLabels(
   t: Translate,
+  tc: Translate,
 ): CoachRequestsListLabels {
   return {
     tabPending: t('requests.tabPending'),
@@ -64,6 +66,7 @@ export function buildCoachRequestsLabels(
       panelWorking: t('requests.card.panelWorking'),
       errorConflict: t('requests.card.errorConflict'),
       errorGeneric: t('requests.card.errorGeneric'),
+      chat: buildOpenChatLabels(tc),
     },
   };
 }
@@ -73,6 +76,7 @@ export function buildCoachSessionsLabels(
   tf: Translate,
   tr: Translate,
   tt: Translate,
+  tc: Translate,
 ): CoachSessionsListLabels {
   return {
     tabAll: t('sessions.tabAll'),
@@ -110,6 +114,7 @@ export function buildCoachSessionsLabels(
       errorConflict: t('sessions.card.errorConflict'),
       errorGeneric: t('sessions.card.errorGeneric'),
       split: buildTeamSplitLabels(tt),
+      chat: buildOpenChatLabels(tc),
       review: {
         write: tr('session.write'),
         yourReview: tr('session.yourReview'),

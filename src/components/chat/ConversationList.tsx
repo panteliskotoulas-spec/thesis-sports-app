@@ -49,7 +49,7 @@ export function ConversationList({ lng, labels }: ConversationListProps) {
     let cancelled = false;
 
     async function run() {
-      const result = await fetchConversations();
+      const result = await fetchConversations(lng);
       if (cancelled) return;
       if (result.status === 'ok') {
         setItems(result.items);
@@ -65,7 +65,7 @@ export function ConversationList({ lng, labels }: ConversationListProps) {
     return () => {
       cancelled = true;
     };
-  }, [attempt]);
+  }, [attempt, lng]);
 
   useEffect(() => {
     if (phase !== 'ready') return;
@@ -74,7 +74,7 @@ export function ConversationList({ lng, labels }: ConversationListProps) {
 
     const timer = setInterval(async () => {
       if (document.visibilityState !== 'visible') return;
-      const result = await fetchConversations();
+      const result = await fetchConversations(lng);
       if (cancelled) return;
       if (result.status === 'ok') {
         setItems(result.items);
@@ -86,7 +86,7 @@ export function ConversationList({ lng, labels }: ConversationListProps) {
       cancelled = true;
       clearInterval(timer);
     };
-  }, [phase]);
+  }, [phase, lng]);
 
   function handleRetry() {
     setPhase('loading');

@@ -7,11 +7,13 @@ import { ArrowLeft, MapPin, UserSearch } from 'lucide-react';
 import { TRPCError } from '@trpc/server';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
+import { OpenChatButton } from '@/components/chat/OpenChatButton';
 import { Header } from '@/components/layout/Header';
 import { TeamAvatar } from '@/components/teams/TeamAvatar';
 import { TeamJoinButton } from '@/components/teams/TeamJoinButton';
 import { TeamMembersList } from '@/components/teams/TeamMembersList';
 import { TeamReservations } from '@/components/teams/TeamReservations';
+import { buildOpenChatLabels } from '@/lib/chat/chat-labels';
 import { getCurrentUser } from '@/lib/session';
 import { formatTeamSince, toTeamDetailItem } from '@/lib/teams/team';
 import { toTeamReservationItem } from '@/lib/teams/team-booking';
@@ -52,6 +54,7 @@ export default async function TeamPage({
   const query = await searchParams;
   const { t } = await getT('teams');
   const { t: tf } = await getT('fields');
+  const { t: tc } = await getT('chat');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
 
@@ -164,6 +167,15 @@ export default async function TeamPage({
             </div>
           ) : null}
         </section>
+
+        {viewer.kind === 'leader' || viewer.kind === 'member' ? (
+          <div className="mt-4">
+            <OpenChatButton
+              target={{ kind: 'team', id: team.id }}
+              labels={buildOpenChatLabels(tc)}
+            />
+          </div>
+        ) : null}
 
         {viewer.kind === 'leader' || viewer.kind === 'member' ? (
           <div className="mt-4">

@@ -1,6 +1,7 @@
 import type { getT } from '@/i18n.server';
 import type { ChatInboxLabels } from '@/components/chat/ConversationList';
 import type { ChatThreadLabels } from '@/components/chat/ChatThread';
+import type { OpenChatLabels } from '@/components/chat/OpenChatButton';
 
 type Translate = Awaited<ReturnType<typeof getT>>['t'];
 
@@ -49,5 +50,14 @@ export function buildChatThreadLabels(tr: Translate): ChatThreadLabels {
     errorReadOnly: tr('thread.errorReadOnly'),
     errorUnauthorized: tr('thread.errorUnauthorized'),
     errorGeneric: tr('thread.errorGeneric'),
+  };
+}
+
+export function buildOpenChatLabels(tr: Translate): OpenChatLabels {
+  return {
+    open: tr('open.label'),
+    opening: tr('open.opening'),
+    errorUnavailable: tr('open.errorUnavailable'),
+    errorGeneric: tr('open.errorGeneric'),
   };
 }

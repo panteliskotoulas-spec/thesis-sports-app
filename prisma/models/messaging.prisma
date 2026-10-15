@@ -1,9 +1,10 @@
 model Conversation {
   id                String           @id @default(cuid())
   type              ConversationType
-  teamId            String?
-  coachingSessionId String?
+  teamId            String?          @unique
+  coachingSessionId String?          @unique
   reservationId     String?
+  createdAt         DateTime         @default(now())
   messages          Message[]
 }
 
@@ -14,6 +15,18 @@ model Message {
   senderId       String
   content        String
   createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+model ConversationRead {
+  id             String   @id @default(cuid())
+  conversationId String
+  userId         String
+  lastReadAt     DateTime @default(now())
+
+  @@unique([conversationId, userId])
+  @@index([userId])
 }
 
 model Notification {

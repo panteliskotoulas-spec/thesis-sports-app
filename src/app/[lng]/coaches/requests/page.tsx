@@ -23,6 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function CoachRequestsPage() {
   const { t } = await getT('coaches');
+  const { t: tc } = await getT('chat');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
 
@@ -84,7 +85,7 @@ export default async function CoachRequestsPage() {
             <CoachRequestsList
               lng={lng}
               items={items}
-              labels={buildCoachRequestsLabels(t)}
+              labels={buildCoachRequestsLabels(t, tc)}
             />
           )}
         </div>

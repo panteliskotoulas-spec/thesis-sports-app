@@ -105,6 +105,7 @@ export function ChatThread({
     async function run() {
       const result = await fetchThread({
         conversationId,
+        lng,
         limit: CHAT_THREAD_PAGE_SIZE,
       });
       if (cancelled) return;
@@ -131,7 +132,7 @@ export function ChatThread({
     return () => {
       cancelled = true;
     };
-  }, [conversationId, attempt]);
+  }, [conversationId, lng, attempt]);
 
   useEffect(() => {
     if (phase !== 'ready') return;
@@ -158,6 +159,7 @@ export function ChatThread({
       const last = known[known.length - 1];
       const result = await fetchThread({
         conversationId,
+        lng,
         after: last?.id,
         limit: CHAT_THREAD_PAGE_SIZE,
       });
@@ -194,7 +196,7 @@ export function ChatThread({
       clearTimeout(timer);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [phase, conversationId]);
+  }, [phase, conversationId, lng]);
 
   useLayoutEffect(() => {
     const element = listRef.current;
@@ -233,6 +235,7 @@ export function ChatThread({
 
     const result = await fetchThread({
       conversationId,
+      lng,
       before: messages[0].id,
       limit: CHAT_THREAD_PAGE_SIZE,
     });

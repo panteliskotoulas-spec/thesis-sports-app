@@ -42,6 +42,7 @@ export interface ChatThreadData {
 
 export interface FetchThreadInput {
   conversationId: string;
+  lng: 'el' | 'en';
   after?: string;
   before?: string;
   limit: number;
@@ -51,6 +52,16 @@ export interface SendMessageInput {
   conversationId: string;
   content: string;
 }
+
+export interface OpenConversationInput {
+  kind: 'team' | 'coach';
+  id: string;
+}
+
+export type OpenConversationResult =
+  | { status: 'ok'; conversationId: string }
+  | { status: 'unavailable' }
+  | { status: 'error' };
 
 export type FetchConversationsResult =
   | { status: 'ok'; items: ChatConversation[] }

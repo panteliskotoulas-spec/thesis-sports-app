@@ -33,6 +33,10 @@ import {
 } from '@/components/reviews/ReviewForm';
 import { StarRating } from '@/components/reviews/StarRating';
 import {
+  OpenChatButton,
+  type OpenChatLabels,
+} from '@/components/chat/OpenChatButton';
+import {
   TeamSplitProgress,
   type TeamSplitLabels,
 } from '@/components/teams/TeamSplitProgress';
@@ -69,6 +73,7 @@ export interface CoachSessionCardLabels {
   errorGeneric: string;
   review: SessionReviewLabels;
   split: TeamSplitLabels;
+  chat: OpenChatLabels;
   credit: CreditToggleLabels;
   panel: CancelPanelLabels;
 }
@@ -265,6 +270,15 @@ export function CoachSessionCard({
           {item.total}
         </p>
       )}
+
+      {item.state === 'AWAITING_PAYMENT' || item.state === 'CONFIRMED' ? (
+        <div className="mt-3">
+          <OpenChatButton
+            target={{ kind: 'coach', id: item.id }}
+            labels={labels.chat}
+          />
+        </div>
+      ) : null}
 
       {item.state === 'CONFIRMED' && item.split ? (
         <TeamSplitProgress split={item.split} lng={lng} labels={labels.split} />

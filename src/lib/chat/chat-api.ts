@@ -1,22 +1,93 @@
+import { createTRPCClient, httpBatchLink, TRPCClientError } from '@trpc/client';
+import superjson from 'superjson';
+import type { AppRouter } from '@/trpc/server/routers/_app';
 import type {
   FetchConversationsResult,
   FetchThreadInput,
   FetchThreadResult,
+  OpenConversationInput,
+  OpenConversationResult,
   SendMessageInput,
   SendMessageResult,
 } from '@/lib/chat/chat';
 
-export const fetchConversations: () => Promise<FetchConversationsResult> =
-  async () => ({ status: 'error' });
+const client = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: '/api/trpc',
+      transformer: superjson,
+      fetch(url, options) {
+        return fetch(url, { ...options, credentials: 'include' });
+      },
+    }),
+  ],
+});
 
-export const fetchThread: (
+function errorCode(error: unknown): string | null {
+  if (error instanceof TRPCClientError) {
+    return (error.data as { code?: string } | null | undefined)?.code ?? null;
+  }
+  return null;
+}
+
+export async function fetchConversations(
+  lng: 'el' | 'en',
+): Promise<FetchConversationsResult> {
+  try {
+    const items = await client.conversations.listMine.query({ lng });
+    return { status: 'ok', items };
+  } catch {
+    return { status: 'error' };
+  }
+}
+
+export async function fetchThread(
   input: FetchThreadInput,
-) => Promise<FetchThreadResult> = async () => ({ status: 'error' });
+): Promise<FetchThreadResult> {
+  try {
+    const thread = await client.conversations.getThread.query(input);
+    return { status: 'ok', thread };
+  } catch (error) {
+    if (errorCode(error) === 'NOT_FOUND') return { status: 'notFound' };
+    return { status: 'error' };
+  }
+}
 
-export const sendMessage: (
+export async function sendMessage(
   input: SendMessageInput,
-) => Promise<SendMessageResult> = async () => ({ status: 'error' });
+): Promise<SendMessageResult> {
+  try {
+    const message = await client.conversations.send.mutate(input);
+    return { status: 'ok', message };
+  } catch (error) {
+    const code = errorCode(error);
+    if (code === 'CONFLICT') return { status: 'readOnly' };
+    if (code === 'TOO_MANY_REQUESTS') return { status: 'rateLimited' };
+    if (code === 'NOT_FOUND') return { status: 'notFound' };
+    if (code === 'UNAUTHORIZED') return { status: 'unauthorized' };
+    return { status: 'error' };
+  }
+}
 
-export const markConversationRead: (
+export async function markConversationRead(
   conversationId: string,
-) => Promise<void> = async () => undefined;
+): Promise<void> {
+  try {
+    await client.conversations.markRead.mutate({ conversationId });
+  } catch {
+    return;
+  }
+}
+
+export async function openConversation(
+  input: OpenConversationInput,
+): Promise<OpenConversationResult> {
+  try {
+    const result = await client.conversations.open.mutate(input);
+    return { status: 'ok', conversationId: result.conversationId };
+  } catch (error) {
+    const code = errorCode(error);
+    if (code === 'NOT_FOUND') return { status: 'unavailable' };
+    return { status: 'error' };
+  }
+}

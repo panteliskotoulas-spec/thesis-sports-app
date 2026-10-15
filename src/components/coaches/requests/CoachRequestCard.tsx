@@ -2,6 +2,10 @@
 
 import { useState } from 'react';
 import { Calendar, Clock, Users } from 'lucide-react';
+import {
+  OpenChatButton,
+  type OpenChatLabels,
+} from '@/components/chat/OpenChatButton';
 import { fillTemplate } from '@/lib/bookings/booking';
 import type {
   CancelCoachRequestResult,
@@ -27,6 +31,7 @@ export interface CoachRequestCardLabels {
   panelWorking: string;
   errorConflict: string;
   errorGeneric: string;
+  chat: OpenChatLabels;
 }
 
 export interface CoachRequestCardProps {
@@ -185,6 +190,15 @@ export function CoachRequestCard({
           <span className={`${badgeBase} ${badge.className}`}>
             {badge.text}
           </span>
+        </div>
+      ) : null}
+
+      {item.state === 'ACCEPTED' && item.payment !== 'EXPIRED' ? (
+        <div className="mt-3">
+          <OpenChatButton
+            target={{ kind: 'coach', id: item.id }}
+            labels={labels.chat}
+          />
         </div>
       ) : null}
 

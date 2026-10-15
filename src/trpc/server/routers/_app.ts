@@ -4,6 +4,7 @@ import { coachReviewsRouter } from './coach-reviews';
 import { coachSessionsRouter } from './coach-sessions';
 import { coachSlotsRouter } from './coach-slots';
 import { coachesRouter } from './coaches';
+import { conversationsRouter } from './conversations';
 import { fieldApprovalRouter } from './field-approval';
 import { fieldOwnerRouter } from './field-owner';
 import { fieldReviewsRouter } from './field-reviews';
@@ -33,6 +34,7 @@ export const appRouter = router({
   coachSlots: coachSlotsRouter,
   coachSessions: coachSessionsRouter,
   coachReviews: coachReviewsRouter,
+  conversations: conversationsRouter,
 });
 
 export type AppRouter = typeof appRouter;
