@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "inbox": "Messages",
+    "thread": "Conversation"
+  },
+  "inbox": {
+    "title": "Messages",
+    "subtitle": "Your team and coach conversations.",
+    "loading": "Loading conversations…",
+    "error": "Conversations didn't load.",
+    "retry": "Try again",
+    "emptyTitle": "No conversations yet",
+    "emptyDescription": "Team and coach conversations show up here.",
+    "kindTeam": "Team",
+    "kindCoach": "Coach",
+    "you": "You",
+    "noMessages": "No messages yet.",
+    "unreadOne": "{count} unread message",
+    "unreadOther": "{count} unread messages",
+    "justNow": "Just now"
+  },
+  "thread": {
+    "back": "Messages",
+    "membersOne": "{count} member",
+    "membersOther": "{count} members",
+    "loading": "Loading conversation…",
+    "notFound": "Conversation not found.",
+    "error": "The conversation didn't load.",
+    "retry": "Try again",
+    "empty": "Send the first message.",
+    "loadOlder": "Older messages",
+    "loadingOlder": "One moment…",
+    "loadOlderError": "Older messages didn't load. Try again.",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "you": "You",
+    "composerLabel": "Message",
+    "placeholder": "Write a message",
+    "send": "Send",
+    "sending": "Sending…",
+    "counter": "{count} / {max}",
+    "readOnly": "This conversation is read-only.",
+    "errorEmpty": "Write a message first.",
+    "errorTooLong": "A message can't be longer than {max} characters.",
+    "errorRateLimited": "You're sending too fast. Wait a moment.",
+    "errorReadOnly": "This conversation is now read-only.",
+    "errorUnauthorized": "Sign in again to send a message.",
+    "errorGeneric": "The message wasn't sent. Try again."
+  }
+}
