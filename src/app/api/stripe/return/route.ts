@@ -10,6 +10,10 @@ import {
   confirmCoachCheckoutSession,
 } from '@/lib/server/coach-session-payment';
 import {
+  abandonSessionSplitPayment,
+  confirmSessionSplitCheckout,
+} from '@/lib/server/session-split-payment';
+import {
   abandonSplitPayment,
   confirmSplitCheckoutSession,
 } from '@/lib/server/team-split-payment';
@@ -30,6 +34,7 @@ export async function GET(request: Request) {
   const status = url.searchParams.get('status');
   const isSplit = url.searchParams.get('kind') === 'split';
   const isCoaching = url.searchParams.get('kind') === 'coaching';
+  const isSessionSplit = url.searchParams.get('kind') === 'sessionsplit';
   const teamId = safeId(url.searchParams.get('team'));
   const teamPath = teamId ? `/${lng}/teams/${teamId}` : `/${lng}/teams`;
 
@@ -53,6 +58,21 @@ export async function GET(request: Request) {
       } catch (error) {
         console.error('[stripe return]', error);
         return redirectTo(request, sessionsPath);
+      }
+    }
+
+    if (isSessionSplit) {
+      try {
+        const result = await confirmSessionSplitCheckout(prisma, sessionId);
+
+        if (result.status === 'confirmed') {
+          return redirectTo(request, `${teamPath}?split=paid`);
+        }
+        if (result.status === 'pending') return redirectTo(request, teamPath);
+        return redirectTo(request, `${teamPath}?split=failed`);
+      } catch (error) {
+        console.error('[stripe return]', error);
+        return redirectTo(request, teamPath);
       }
     }
 
@@ -115,6 +135,35 @@ export async function GET(request: Request) {
     }
 
     return redirectTo(request, sessionsPath);
+  }
+
+  if (status === 'cancelled' && isSessionSplit) {
+    const paymentId = safeId(url.searchParams.get('payment'));
+
+    if (paymentId) {
+      try {
+        const session = await auth.api.getSession({
+          headers: request.headers,
+        });
+
+        const payment = await prisma.payment.findUnique({
+          where: { id: paymentId },
+          select: { id: true, userId: true, sessionId: true },
+        });
+
+        if (session && payment && payment.userId === session.user.id) {
+          const outcome = await abandonSessionSplitPayment(prisma, payment);
+
+          if (outcome === 'confirmed') {
+            return redirectTo(request, `${teamPath}?split=paid`);
+          }
+        }
+      } catch (error) {
+        console.error('[stripe return]', error);
+      }
+    }
+
+    return redirectTo(request, teamPath);
   }
 
   if (status === 'cancelled' && isSplit) {

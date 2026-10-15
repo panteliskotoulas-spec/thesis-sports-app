@@ -9,6 +9,7 @@ import {
   confirmCoachCheckoutSession,
   releaseCoachPayment,
 } from '@/lib/server/coach-session-payment';
+import { confirmSessionSplitCheckout } from '@/lib/server/session-split-payment';
 import { getStripe, getWebhookSecret } from '@/lib/server/stripe';
 import { confirmSplitCheckoutSession } from '@/lib/server/team-split-payment';
 
@@ -37,7 +38,9 @@ export async function POST(request: Request) {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
 
-      if (session.metadata?.splitId) {
+      if (session.metadata?.sessionSplitId) {
+        await confirmSessionSplitCheckout(prisma, session.id);
+      } else if (session.metadata?.splitId) {
         await confirmSplitCheckoutSession(prisma, session.id);
       } else if (session.metadata?.coachingSessionId) {
         await confirmCoachCheckoutSession(prisma, session.id);

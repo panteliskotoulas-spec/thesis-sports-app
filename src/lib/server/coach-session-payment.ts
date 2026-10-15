@@ -19,6 +19,7 @@ import {
   sessionPaidCoachMessage,
   sessionPaidMessage,
 } from '@/lib/server/coach-session-notifications';
+import { createSessionSplits } from '@/lib/server/session-split';
 import { getAppUrl, getStripe } from '@/lib/server/stripe';
 
 export interface StartSessionCheckoutParams {
@@ -106,6 +107,9 @@ export async function confirmCoachCheckoutSession(
     where: { id: payment.coachingSessionId },
     select: {
       slotId: true,
+      teamId: true,
+      price: true,
+      team: { select: { name: true } },
       user: { select: { name: true } },
       slot: {
         select: {
@@ -191,6 +195,20 @@ export async function confirmCoachCheckoutSession(
           linkUrl: '/coaches/requests',
         },
       });
+
+      if (coaching.teamId && coaching.team) {
+        await createSessionSplits(tx, {
+          coachingSessionId,
+          teamId: coaching.teamId,
+          teamName: coaching.team.name,
+          payerId: userId,
+          payerName: coaching.user.name,
+          coachName: coaching.slot.coach.user.name,
+          totalCents: decimalToCents(coaching.price),
+          startTime: coaching.slot.startTime,
+          endTime: coaching.slot.endTime,
+        });
+      }
     });
 
     return { status: 'confirmed' };
@@ -253,6 +271,8 @@ export async function startCoachSessionCheckout(
       slotId: true,
       price: true,
       payBy: true,
+      teamId: true,
+      team: { select: { name: true } },
       user: { select: { name: true } },
       slot: {
         select: {
@@ -372,6 +392,20 @@ export async function startCoachSessionCheckout(
           linkUrl: '/coaches/requests',
         },
       });
+
+      if (coaching.teamId && coaching.team) {
+        await createSessionSplits(tx, {
+          coachingSessionId: coaching.id,
+          teamId: coaching.teamId,
+          teamName: coaching.team.name,
+          payerId: params.userId,
+          payerName: coaching.user.name,
+          coachName,
+          totalCents: priceCents,
+          startTime: coaching.slot.startTime,
+          endTime: coaching.slot.endTime,
+        });
+      }
     });
 
     return { url: null };

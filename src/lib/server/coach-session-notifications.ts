@@ -94,6 +94,46 @@ export function sessionPaidCoachMessage(
   };
 }
 
+function formatMoney(cents: number, lng: 'el' | 'en'): string {
+  return new Intl.NumberFormat(lng, {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(cents / 100);
+}
+
+export function sessionSplitRequestedMessage(
+  teamName: string,
+  coachName: string,
+  leaderName: string,
+  amountCents: number,
+  startTime: Date,
+  endTime: Date,
+): LocalizedText {
+  const slot = when(startTime, endTime);
+
+  return {
+    el: `Σου αναλογούν ${formatMoney(amountCents, 'el')} για τη συνεδρία της ομάδας «${teamName}» με τον προπονητή ${coachName}, ${slot.el}. Πλήρωσε το μερίδιό σου, που επιστρέφεται στον/στην ${leaderName} (έκλεισε τη συνεδρία).`,
+    en: `You owe ${formatMoney(amountCents, 'en')} for your team "${teamName}" session with coach ${coachName}, ${slot.en}. Pay your share; it goes back to ${leaderName}, who booked the session.`,
+  };
+}
+
+export function sessionSplitPaidMessage(
+  memberName: string,
+  amountCents: number,
+  coachName: string,
+  startTime: Date,
+  endTime: Date,
+): LocalizedText {
+  const slot = when(startTime, endTime);
+
+  return {
+    el: `Το μέλος ${memberName} πλήρωσε το μερίδιό του (${formatMoney(amountCents, 'el')}) για τη συνεδρία με τον προπονητή ${coachName}, ${slot.el}. Το ποσό προστέθηκε στην πίστωσή σου.`,
+    en: `${memberName} paid their share (${formatMoney(amountCents, 'en')}) for the session with coach ${coachName}, ${slot.en}. The amount was added to your credit.`,
+  };
+}
+
 export function sessionExpiredMessage(
   coachName: string,
   startTime: Date,

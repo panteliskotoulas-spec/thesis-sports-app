@@ -12,6 +12,7 @@ import { fieldsRouter } from './fields';
 import { notificationsRouter } from './notifications';
 import { ownerBookingsRouter } from './owner-bookings';
 import { reservationsRouter } from './reservations';
+import { sessionSplitsRouter } from './session-splits';
 import { splitsRouter } from './splits';
 import { teamsRouter } from './teams';
 
@@ -26,6 +27,7 @@ export const appRouter = router({
   ownerBookings: ownerBookingsRouter,
   teams: teamsRouter,
   splits: splitsRouter,
+  sessionSplits: sessionSplitsRouter,
   coaches: coachesRouter,
   coachApproval: coachApprovalRouter,
   coachSlots: coachSlotsRouter,

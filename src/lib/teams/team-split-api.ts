@@ -68,6 +68,20 @@ export async function startSplitCheckout(
 export async function startSessionSplitCheckout(
   input: StartSessionSplitCheckoutInput,
 ): Promise<StartSplitCheckoutResult> {
-  void input;
-  return { status: 'error' };
+  try {
+    const result = await client.sessionSplits.startCheckout.mutate({
+      sessionId: input.sessionId,
+      useCredit: input.useCredit,
+      lng: input.lng === 'en' ? 'en' : 'el',
+    });
+    if (result.url) return { status: 'redirect', url: result.url };
+    return { status: 'paid' };
+  } catch (error) {
+    const code = errorCode(error);
+    if (code === 'CONFLICT' || code === 'NOT_FOUND') {
+      return { status: 'unavailable' };
+    }
+    if (code === 'UNAUTHORIZED') return { status: 'unauthorized' };
+    return { status: 'error' };
+  }
 }

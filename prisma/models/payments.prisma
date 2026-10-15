@@ -37,6 +37,19 @@ model PaymentSplit {
   @@index([userId])
 }
 
+model SessionSplit {
+  id                String      @id @default(cuid())
+  coachingSessionId String
+  userId            String
+  amount            Decimal     @db.Decimal(10, 2)
+  status            SplitStatus @default(PENDING)
+  paidAt            DateTime?
+  createdAt         DateTime    @default(now())
+
+  @@unique([coachingSessionId, userId])
+  @@index([userId])
+}
+
 model CreditTransaction {
   id                   String       @id @default(cuid())
   userId               String
