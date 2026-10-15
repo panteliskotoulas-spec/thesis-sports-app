@@ -55,5 +55,14 @@
     "submitting": "Creating account…",
     "errorGeneric": "Something went wrong. Please try again.",
     "errorEmailTaken": "An account with this email already exists."
+  },
+  "app": {
+    "name": "Sports App"
+  },
+  "footer": {
+    "tagline": "Fields, teams and coaches in one place.",
+    "explore": "Explore",
+    "account": "Account",
+    "rights": "All rights reserved."
   }
 }

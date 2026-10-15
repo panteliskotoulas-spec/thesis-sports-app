@@ -93,7 +93,7 @@ export async function Header({ user }: HeaderProps) {
       <div className="mx-auto flex h-16 max-w-360 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4 lg:gap-10">
           <Link className="whitespace-nowrap text-foreground" href={`/${lng}`}>
-            Sports App
+            {t('app.name')}
           </Link>
 
           <nav className="hidden md:block">

@@ -12,6 +12,7 @@ const i18nConfig: I18nConfig = {
     'reviews',
     'chat',
     'profile',
+    'home',
   ],
   defaultNS: 'common',
   persistCookie: false,

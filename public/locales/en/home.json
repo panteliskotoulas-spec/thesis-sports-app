@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "title": "Sports App — Fields, teams, coaches",
+    "description": "Book a field, build a team and arrange a session with a coach, all in one place."
+  },
+  "hero": {
+    "badge": "Fields, teams, coaches",
+    "title": "Find a field, build a team and play",
+    "subtitle": "Book a field in a few steps, split the cost with your team and arrange a session with a coach.",
+    "ctaFields": "Find a field",
+    "ctaRegister": "Create an account",
+    "ctaBookings": "My bookings",
+    "preview": {
+      "title": "5x5 field",
+      "sport": "Football",
+      "slots": "Available times",
+      "cta": "Book"
+    }
+  },
+  "featured": {
+    "title": "Featured fields",
+    "subtitle": "Available fields, with the highest-rated first.",
+    "viewAll": "View all"
+  },
+  "steps": {
+    "title": "3 simple steps",
+    "subtitle": "From searching to the starting whistle.",
+    "find": {
+      "title": "Find a field",
+      "description": "Filter by sport and area, and check reviews and available times."
+    },
+    "book": {
+      "title": "Book and pay",
+      "description": "Pay securely by card or with your credit."
+    },
+    "play": {
+      "title": "Play together",
+      "description": "Split the cost with your team and talk in the chat."
+    }
+  },
+  "audiences": {
+    "title": "For everyone who loves the game",
+    "players": {
+      "title": "Players and teams",
+      "description": "Book a field, build a team and share the payment.",
+      "cta": "Create a team"
+    },
+    "coaches": {
+      "title": "Coaches",
+      "description": "Publish your available times and accept session requests.",
+      "cta": "Become a coach"
+    },
+    "owners": {
+      "title": "Field owners",
+      "description": "Add your field and manage its bookings.",
+      "cta": "Add a field"
+    }
+  },
+  "cta": {
+    "title": "Ready to play?",
+    "subtitleGuest": "Create an account and book your first field.",
+    "subtitleUser": "Find your next field and book your time.",
+    "register": "Create an account",
+    "fields": "Find a field"
+  }
+}
