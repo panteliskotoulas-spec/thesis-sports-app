@@ -16,6 +16,8 @@ export async function getCurrentUser() {
     email: user.email,
     avatarUrl: user.image ?? undefined,
     accountType: user.accountType,
+    businessName: user.businessName ?? undefined,
+    taxId: user.taxId ?? undefined,
     isAdmin: user.isAdmin,
   };
 }

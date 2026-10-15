@@ -1,0 +1,127 @@
+{
+  "meta": {
+    "title": "Profile"
+  },
+  "page": {
+    "title": "Profile",
+    "subtitle": "Manage your details, credit, and account security."
+  },
+  "tabs": {
+    "label": "Profile settings",
+    "details": "Details",
+    "credit": "Credit",
+    "security": "Security",
+    "delete": "Delete account"
+  },
+  "details": {
+    "title": "Details",
+    "avatarAdd": "Add photo",
+    "avatarChange": "Change photo",
+    "avatarRemove": "Remove",
+    "avatarHint": "JPG, PNG, or WebP, up to {max} MB.",
+    "avatarBusy": "Uploading…",
+    "avatarErrorType": "Choose a JPG, PNG, or WebP image.",
+    "avatarErrorSize": "The image is too large.",
+    "avatarErrorGeneric": "Couldn't change the photo. Try again.",
+    "nameLabel": "Name",
+    "nameErrorShort": "Your name needs at least {min} characters.",
+    "nameErrorLong": "Your name can't be longer than {max} characters.",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved.",
+    "errorGeneric": "Couldn't save your name. Try again.",
+    "accountTitle": "Account details",
+    "email": "Email",
+    "accountType": "Account type",
+    "typeIndividual": "Individual",
+    "typeBusiness": "Business",
+    "businessName": "Business name",
+    "taxId": "Tax ID",
+    "lockedNote": "These details can't be changed."
+  },
+  "credit": {
+    "title": "Credit",
+    "balance": "Available balance",
+    "history": "Activity",
+    "loading": "Loading your credit…",
+    "error": "Couldn't load your credit.",
+    "retry": "Try again",
+    "emptyTitle": "No activity yet",
+    "emptyDescription": "Refunds and payments made with credit show up here.",
+    "loadMore": "More activity",
+    "loadingMore": "Loading…",
+    "loadMoreError": "Couldn't load more activity.",
+    "types": {
+      "EARNED_FROM_CANCELLATION": "Refund from cancellation",
+      "SPENT_ON_BOOKING": "Booking payment",
+      "EARNED_FROM_SPLIT": "Share received",
+      "SPENT_ON_SPLIT": "Share payment"
+    }
+  },
+  "security": {
+    "title": "Security",
+    "currentLabel": "Current password",
+    "newLabel": "New password",
+    "newHint": "At least 8 characters.",
+    "confirmLabel": "Confirm new password",
+    "revokeOthers": "Sign out of other devices",
+    "submit": "Change password",
+    "submitting": "Changing…",
+    "success": "Password changed.",
+    "errorCurrentRequired": "Enter your current password.",
+    "errorNewShort": "Your new password needs at least {min} characters.",
+    "errorNewLong": "Your new password can't be longer than {max} characters.",
+    "errorNewSame": "Your new password must be different from the current one.",
+    "errorMismatch": "The passwords don't match.",
+    "errorWrongPassword": "Your current password is incorrect.",
+    "errorGeneric": "Couldn't change your password. Try again."
+  },
+  "delete": {
+    "title": "Delete account",
+    "description": "Deleting your account is permanent. Your profile, photo, and messages are removed. Reviews and payment history stay without your name.",
+    "loading": "Checking your account…",
+    "error": "Couldn't check your account.",
+    "retry": "Try again",
+    "blockersTitle": "Before you delete, these need to be resolved:",
+    "blockers": {
+      "UPCOMING_BOOKINGS": {
+        "title": "Upcoming bookings",
+        "hint": "Cancel them or wait until they take place."
+      },
+      "UPCOMING_SESSIONS": {
+        "title": "Upcoming coaching sessions",
+        "hint": "Cancel them or wait until they take place."
+      },
+      "TEAM_LEADER": {
+        "title": "Teams where you're the leader with other members",
+        "hint": "Transfer leadership to another member."
+      },
+      "OWNED_FIELD_BOOKINGS": {
+        "title": "Upcoming bookings at your fields",
+        "hint": "Cancel them from your field bookings or wait until they take place."
+      },
+      "COACH_SESSIONS": {
+        "title": "Upcoming sessions as a coach",
+        "hint": "Cancel them or wait until they take place."
+      },
+      "PENDING_SPLITS": {
+        "title": "Unpaid shares",
+        "hint": "Pay them or wait until they expire."
+      }
+    },
+    "creditWarning": "You have {amount} in credit. It will be lost when you delete your account.",
+    "creditAccept": "I understand my balance will be lost",
+    "passwordLabel": "Password",
+    "confirmLabel": "Type {word} to confirm",
+    "confirmWord": "DELETE",
+    "submit": "Delete account",
+    "submitting": "Deleting…",
+    "errorPassword": "Enter your password.",
+    "errorConfirm": "Type {word} exactly.",
+    "errorCredit": "Confirm that your balance will be lost.",
+    "errorWrongPassword": "Your password is incorrect.",
+    "errorBlocked": "Something changed and deleting is no longer possible.",
+    "errorUnauthorized": "Sign in again to continue.",
+    "errorGeneric": "Couldn't delete your account. Try again."
+  }
+}
