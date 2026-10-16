@@ -5,6 +5,8 @@ export const CHAT_POLL_IDLE_MS = 20000;
 export const CHAT_INBOX_POLL_MS = 10000;
 export const CHAT_UNREAD_POLL_MS = 30000;
 export const CHAT_UNREAD_EVENT = 'chat-unread-changed';
+export const CHAT_POPUP_EVENT = 'chat-popup-open';
+export const CHAT_DESKTOP_QUERY = '(min-width: 768px)';
 
 export type ChatKind = 'TEAM' | 'COACH';
 

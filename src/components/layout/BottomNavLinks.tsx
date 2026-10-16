@@ -2,7 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CalendarDays, Home, MapPin, ShieldCheck, User } from 'lucide-react';
+import {
+  CalendarDays,
+  Home,
+  MapPin,
+  MessageCircle,
+  ShieldCheck,
+  User,
+} from 'lucide-react';
+import { useChatUnread } from '@/components/chat/useChatUnread';
+import { fillTemplate } from '@/lib/bookings/booking';
+import { formatBadgeCount } from '@/lib/notifications/notification';
 
 // Οι Server Components δεν μπορούν να περάσουν components ως props,
 // γι' αυτό περνάμε ένα κλειδί και το εικονίδιο επιλέγεται εδώ.
@@ -10,6 +20,7 @@ const icons = {
   home: Home,
   fields: MapPin,
   bookings: CalendarDays,
+  messages: MessageCircle,
   profile: User,
   admin: ShieldCheck,
 } as const;
@@ -19,15 +30,22 @@ export interface BottomNavItem {
   href: string;
   label: string;
   exact?: boolean;
+  unreadLabel?: string;
 }
 
 export interface BottomNavLinksProps {
   label: string;
   items: BottomNavItem[];
+  messagesUnread: number;
 }
 
-export function BottomNavLinks({ label, items }: BottomNavLinksProps) {
+export function BottomNavLinks({
+  label,
+  items,
+  messagesUnread,
+}: BottomNavLinksProps) {
   const pathname = usePathname();
+  const unread = useChatUnread(messagesUnread);
 
   return (
     <>
@@ -41,6 +59,7 @@ export function BottomNavLinks({ label, items }: BottomNavLinksProps) {
         <ul className="mx-auto flex h-16 max-w-xl items-stretch justify-around px-2">
           {items.map((item) => {
             const Icon = icons[item.icon];
+            const badge = item.icon === 'messages' ? unread : 0;
             const isActive = item.exact
               ? pathname === item.href
               : pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -50,16 +69,31 @@ export function BottomNavLinks({ label, items }: BottomNavLinksProps) {
                 <Link
                   href={item.href}
                   aria-current={isActive ? 'page' : undefined}
+                  aria-label={
+                    badge > 0 && item.unreadLabel
+                      ? fillTemplate(item.unreadLabel, {
+                          count: String(badge),
+                        })
+                      : undefined
+                  }
                   className={`flex h-full flex-col items-center justify-center gap-0.5 text-xs ${
                     isActive ? 'text-foreground' : 'text-muted-foreground'
                   }`}
                 >
                   <span
-                    className={`flex h-7 w-14 items-center justify-center rounded-full ${
+                    className={`relative flex h-7 w-14 items-center justify-center rounded-full ${
                       isActive ? 'bg-secondary' : ''
                     }`}
                   >
                     <Icon className="size-5" aria-hidden="true" />
+                    {badge > 0 ? (
+                      <span
+                        aria-hidden="true"
+                        className="absolute right-3 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-terracotta px-1 text-[11px] font-medium leading-none text-white"
+                      >
+                        {formatBadgeCount(badge)}
+                      </span>
+                    ) : null}
                   </span>
                   {item.label}
                 </Link>

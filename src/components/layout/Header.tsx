@@ -5,11 +5,17 @@ import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { SignOutButton } from '@/components/shared/SignOutButton';
 import { NavLink } from '@/components/shared/NavLink';
-import { MessagesLink } from '@/components/chat/MessagesLink';
+import { ChatDock } from '@/components/chat/ChatDock';
+import { CreditChip } from '@/components/layout/CreditChip';
 import {
   NotificationBell,
   type NotificationBellLabels,
 } from '@/components/notifications/NotificationBell';
+import { formatAmount } from '@/lib/bookings/booking';
+import {
+  buildChatInboxLabels,
+  buildChatThreadLabels,
+} from '@/lib/chat/chat-labels';
 import { getServerCaller } from '@/trpc/server/caller';
 
 export interface HeaderProps {
@@ -35,6 +41,16 @@ async function loadMessagesUnread(): Promise<number> {
   }
 }
 
+async function loadCreditBalance(): Promise<number> {
+  try {
+    const caller = await getServerCaller();
+    const result = await caller.profile.creditHistory({ offset: 0, limit: 1 });
+    return result.balance;
+  } catch {
+    return 0;
+  }
+}
+
 async function loadUnreadCount(): Promise<number> {
   try {
     const caller = await getServerCaller();
@@ -50,9 +66,14 @@ export async function Header({ user }: HeaderProps) {
   const { t: tc } = await getT('chat');
   const lng = await routeLanguage();
   const language = lng === 'en' ? 'en' : 'el';
-  const [unread, messagesUnread] = user
-    ? await Promise.all([loadUnreadCount(), loadMessagesUnread()])
-    : [0, 0];
+  const [unread, messagesUnread, creditBalance] = user
+    ? await Promise.all([
+        loadUnreadCount(),
+        loadMessagesUnread(),
+        loadCreditBalance(),
+      ])
+    : [0, 0, 0];
+  const creditText = formatAmount(creditBalance, lng);
 
   const bellLabels: NotificationBellLabels = {
     bell: tn('notifications.bell'),
@@ -116,14 +137,10 @@ export async function Header({ user }: HeaderProps) {
 
           {user ? (
             <div className="flex items-center gap-1">
-              <MessagesLink
-                key={`messages-${messagesUnread}`}
-                href={`/${lng}/messages`}
-                initialUnread={messagesUnread}
-                labels={{
-                  messages: tc('nav.messages'),
-                  messagesUnread: tc('nav.messagesUnread'),
-                }}
+              <CreditChip
+                href={`/${lng}/profile?tab=credit`}
+                amountText={creditText}
+                ariaLabel={t('nav.creditAria', { amount: creditText })}
               />
               <NotificationBell
                 key={unread}
@@ -168,6 +185,20 @@ export async function Header({ user }: HeaderProps) {
           )}
         </div>
       </div>
+      {user ? (
+        <ChatDock
+          lng={language}
+          initialUnread={messagesUnread}
+          labels={{
+            messages: tc('nav.messages'),
+            messagesUnread: tc('nav.messagesUnread'),
+            close: tc('dock.close'),
+            openFull: tc('dock.openFull'),
+            inbox: buildChatInboxLabels(tc),
+            thread: buildChatThreadLabels(tc),
+          }}
+        />
+      ) : null}
     </header>
   );
 }

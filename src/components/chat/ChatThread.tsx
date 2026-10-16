@@ -2,14 +2,16 @@
 
 import {
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type KeyboardEvent,
+  type ReactNode,
 } from 'react';
 import Link from 'next/link';
-import { Lock, Send } from 'lucide-react';
+import { ArrowLeft, Lock, Send } from 'lucide-react';
 import { TeamAvatar } from '@/components/teams/TeamAvatar';
 import { fillTemplate } from '@/lib/bookings/booking';
 import {
@@ -66,6 +68,8 @@ export interface ChatThreadProps {
   conversationId: string;
   backHref: string;
   labels: ChatThreadLabels;
+  onBack?: () => void;
+  headerActions?: ReactNode;
 }
 
 type Phase = 'loading' | 'ready' | 'notFound' | 'error';
@@ -75,7 +79,11 @@ export function ChatThread({
   conversationId,
   backHref,
   labels,
+  onBack,
+  headerActions,
 }: ChatThreadProps) {
+  const embedded = onBack !== undefined;
+  const composerId = useId();
   const [phase, setPhase] = useState<Phase>('loading');
   const [attempt, setAttempt] = useState(0);
   const [conversation, setConversation] = useState<ChatConversation | null>(
@@ -222,6 +230,8 @@ export function ChatThread({
       element.scrollHeight - element.scrollTop - element.clientHeight < 80;
   }
 
+  const cardClass = 'rounded-xl border-[0.5px] border-border bg-card';
+
   function handleRetry() {
     setPhase('loading');
     setAttempt((value) => value + 1);
@@ -301,7 +311,10 @@ export function ChatThread({
 
   if (phase === 'loading') {
     return (
-      <p role="status" className="text-muted-foreground">
+      <p
+        role="status"
+        className={`text-muted-foreground ${embedded ? 'p-4' : ''}`}
+      >
         {labels.loading}
       </p>
     );
@@ -309,24 +322,43 @@ export function ChatThread({
 
   if (phase === 'notFound') {
     return (
-      <div className="rounded-xl border-[0.5px] border-border bg-card p-6">
+      <div className={`p-6 ${embedded ? '' : cardClass}`}>
         <p className="text-muted-foreground">{labels.notFound}</p>
-        <Link
-          href={backHref}
-          className="mt-4 inline-flex h-11 items-center rounded-full border-[0.5px] border-border bg-card px-5 text-sm font-medium text-foreground hover:bg-secondary"
-        >
-          {labels.back}
-        </Link>
+        {embedded ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className="mt-4 inline-flex h-11 items-center rounded-full border-[0.5px] border-border bg-card px-5 text-sm font-medium text-foreground hover:bg-secondary"
+          >
+            {labels.back}
+          </button>
+        ) : (
+          <Link
+            href={backHref}
+            className="mt-4 inline-flex h-11 items-center rounded-full border-[0.5px] border-border bg-card px-5 text-sm font-medium text-foreground hover:bg-secondary"
+          >
+            {labels.back}
+          </Link>
+        )}
       </div>
     );
   }
 
   if (phase === 'error' || !conversation) {
     return (
-      <div className="rounded-xl border-[0.5px] border-border bg-card p-6">
+      <div className={`p-6 ${embedded ? '' : cardClass}`}>
         <p role="alert" className="text-destructive">
           {labels.error}
         </p>
+        {embedded ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className="mr-2 mt-4 h-11 rounded-full border-[0.5px] border-border bg-card px-5 text-sm font-medium text-foreground hover:bg-secondary"
+          >
+            {labels.back}
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={handleRetry}
@@ -349,19 +381,40 @@ export function ChatThread({
       : conversation.subtitle;
 
   return (
-    <section className="flex h-[min(70dvh,680px)]  min-h-105 flex-col overflow-hidden rounded-xl border-[0.5px] border-border bg-card">
+    <section
+      className={
+        embedded
+          ? 'flex h-full min-h-0 flex-col overflow-hidden bg-card'
+          : `flex h-[min(70dvh,680px)] min-h-105 flex-col overflow-hidden ${cardClass}`
+      }
+    >
       <header className="flex items-center gap-3 border-b-[0.5px] border-border px-4 py-3">
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label={labels.back}
+            className="-ml-2 inline-flex size-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" aria-hidden="true" />
+          </button>
+        ) : null}
         <TeamAvatar
           name={conversation.title}
           logoUrl={conversation.logoUrl}
           size="sm"
         />
-        <div className="min-w-0">
-          <h1 className="truncate text-base">{conversation.title}</h1>
+        <div className="min-w-0 flex-1">
+          {embedded ? (
+            <h2 className="truncate text-base">{conversation.title}</h2>
+          ) : (
+            <h1 className="truncate text-base">{conversation.title}</h1>
+          )}
           {subtitle ? (
             <p className="truncate text-sm text-muted-foreground">{subtitle}</p>
           ) : null}
         </div>
+        {headerActions}
       </header>
 
       <div
@@ -430,16 +483,16 @@ export function ChatThread({
       ) : (
         <div className="border-t-[0.5px] border-border px-4 py-3">
           <div className="flex items-end gap-2">
-            <label htmlFor="chat-message" className="sr-only">
+            <label htmlFor={composerId} className="sr-only">
               {labels.composerLabel}
             </label>
             <textarea
-              id="chat-message"
+              id={composerId}
               rows={1}
               value={draft}
               maxLength={CHAT_MESSAGE_MAX}
               placeholder={labels.placeholder}
-              aria-describedby={sendError ? 'chat-message-error' : undefined}
+              aria-describedby={sendError ? `${composerId}-error` : undefined}
               onChange={(event) => {
                 setDraft(event.target.value);
                 setSendError(null);
@@ -459,7 +512,7 @@ export function ChatThread({
           </div>
           <div className="mt-1.5 flex items-start justify-between gap-3 text-xs">
             <p
-              id="chat-message-error"
+              id={`${composerId}-error`}
               role="alert"
               className="text-destructive"
             >

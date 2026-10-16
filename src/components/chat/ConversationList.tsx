@@ -29,6 +29,8 @@ export interface ChatInboxLabels {
 export interface ConversationListProps {
   lng: 'el' | 'en';
   labels: ChatInboxLabels;
+  embedded?: boolean;
+  onSelect?: (conversationId: string) => void;
 }
 
 function previewOf(item: ChatConversation, labels: ChatInboxLabels): string {
@@ -39,7 +41,12 @@ function previewOf(item: ChatConversation, labels: ChatInboxLabels): string {
   return last.content;
 }
 
-export function ConversationList({ lng, labels }: ConversationListProps) {
+export function ConversationList({
+  lng,
+  labels,
+  embedded = false,
+  onSelect,
+}: ConversationListProps) {
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading');
   const [items, setItems] = useState<ChatConversation[]>([]);
   const [attempt, setAttempt] = useState(0);
@@ -93,9 +100,18 @@ export function ConversationList({ lng, labels }: ConversationListProps) {
     setAttempt((value) => value + 1);
   }
 
+  const boxClass = embedded
+    ? ''
+    : 'rounded-xl border-[0.5px] border-border bg-card';
+  const rowClass =
+    'flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-secondary';
+
   if (phase === 'loading') {
     return (
-      <p role="status" className="text-muted-foreground">
+      <p
+        role="status"
+        className={`text-muted-foreground ${embedded ? 'p-4' : ''}`}
+      >
         {labels.loading}
       </p>
     );
@@ -103,7 +119,7 @@ export function ConversationList({ lng, labels }: ConversationListProps) {
 
   if (phase === 'error') {
     return (
-      <div className="rounded-xl border-[0.5px] border-border bg-card p-6">
+      <div className={`p-6 ${boxClass}`}>
         <p role="alert" className="text-destructive">
           {labels.error}
         </p>
@@ -120,7 +136,7 @@ export function ConversationList({ lng, labels }: ConversationListProps) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-xl border-[0.5px] border-border bg-card p-6 text-center">
+      <div className={`p-6 text-center ${boxClass}`}>
         <h2 className="text-lg">{labels.emptyTitle}</h2>
         <p className="mt-2 text-muted-foreground">{labels.emptyDescription}</p>
       </div>
@@ -128,75 +144,88 @@ export function ConversationList({ lng, labels }: ConversationListProps) {
   }
 
   return (
-    <ul className="overflow-hidden rounded-xl border-[0.5px] border-border bg-card">
+    <ul className={embedded ? '' : `overflow-hidden ${boxClass}`}>
       {items.map((item) => {
         const unread = item.unreadCount > 0;
+
+        const content = (
+          <>
+            <TeamAvatar name={item.title} logoUrl={item.logoUrl} size="sm" />
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-2">
+                <span
+                  className={`truncate text-sm ${
+                    unread ? 'font-medium' : ''
+                  } text-foreground`}
+                >
+                  {item.title}
+                </span>
+                <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
+                  {item.kind === 'TEAM' ? labels.kindTeam : labels.kindCoach}
+                </span>
+              </span>
+              <span
+                className={`mt-0.5 block truncate text-sm ${
+                  unread ? 'text-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                {previewOf(item, labels)}
+              </span>
+            </span>
+            <span className="flex shrink-0 flex-col items-end gap-1.5">
+              {item.lastMessage ? (
+                <span
+                  suppressHydrationWarning
+                  className="text-xs text-muted-foreground"
+                >
+                  {formatRelativeTime(
+                    item.lastMessage.createdAt,
+                    now,
+                    lng,
+                    labels.justNow,
+                  )}
+                </span>
+              ) : null}
+              {unread ? (
+                <>
+                  <span
+                    aria-hidden="true"
+                    className="flex h-5 min-w-5 items-center justify-center rounded-full bg-terracotta px-1.5 text-xs text-white"
+                  >
+                    {formatBadgeCount(item.unreadCount)}
+                  </span>
+                  <span className="sr-only">
+                    {fillTemplate(
+                      item.unreadCount === 1
+                        ? labels.unreadOne
+                        : labels.unreadOther,
+                      { count: String(item.unreadCount) },
+                    )}
+                  </span>
+                </>
+              ) : null}
+            </span>
+          </>
+        );
 
         return (
           <li
             key={item.id}
             className="border-b-[0.5px] border-border last:border-b-0"
           >
-            <Link
-              href={`/${lng}/messages/${item.id}`}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary"
-            >
-              <TeamAvatar name={item.title} logoUrl={item.logoUrl} size="sm" />
-              <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-2">
-                  <span
-                    className={`truncate text-sm ${
-                      unread ? 'font-medium' : ''
-                    } text-foreground`}
-                  >
-                    {item.title}
-                  </span>
-                  <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-                    {item.kind === 'TEAM' ? labels.kindTeam : labels.kindCoach}
-                  </span>
-                </span>
-                <span
-                  className={`mt-0.5 block truncate text-sm ${
-                    unread ? 'text-foreground' : 'text-muted-foreground'
-                  }`}
-                >
-                  {previewOf(item, labels)}
-                </span>
-              </span>
-              <span className="flex shrink-0 flex-col items-end gap-1.5">
-                {item.lastMessage ? (
-                  <span
-                    suppressHydrationWarning
-                    className="text-xs text-muted-foreground"
-                  >
-                    {formatRelativeTime(
-                      item.lastMessage.createdAt,
-                      now,
-                      lng,
-                      labels.justNow,
-                    )}
-                  </span>
-                ) : null}
-                {unread ? (
-                  <>
-                    <span
-                      aria-hidden="true"
-                      className="flex h-5 min-w-5 items-center justify-center rounded-full bg-terracotta px-1.5 text-xs text-white"
-                    >
-                      {formatBadgeCount(item.unreadCount)}
-                    </span>
-                    <span className="sr-only">
-                      {fillTemplate(
-                        item.unreadCount === 1
-                          ? labels.unreadOne
-                          : labels.unreadOther,
-                        { count: String(item.unreadCount) },
-                      )}
-                    </span>
-                  </>
-                ) : null}
-              </span>
-            </Link>
+            {onSelect ? (
+              <button
+                type="button"
+                onClick={() => onSelect(item.id)}
+                className={rowClass}
+              >
+                {content}
+              </button>
+            ) : (
+              <Link href={`/${lng}/messages/${item.id}`} className={rowClass}>
+                {content}
+              </Link>
+            )}
           </li>
         );
       })}

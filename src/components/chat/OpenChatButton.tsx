@@ -4,7 +4,11 @@ import { useState } from 'react';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 import { openConversation } from '@/lib/chat/chat-api';
-import type { OpenConversationInput } from '@/lib/chat/chat';
+import {
+  CHAT_DESKTOP_QUERY,
+  CHAT_POPUP_EVENT,
+  type OpenConversationInput,
+} from '@/lib/chat/chat';
 
 export interface OpenChatLabels {
   open: string;
@@ -34,6 +38,20 @@ export function OpenChatButton({ target, labels }: OpenChatButtonProps) {
     const result = await openConversation(target);
 
     if (result.status === 'ok') {
+      const messagesPrefix = `/${params.lng}/messages`;
+      if (
+        window.matchMedia(CHAT_DESKTOP_QUERY).matches &&
+        !pathname.startsWith(messagesPrefix)
+      ) {
+        window.dispatchEvent(
+          new CustomEvent(CHAT_POPUP_EVENT, {
+            detail: { conversationId: result.conversationId },
+          }),
+        );
+        setBusy(false);
+        return;
+      }
+
       router.push(
         `/${params.lng}/messages/${result.conversationId}?from=${encodeURIComponent(pathname)}`,
       );

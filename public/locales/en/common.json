@@ -7,7 +7,8 @@
     "home": "Home",
     "bookings": "Bookings",
     "admin": "Admin",
-    "mobileLabel": "Main navigation"
+    "mobileLabel": "Main navigation",
+    "creditAria": "Credit: {{amount}}"
   },
   "auth": {
     "login": "Log in",

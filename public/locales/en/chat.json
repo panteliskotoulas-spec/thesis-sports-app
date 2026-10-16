@@ -57,5 +57,9 @@
   "nav": {
     "messages": "Messages",
     "messagesUnread": "Messages, {count} unread"
+  },
+  "dock": {
+    "close": "Close messages",
+    "openFull": "Open full page"
   }
 }

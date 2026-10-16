@@ -7,7 +7,8 @@
     "home": "Αρχική",
     "bookings": "Κρατήσεις",
     "admin": "Διαχείριση",
-    "mobileLabel": "Κύρια πλοήγηση"
+    "mobileLabel": "Κύρια πλοήγηση",
+    "creditAria": "Πίστωση: {{amount}}"
   },
   "auth": {
     "login": "Σύνδεση",
