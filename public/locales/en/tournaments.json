@@ -220,6 +220,54 @@
       "short": "Dig"
     }
   },
+  "stats": {
+    "meta": {
+      "title": "My stats"
+    },
+    "page": {
+      "title": "My stats",
+      "subtitle": "Your tournament performance, by sport."
+    },
+    "sportLabel": "Sport",
+    "sports": {
+      "FOOTBALL": "Football",
+      "BASKETBALL": "Basketball",
+      "VOLLEYBALL": "Volleyball"
+    },
+    "tournamentLabel": "Tournament",
+    "allTournaments": "All tournaments",
+    "games": "Games",
+    "ratios": {
+      "title": "Percentages",
+      "lowSample": "Small sample",
+      "note": "Percentages are considered reliable from {n} attempts and up."
+    },
+    "chart": {
+      "title": "{metric} per game",
+      "aria": "Chart: {metric} per game",
+      "match": "Game {n}"
+    },
+    "compare": {
+      "title": "Comparison with the average",
+      "caption": "Per-game values compared with all players in the same tournaments.",
+      "mine": "Me",
+      "average": "Average",
+      "values": "{mine} · average {avg}"
+    },
+    "table": {
+      "title": "My games",
+      "aria": "Table of my games",
+      "round": "Rd.",
+      "roundValue": "R{n}",
+      "opponent": "Opponent",
+      "score": "Score"
+    },
+    "empty": {
+      "title": "No stats yet",
+      "description": "Your stats will show up once they're recorded in tournament games.",
+      "cta": "Browse tournaments"
+    }
+  },
   "admin": {
     "list": {
       "meta": "Manage tournaments",

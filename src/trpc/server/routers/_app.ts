@@ -16,6 +16,7 @@ import { profileRouter } from './profile';
 import { reservationsRouter } from './reservations';
 import { sessionSplitsRouter } from './session-splits';
 import { splitsRouter } from './splits';
+import { statsRouter } from './stats';
 import { teamsRouter } from './teams';
 import { tournamentsRouter } from './tournaments';
 
@@ -39,6 +40,7 @@ export const appRouter = router({
   conversations: conversationsRouter,
   profile: profileRouter,
   tournaments: tournamentsRouter,
+  stats: statsRouter,
 });
 
 export type AppRouter = typeof appRouter;
