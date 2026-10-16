@@ -131,30 +131,22 @@ export async function Header({ user }: HeaderProps) {
         </div>
       </div>
 
-      <div className="mx-auto flex h-16 max-w-360 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4 lg:gap-10">
-          <Link className="whitespace-nowrap text-foreground" href={`/${lng}`}>
-            {t('app.name')}
-          </Link>
+      <div className="mx-auto flex h-16 max-w-360 items-center justify-between px-4 sm:px-6 md:grid md:grid-cols-[1fr_auto_1fr] lg:px-8">
+        <Link className="whitespace-nowrap text-foreground" href={`/${lng}`}>
+          {t('app.name')}
+        </Link>
 
-          <nav className="hidden md:block">
-            <ul className="flex items-center gap-1 lg:gap-2">
-              {navItems.map((item) => (
-                <li key={item.slug}>
-                  <NavLink href={`/${lng}/${item.slug}`}>{item.label}</NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
+        <nav className="hidden md:block">
+          <ul className="flex items-center gap-1 lg:gap-2">
+            {navItems.map((item) => (
+              <li key={item.slug}>
+                <NavLink href={`/${lng}/${item.slug}`}>{item.label}</NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-        <div className="flex items-center">
-          <div className="hidden items-center gap-1 md:flex">
-            <LanguageSwitcher />
-            <ThemeToggle />
-            <span className="mx-2 h-5 w-px bg-border" aria-hidden="true" />
-          </div>
-
+        <div className="flex items-center md:justify-self-end">
           {user ? (
             <div className="flex items-center gap-1">
               <CreditChip
@@ -195,6 +187,11 @@ export async function Header({ user }: HeaderProps) {
             </div>
           ) : (
             <div className="flex items-center gap-2">
+              <div className="hidden items-center gap-1 md:flex">
+                <LanguageSwitcher />
+                <ThemeToggle />
+                <span className="mx-2 h-5 w-px bg-border" aria-hidden="true" />
+              </div>
               <Link
                 className="whitespace-nowrap rounded-full border-[0.5px] border-border px-4 py-1.5 text-foreground hover:bg-secondary md:border-transparent"
                 href={`/${lng}/login`}

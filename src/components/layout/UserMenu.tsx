@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
 import { SignOutButton } from '@/components/shared/SignOutButton';
+import { MenuPreferences } from '@/components/layout/MenuPreferences';
 import type { AccountMenuGroup } from '@/lib/layout/account-menu';
 import { accountMenuIcons } from './account-menu-icons';
 
@@ -64,7 +65,7 @@ export function UserMenu({
         aria-expanded={open}
         aria-controls="user-menu-panel"
         aria-label={menuLabel}
-        className="flex items-center gap-2 rounded-full p-1 pr-2.5 hover:bg-secondary"
+        className="flex items-center gap-1 rounded-full p-1 pr-2 hover:bg-secondary"
       >
         <span
           aria-hidden="true"
@@ -72,7 +73,6 @@ export function UserMenu({
         >
           {initials}
         </span>
-        <span className="max-w-40 truncate text-foreground">{name}</span>
         <ChevronDown
           className={`size-4 text-muted-foreground ${open ? 'rotate-180' : ''}`}
           aria-hidden="true"
@@ -84,6 +84,16 @@ export function UserMenu({
           id="user-menu-panel"
           className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border-[0.5px] border-border bg-popover p-1.5 text-popover-foreground shadow-lg"
         >
+          <div className="flex items-center gap-3 px-3 py-2.5">
+            <span
+              aria-hidden="true"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm text-foreground"
+            >
+              {initials}
+            </span>
+            <span className="truncate text-foreground">{name}</span>
+          </div>
+          <div className="mt-1 border-t-[0.5px] border-border" />
           {visibleGroups.map((group, index) => (
             <div
               key={group.key}
@@ -125,6 +135,10 @@ export function UserMenu({
               </ul>
             </div>
           ))}
+
+          <div className="mt-1 border-t-[0.5px] border-border pt-1">
+            <MenuPreferences />
+          </div>
 
           <div className="mt-1 border-t-[0.5px] border-border pt-1">
             <SignOutButton lng={lng} label={signOutLabel} variant="menu" />

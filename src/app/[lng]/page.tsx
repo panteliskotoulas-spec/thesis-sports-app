@@ -32,7 +32,7 @@ export default async function LandingPage() {
   const loggedIn = user !== null;
 
   const [featuredFields, dashboard, coach, owner, admin] = await Promise.all([
-    loadFeaturedFields(lng),
+    user ? Promise.resolve([]) : loadFeaturedFields(lng),
     user
       ? loadPlayerDashboard({
           lng,
@@ -59,20 +59,17 @@ export default async function LandingPage() {
       <Header user={user} />
       <main className="flex-1">
         {user && dashboard ? (
-          <>
-            <PlayerDashboard
-              name={user.name}
-              data={dashboard}
-              roles={
-                <>
-                  {coach ? <CoachSection data={coach} /> : null}
-                  {owner ? <OwnerSection data={owner} /> : null}
-                  {admin ? <AdminSection data={admin} /> : null}
-                </>
-              }
-            />
-            <HomeFeaturedFields fields={featuredFields} />
-          </>
+          <PlayerDashboard
+            name={user.name}
+            data={dashboard}
+            roles={
+              <>
+                {coach ? <CoachSection data={coach} /> : null}
+                {owner ? <OwnerSection data={owner} /> : null}
+                {admin ? <AdminSection data={admin} /> : null}
+              </>
+            }
+          />
         ) : (
           <>
             <HomeHero loggedIn={loggedIn} />
@@ -83,7 +80,7 @@ export default async function LandingPage() {
           </>
         )}
       </main>
-      <Footer loggedIn={loggedIn} />
+      {loggedIn ? null : <Footer loggedIn={false} />}
       <BottomNav user={user} />
     </>
   );
