@@ -437,6 +437,10 @@
       "less": "Fewer",
       "cancel": "Cancel",
       "save": "Save result",
+      "confirmTitle": "A result already exists",
+      "confirmBody": "This will replace the previous result and the player stats. Continue?",
+      "confirmYes": "Yes, replace",
+      "confirmBack": "Back",
       "saving": "Saving…",
       "columns": {
         "two": {
@@ -461,6 +465,8 @@
       "SPORT_MISMATCH": "That team plays a different sport from the tournament.",
       "NOT_ENOUGH_TEAMS": "More teams are needed to create a schedule.",
       "DATETIME_INVALID": "Fill in both the day and the time, or leave both empty.",
+      "MATCH_OUT_OF_DATES": "The match date must fall within the tournament dates.",
+      "FIELD_CONFLICT": "The field is already taken at that time (another match or a booking). Pick another time.",
       "CONFLICT": "That's no longer possible. The page was refreshed with the current state.",
       "NOT_FOUND": "That item wasn't found. Refresh the page and try again.",
       "ERROR": "Something went wrong. Try again.",

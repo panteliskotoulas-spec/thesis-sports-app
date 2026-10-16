@@ -114,12 +114,6 @@ export function buildAccountMenu({
           href: `/${lng}/tournaments/mine`,
           label: t('nav.myTournaments'),
         },
-        {
-          key: 'tournaments',
-          href: `/${lng}/tournaments`,
-          label: t('nav.tournaments'),
-          mobileOnly: true,
-        },
         { key: 'stats', href: `/${lng}/stats`, label: t('nav.stats') },
         { key: 'profile', href: `/${lng}/profile`, label: t('nav.profile') },
       ],

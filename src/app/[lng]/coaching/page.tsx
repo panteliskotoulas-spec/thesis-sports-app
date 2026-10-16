@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
-import { AlertTriangle, ArrowLeft } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
@@ -61,15 +60,7 @@ export default async function CoachingSessionsPage({
     <>
       <Header user={user} />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 md:py-10">
-        <Link
-          href={`/${lng}/bookings`}
-          className="inline-flex h-10 items-center gap-2 text-sm font-medium text-muted-foreground"
-        >
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          {t('sessions.back')}
-        </Link>
-
-        <h1 className="mt-2">{t('sessions.title')}</h1>
+        <h1>{t('sessions.title')}</h1>
         <p className="mt-2 text-muted-foreground">{t('sessions.subtitle')}</p>
 
         {query.payment === 'failed' ? (

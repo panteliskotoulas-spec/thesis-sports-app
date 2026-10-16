@@ -9,7 +9,11 @@ import {
 import { Prisma, type PrismaClient } from '@/generated/prisma/client';
 import { localized } from '@/lib/i18n-content';
 import { asLocalized } from '@/lib/server/booking-shared';
-import { athensDateTime, athensDayStart } from '@/lib/server/athens-time';
+import {
+  athensDateTime,
+  athensDayRange,
+  athensDayStart,
+} from '@/lib/server/athens-time';
 import { matchResultMessage } from '@/lib/server/tournament-notifications';
 import { toLocalized } from '@/lib/server/translate';
 import { toAthensParts } from '@/lib/tournaments/admin';
@@ -25,6 +29,7 @@ import {
   type TournamentListItem,
 } from '@/lib/tournaments/tournament';
 
+const MATCH_WINDOW_MS = 2 * 60 * 60 * 1000;
 const NAME_MAX = 80;
 const DESCRIPTION_MAX = 1000;
 const MIN_TEAMS = 2;
@@ -597,11 +602,60 @@ export const tournamentsRouter = router({
         });
       }
 
-      const updated = await ctx.prisma.match.updateMany({
+      const match = await ctx.prisma.match.findUnique({
+        where: { id: input.matchId },
+        select: {
+          tournament: {
+            select: { hostFieldId: true, startDate: true, endDate: true },
+          },
+        },
+      });
+      if (!match) throw new TRPCError({ code: 'NOT_FOUND' });
+
+      if (scheduledAt) {
+        const { hostFieldId, startDate, endDate } = match.tournament;
+        const lastDay = toAthensParts(endDate.toISOString()).day;
+        if (
+          scheduledAt < startDate ||
+          scheduledAt >= athensDayRange(lastDay).end
+        ) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'MATCH_OUT_OF_DATES',
+          });
+        }
+
+        const from = new Date(scheduledAt.getTime() - MATCH_WINDOW_MS);
+        const to = new Date(scheduledAt.getTime() + MATCH_WINDOW_MS);
+        const [otherMatches, bookedSlots] = await Promise.all([
+          ctx.prisma.match.count({
+            where: {
+              id: { not: input.matchId },
+              tournament: { hostFieldId },
+              scheduledAt: { gt: from, lt: to },
+            },
+          }),
+          ctx.prisma.availabilitySlot.count({
+            where: {
+              fieldId: hostFieldId,
+              status: { in: ['BOOKED', 'PENDING_PAYMENT'] },
+              startTime: { lt: to },
+              endTime: { gt: scheduledAt },
+            },
+          }),
+        ]);
+        if (otherMatches > 0 || bookedSlots > 0) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'FIELD_CONFLICT',
+          });
+        }
+      }
+
+      await ctx.prisma.match.update({
         where: { id: input.matchId },
         data: { scheduledAt },
       });
-      if (updated.count === 0) throw new TRPCError({ code: 'NOT_FOUND' });
 
       return { id: input.matchId };
     }),

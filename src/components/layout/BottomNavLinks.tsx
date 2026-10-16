@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, MapPin, Menu, Trophy, UserRound, Users } from 'lucide-react';
+import { MapPin, Menu, Trophy, UserRound, Users } from 'lucide-react';
 import { useChatUnread } from '@/components/chat/useChatUnread';
 import {
   Sheet,
@@ -21,7 +21,6 @@ import { accountMenuIcons } from './account-menu-icons';
 // Οι Server Components δεν μπορούν να περάσουν components ως props,
 // γι' αυτό περνάμε ένα κλειδί και το εικονίδιο επιλέγεται εδώ.
 const icons = {
-  home: Home,
   fields: MapPin,
   teams: Users,
   coaches: UserRound,

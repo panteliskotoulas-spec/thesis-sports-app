@@ -104,7 +104,7 @@
       }
     },
     "coaching": {
-      "title": "Coaching sessions",
+      "title": "Coaching",
       "viewAll": "All sessions",
       "empty": "You have no upcoming coaching sessions.",
       "onlyRequested": "No confirmed sessions yet. Requests awaiting a reply: {{count}}.",

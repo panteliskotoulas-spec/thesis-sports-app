@@ -116,6 +116,10 @@ export default async function AdminMatchResultPage({
     cancel: t('admin.result.cancel'),
     save: t('admin.result.save'),
     saving: t('admin.result.saving'),
+    confirmTitle: t('admin.result.confirmTitle'),
+    confirmBody: t('admin.result.confirmBody'),
+    confirmYes: t('admin.result.confirmYes'),
+    confirmBack: t('admin.result.confirmBack'),
     table: tableLabels,
     errors: buildAdminErrorLabels(t),
   };
@@ -160,6 +164,7 @@ export default async function AdminMatchResultPage({
               players: awayRows,
             }}
             initial={initial}
+            replacing={completed}
             backHref={backHref}
             labels={labels}
           />

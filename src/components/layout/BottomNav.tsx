@@ -30,16 +30,8 @@ export async function BottomNav({ user }: BottomNavProps) {
     ? ([0, null] as const)
     : await Promise.all([loadMessagesUnread(), loadCoachMenuStatus()]);
 
-  const home: BottomNavItem = {
-    icon: 'home',
-    href: `/${lng}`,
-    label: t('nav.home'),
-    exact: true,
-  };
-
   const items: BottomNavItem[] = isAdmin
     ? [
-        home,
         {
           icon: 'fields',
           href: `/${lng}/admin/fields`,
@@ -57,10 +49,14 @@ export async function BottomNav({ user }: BottomNavProps) {
         },
       ]
     : [
-        home,
         { icon: 'fields', href: `/${lng}/fields`, label: t('nav.fields') },
         { icon: 'teams', href: `/${lng}/teams`, label: t('nav.teams') },
         { icon: 'coaches', href: `/${lng}/coaches`, label: t('nav.coaches') },
+        {
+          icon: 'tournaments',
+          href: `/${lng}/tournaments`,
+          label: t('nav.tournaments'),
+        },
       ];
 
   const groups = buildAccountMenu({

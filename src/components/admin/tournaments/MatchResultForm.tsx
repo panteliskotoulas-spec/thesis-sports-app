@@ -47,6 +47,10 @@ export interface MatchResultFormLabels {
   cancel: string;
   save: string;
   saving: string;
+  confirmTitle: string;
+  confirmBody: string;
+  confirmYes: string;
+  confirmBack: string;
   table: ResultTeamTableLabels;
   errors: AdminErrorLabels;
 }
@@ -57,6 +61,7 @@ export interface MatchResultFormProps {
   home: MatchResultTeam;
   away: MatchResultTeam;
   initial: ResultFormState;
+  replacing: boolean;
   backHref: string;
   labels: MatchResultFormLabels;
 }
@@ -75,6 +80,7 @@ export function MatchResultForm({
   home,
   away,
   initial,
+  replacing,
   backHref,
   labels,
 }: MatchResultFormProps) {
@@ -82,6 +88,7 @@ export function MatchResultForm({
   const [showMore, setShowMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const router = useRouter();
 
   const columns = SPORT_COLUMNS[sport];
@@ -154,9 +161,29 @@ export function MatchResultForm({
     });
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving) return;
+    if (replacing && !confirming) {
+      const check = buildResultInput(
+        sport,
+        home.id,
+        away.id,
+        [...home.players, ...away.players],
+        state,
+      );
+      if (!check.ok) {
+        setError(errorLabel(labels.errors, check.code));
+        return;
+      }
+      setError(null);
+      setConfirming(true);
+      return;
+    }
+    void save();
+  }
+
+  async function save() {
     const built = buildResultInput(
       sport,
       home.id,
@@ -165,6 +192,7 @@ export function MatchResultForm({
       state,
     );
     if (!built.ok) {
+      setConfirming(false);
       setError(errorLabel(labels.errors, built.code));
       return;
     }
@@ -174,6 +202,7 @@ export function MatchResultForm({
     const saved = await recordMatchResult(matchId, built.result);
     if (!saved.ok) {
       setSaving(false);
+      setConfirming(false);
       setError(errorLabel(labels.errors, saved.code));
       return;
     }
@@ -183,11 +212,7 @@ export function MatchResultForm({
   }
 
   return (
-    <form
-      onSubmit={(event) => void handleSubmit(event)}
-      noValidate
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
       {isVolleyball ? (
         <section aria-labelledby="result-sets-title" className={cardClass}>
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -345,18 +370,52 @@ export function MatchResultForm({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap justify-end gap-2">
-        <Link href={backHref} className={outlineButton}>
-          {labels.cancel}
-        </Link>
-        <button
-          type="submit"
-          aria-busy={saving}
-          className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:opacity-90 aria-busy:cursor-not-allowed aria-busy:opacity-60"
+      {confirming ? (
+        <div
+          role="alertdialog"
+          aria-labelledby="result-confirm-title"
+          className="rounded-xl border-[0.5px] border-terracotta bg-card p-4"
         >
-          {saving ? labels.saving : labels.save}
-        </button>
-      </div>
+          <p id="result-confirm-title" className="font-medium">
+            {labels.confirmTitle}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {labels.confirmBody}
+          </p>
+          <div className="mt-3 flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => setConfirming(false)}
+              className={outlineButton}
+            >
+              {labels.confirmBack}
+            </button>
+            <button
+              type="button"
+              disabled={saving}
+              aria-busy={saving}
+              onClick={() => void save()}
+              className="inline-flex h-10 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {saving ? labels.saving : labels.confirmYes}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-wrap justify-end gap-2">
+          <Link href={backHref} className={outlineButton}>
+            {labels.cancel}
+          </Link>
+          <button
+            type="submit"
+            aria-busy={saving}
+            className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:opacity-90 aria-busy:cursor-not-allowed aria-busy:opacity-60"
+          >
+            {saving ? labels.saving : labels.save}
+          </button>
+        </div>
+      )}
     </form>
   );
 }
