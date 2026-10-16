@@ -12,25 +12,26 @@ enum JoinRequestStatus {
 }
 
 model Team {
-  id               String            @id @default(cuid())
-  name             String
-  sportType        SportType
-  level            TeamLevel         @default(INTERMEDIATE)
-  area             Json?
-  description      Json?
-  logoUrl          String?
-  maxMembers       Int               @default(12)
-  isRecruiting     Boolean           @default(false)
-  neededPosition   String?
-  createdAt        DateTime          @default(now())
-  members          TeamMembership[]
-  joinRequests     JoinRequest[]
-  reservations     Reservation[]
-  coachingSessions CoachingSession[]
-  tournamentTeams  TournamentTeam[]
-  homeMatches      Match[]           @relation("MatchHome")
-  awayMatches      Match[]           @relation("MatchAway")
-  matchStats       MatchPlayerStat[]
+  id                 String                  @id @default(cuid())
+  name               String
+  sportType          SportType
+  level              TeamLevel               @default(INTERMEDIATE)
+  area               Json?
+  description        Json?
+  logoUrl            String?
+  maxMembers         Int                     @default(12)
+  isRecruiting       Boolean                 @default(false)
+  neededPosition     String?
+  createdAt          DateTime                @default(now())
+  members            TeamMembership[]
+  joinRequests       JoinRequest[]
+  reservations       Reservation[]
+  coachingSessions   CoachingSession[]
+  tournamentTeams    TournamentTeam[]
+  tournamentRequests TournamentTeamRequest[]
+  homeMatches        Match[]                 @relation("MatchHome")
+  awayMatches        Match[]                 @relation("MatchAway")
+  matchStats         MatchPlayerStat[]
 
   @@index([sportType, isRecruiting])
 }

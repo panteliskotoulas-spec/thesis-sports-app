@@ -1,4 +1,5 @@
 import 'server-only';
+import { getServerCaller } from '@/trpc/server/caller';
 import {
   EMPTY_TEAM_REQUESTS,
   HIDDEN_TEAM_REQUEST_VIEWER,
@@ -9,13 +10,23 @@ import {
 export async function loadTeamRequestViewer(
   tournamentId: string,
 ): Promise<TeamRequestViewer> {
-  void tournamentId;
-  return HIDDEN_TEAM_REQUEST_VIEWER;
+  try {
+    const caller = await getServerCaller();
+    return await caller.tournamentRequests.viewer({ tournamentId });
+  } catch (error) {
+    console.error('[loadTeamRequestViewer]', error);
+    return HIDDEN_TEAM_REQUEST_VIEWER;
+  }
 }
 
 export async function loadTournamentRequests(
   tournamentId: string,
 ): Promise<TeamRequestItem[]> {
-  void tournamentId;
-  return EMPTY_TEAM_REQUESTS;
+  try {
+    const caller = await getServerCaller();
+    return await caller.tournamentRequests.list({ tournamentId });
+  } catch (error) {
+    console.error('[loadTournamentRequests]', error);
+    return EMPTY_TEAM_REQUESTS;
+  }
 }

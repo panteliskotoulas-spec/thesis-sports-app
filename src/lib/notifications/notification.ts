@@ -17,6 +17,9 @@ export type NotificationType =
   | 'TEAM_RESERVATION_CANCELLED'
   | 'TEAM_SPLIT_PAID'
   | 'MATCH_RESULT_SUBMITTED'
+  | 'TOURNAMENT_REQUEST_RECEIVED'
+  | 'TOURNAMENT_REQUEST_ACCEPTED'
+  | 'TOURNAMENT_REQUEST_REJECTED'
   | 'REVIEW_RECEIVED'
   | 'PAYOUT_RECEIVED'
   | 'NEW_MESSAGE';
@@ -73,6 +76,9 @@ const appearances: Record<NotificationType, NotificationAppearance> = {
   TEAM_RESERVATION_CANCELLED: { icon: 'calendarX', tone: 'default' },
   TEAM_SPLIT_PAID: { icon: 'wallet', tone: 'default' },
   MATCH_RESULT_SUBMITTED: { icon: 'bell', tone: 'default' },
+  TOURNAMENT_REQUEST_RECEIVED: { icon: 'bell', tone: 'default' },
+  TOURNAMENT_REQUEST_ACCEPTED: { icon: 'check', tone: 'default' },
+  TOURNAMENT_REQUEST_REJECTED: { icon: 'alert', tone: 'negative' },
   REVIEW_RECEIVED: { icon: 'star', tone: 'default' },
   PAYOUT_RECEIVED: { icon: 'wallet', tone: 'default' },
   NEW_MESSAGE: { icon: 'bell', tone: 'default' },

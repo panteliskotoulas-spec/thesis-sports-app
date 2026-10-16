@@ -1,19 +1,20 @@
 model Tournament {
-  id          String           @id @default(cuid())
-  name        String
-  sportType   SportType
-  hostFieldId String
-  hostField   Field            @relation(fields: [hostFieldId], references: [id])
-  organizerId String
-  organizer   User             @relation(fields: [organizerId], references: [id])
-  startDate   DateTime
-  endDate     DateTime
-  maxTeams    Int              @default(8)
-  description Json
-  status      TournamentStatus @default(UPCOMING)
-  createdAt   DateTime         @default(now())
-  teams       TournamentTeam[]
-  matches     Match[]
+  id           String                  @id @default(cuid())
+  name         String
+  sportType    SportType
+  hostFieldId  String
+  hostField    Field                   @relation(fields: [hostFieldId], references: [id])
+  organizerId  String
+  organizer    User                    @relation(fields: [organizerId], references: [id])
+  startDate    DateTime
+  endDate      DateTime
+  maxTeams     Int                     @default(8)
+  description  Json
+  status       TournamentStatus        @default(UPCOMING)
+  createdAt    DateTime                @default(now())
+  teams        TournamentTeam[]
+  teamRequests TournamentTeamRequest[]
+  matches      Match[]
 
   @@index([sportType, status])
 }
@@ -26,6 +27,19 @@ model TournamentTeam {
   team         Team       @relation(fields: [teamId], references: [id])
 
   @@unique([tournamentId, teamId])
+}
+
+model TournamentTeamRequest {
+  id           String                  @id @default(cuid())
+  tournamentId String
+  tournament   Tournament              @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  teamId       String
+  team         Team                    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  status       TournamentRequestStatus @default(PENDING)
+  createdAt    DateTime                @default(now())
+
+  @@unique([tournamentId, teamId])
+  @@index([tournamentId, status])
 }
 
 model Match {

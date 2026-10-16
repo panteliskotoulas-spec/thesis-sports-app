@@ -420,6 +420,12 @@ export const tournamentsRouter = router({
           await tx.tournamentTeam.create({
             data: { tournamentId: input.tournamentId, teamId: input.teamId },
           });
+          await tx.tournamentTeamRequest.deleteMany({
+            where: {
+              tournamentId: input.tournamentId,
+              teamId: input.teamId,
+            },
+          });
         });
       } catch (error) {
         if (

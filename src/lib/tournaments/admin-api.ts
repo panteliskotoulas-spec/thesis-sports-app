@@ -10,7 +10,7 @@ export type AdminActionResult =
   | { ok: true; id: string | null }
   | { ok: false; code: string };
 
-const client = createTRPCClient<AppRouter>({
+export const client = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
       url: '/api/trpc',
@@ -44,7 +44,7 @@ interface MutationResult {
   count?: number;
 }
 
-async function run(
+export async function run(
   action: () => Promise<MutationResult | null>,
 ): Promise<AdminActionResult> {
   try {

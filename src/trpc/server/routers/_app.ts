@@ -18,6 +18,7 @@ import { sessionSplitsRouter } from './session-splits';
 import { splitsRouter } from './splits';
 import { statsRouter } from './stats';
 import { teamsRouter } from './teams';
+import { tournamentRequestsRouter } from './tournament-requests';
 import { tournamentsRouter } from './tournaments';
 
 export const appRouter = router({
@@ -40,6 +41,7 @@ export const appRouter = router({
   conversations: conversationsRouter,
   profile: profileRouter,
   tournaments: tournamentsRouter,
+  tournamentRequests: tournamentRequestsRouter,
   stats: statsRouter,
 });
 
