@@ -109,6 +109,7 @@ export default async function AdminTournamentPage({
             : null,
           day: parts.day,
           time: parts.time,
+          resultHref: `/${lng}/admin/tournaments/${tournament.id}/matches/${match.id}`,
         };
       }),
     }),
@@ -151,6 +152,8 @@ export default async function AdminTournamentPage({
     clearNo: t('admin.fixtures.clearNo'),
     working: t('admin.working'),
     schedule: t('admin.fixtures.schedule'),
+    result: t('admin.fixtures.result'),
+    correct: t('admin.fixtures.correct'),
     tbd: t('matches.tbd'),
     completed: t('matches.completed'),
     dayLabel: t('admin.fixtures.dayLabel'),

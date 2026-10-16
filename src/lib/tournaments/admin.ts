@@ -1,3 +1,4 @@
+import type { ResultErrorCode } from './result';
 import {
   isTournamentSport,
   isTournamentStatus,
@@ -12,6 +13,19 @@ export const MIN_TEAMS = 2;
 export const MAX_TEAMS = 16;
 export const DEFAULT_MAX_TEAMS = 8;
 
+export const RESULT_ERROR_CODES = [
+  'SCORE_INVALID',
+  'TIE_NOT_ALLOWED',
+  'SETS_INVALID',
+  'STAT_KEY_INVALID',
+  'STAT_VALUE_INVALID',
+  'STAT_INCONSISTENT',
+  'PLAYER_DUPLICATE',
+  'PLAYER_TEAM_INVALID',
+  'POINTS_MISMATCH',
+  'GOALS_EXCEED_SCORE',
+] as const satisfies readonly ResultErrorCode[];
+
 export const SERVER_MESSAGE_CODES = [
   'FIELD_INVALID',
   'DATES_INVALID',
@@ -20,6 +34,7 @@ export const SERVER_MESSAGE_CODES = [
   'SPORT_MISMATCH',
   'NOT_ENOUGH_TEAMS',
   'DATETIME_INVALID',
+  ...RESULT_ERROR_CODES,
 ] as const;
 
 export const ADMIN_ERROR_KEYS = [

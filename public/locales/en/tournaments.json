@@ -299,6 +299,8 @@
       "clearYes": "Delete matches",
       "clearNo": "Cancel",
       "schedule": "Time",
+      "result": "Result",
+      "correct": "Correct",
       "dayLabel": "Day",
       "timeLabel": "Start time",
       "save": "Save",
@@ -308,6 +310,54 @@
       "saving": "Saving…"
     },
     "working": "Working…",
+    "result": {
+      "meta": "Match result",
+      "title": "Match result",
+      "titleEdit": "Correct result",
+      "subtitleNew": "Enter the score and, optionally, the players' stats.",
+      "subtitleEdit": "What you save replaces the previous result and stats.",
+      "back": "Back to the tournament",
+      "scoreTitle": "Score",
+      "scoreAria": "Score of {team}",
+      "setsTitle": "Sets",
+      "setLabel": "Set {n}",
+      "setAria": "{team}, points in set {n}",
+      "addSet": "Add set",
+      "removeSet": "Remove set",
+      "setsResult": "Sets: {home} – {away}",
+      "playersTitle": "Player stats",
+      "playersHint": "Tick the players who played and fill in their stats. Empty fields count as 0.",
+      "player": "Player",
+      "playedAria": "{name} played",
+      "formerPlayer": "Former member",
+      "noMembers": "This team has no members.",
+      "tableAria": "Player stats for {team}",
+      "pairHint": "made / att.",
+      "made": "made",
+      "attempts": "attempts",
+      "pointsOk": "Points total = score ({sum})",
+      "pointsMismatch": "Points total {sum} ≠ score {score}",
+      "pointsOnly": "Points total: {sum}",
+      "more": "More",
+      "less": "Fewer",
+      "cancel": "Cancel",
+      "save": "Save result",
+      "saving": "Saving…",
+      "columns": {
+        "two": {
+          "name": "Two-pointers",
+          "short": "2P"
+        },
+        "three": {
+          "name": "Three-pointers",
+          "short": "3P"
+        },
+        "ft": {
+          "name": "Free throws",
+          "short": "FT"
+        }
+      }
+    },
     "errors": {
       "FIELD_INVALID": "That field isn't available for this sport. Choose another one.",
       "DATES_INVALID": "The dates aren't valid. The end date can't be before the start date.",
@@ -318,7 +368,17 @@
       "DATETIME_INVALID": "Fill in both the day and the time, or leave both empty.",
       "CONFLICT": "That's no longer possible. The page was refreshed with the current state.",
       "NOT_FOUND": "That item wasn't found. Refresh the page and try again.",
-      "ERROR": "Something went wrong. Try again."
+      "ERROR": "Something went wrong. Try again.",
+      "SCORE_INVALID": "Enter a valid score for both teams (0 to 300).",
+      "TIE_NOT_ALLOWED": "Basketball games can't end in a tie. Fix the score.",
+      "SETS_INVALID": "The sets are not valid. You need 3 to 5 sets with no tied set, and the winning team must take exactly 3.",
+      "STAT_KEY_INVALID": "A stat doesn't match this sport. Refresh the page and try again.",
+      "STAT_VALUE_INVALID": "Stats must be whole numbers from 0 to 300.",
+      "STAT_INCONSISTENT": "The stats are inconsistent. Made shots can't exceed attempts, shots on target can't exceed shots, and kills plus attack errors can't exceed attack attempts.",
+      "PLAYER_DUPLICATE": "A player appears twice.",
+      "PLAYER_TEAM_INVALID": "A player is not a member of their team. Refresh the page and try again.",
+      "POINTS_MISMATCH": "The players' points for each team must equal that team's score.",
+      "GOALS_EXCEED_SCORE": "A team's player goals can't exceed its score."
     }
   }
 }

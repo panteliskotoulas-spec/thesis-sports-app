@@ -44,6 +44,16 @@ export async function loadTeamOptions(): Promise<TeamOption[]> {
   }
 }
 
+export async function loadMatchRoster(matchId: string) {
+  try {
+    const caller = await getServerCaller();
+    return await caller.tournaments.matchRoster({ matchId });
+  } catch (error) {
+    console.error('[loadMatchRoster]', error);
+    return null;
+  }
+}
+
 export async function loadEditValues(id: string, lng: string) {
   try {
     const caller = await getServerCaller();

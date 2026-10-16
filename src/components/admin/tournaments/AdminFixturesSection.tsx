@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CalendarClock, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { CalendarClock, ClipboardList, Trash2 } from 'lucide-react';
 import { chipBase, chipOff, chipOn } from '@/components/fields/chipStyles';
 import { errorLabel, type AdminErrorLabels } from '@/lib/tournaments/admin';
 import {
@@ -21,6 +22,7 @@ export interface AdminMatchRow {
   whenText: string | null;
   day: string;
   time: string;
+  resultHref: string;
 }
 
 export interface AdminRoundGroup {
@@ -45,6 +47,8 @@ export interface AdminFixturesSectionLabels {
   clearNo: string;
   working: string;
   schedule: string;
+  result: string;
+  correct: string;
   tbd: string;
   completed: string;
   dayLabel: string;
@@ -279,6 +283,14 @@ export function AdminFixturesSection({
                           />
                           {labels.schedule}
                         </button>
+
+                        <Link href={match.resultHref} className={outlineButton}>
+                          <ClipboardList
+                            className="size-4"
+                            aria-hidden="true"
+                          />
+                          {match.completed ? labels.correct : labels.result}
+                        </Link>
                       </div>
 
                       {editing ? (

@@ -3,6 +3,7 @@ import superjson from 'superjson';
 import type { AppRouter } from '@/trpc/server/routers/_app';
 import { isServerMessageCode, parseMaxTeams } from './admin';
 import type { TournamentFormValues } from './admin';
+import type { CheckedResult } from './result';
 import type { TournamentSport } from './tournament';
 
 export type AdminActionResult =
@@ -119,6 +120,21 @@ export function clearTournamentFixtures(
   tournamentId: string,
 ): Promise<AdminActionResult> {
   return run(() => client.tournaments.clearFixtures.mutate({ tournamentId }));
+}
+
+export function recordMatchResult(
+  matchId: string,
+  result: CheckedResult,
+): Promise<AdminActionResult> {
+  return run(() =>
+    client.tournaments.recordResult.mutate({
+      matchId,
+      homeScore: result.sets ? null : result.homeScore,
+      awayScore: result.sets ? null : result.awayScore,
+      sets: result.sets,
+      players: result.players,
+    }),
+  );
 }
 
 export function scheduleTournamentMatch(
