@@ -36,7 +36,10 @@ import { loadTeamOptions } from '@/lib/tournaments/admin-loader';
 import { getCurrentUser } from '@/lib/session';
 import type { AdminRequestRow } from '@/lib/tournaments/team-request';
 import { buildAdminRequestsLabels } from '@/lib/tournaments/team-request-labels';
-import { loadTournamentRequests } from '@/lib/tournaments/team-request-loader';
+import {
+  loadRejectedTournamentRequests,
+  loadTournamentRequests,
+} from '@/lib/tournaments/team-request-loader';
 import { formatMatchDate } from '@/lib/tournaments/tournament-format';
 import { loadTournamentDetail } from '@/lib/tournaments/tournament-loader';
 
@@ -125,8 +128,13 @@ export default async function AdminTournamentPage({
 
   const errors = buildAdminErrorLabels(t);
 
-  const requestItems = await loadTournamentRequests(tournament.id);
-  const requestRows: AdminRequestRow[] = requestItems.map((item) => ({
+  const [requestItems, rejectedItems] = await Promise.all([
+    loadTournamentRequests(tournament.id),
+    loadRejectedTournamentRequests(tournament.id),
+  ]);
+  const toRequestRow = (
+    item: (typeof requestItems)[number],
+  ): AdminRequestRow => ({
     id: item.id,
     teamName: item.teamName,
     teamLogoUrl: item.teamLogoUrl,
@@ -140,7 +148,9 @@ export default async function AdminTournamentPage({
         t('admin.requests.justNow'),
       ),
     }),
-  }));
+  });
+  const requestRows: AdminRequestRow[] = requestItems.map(toRequestRow);
+  const rejectedRows: AdminRequestRow[] = rejectedItems.map(toRequestRow);
   const requestsLabels: AdminRequestsSectionLabels = buildAdminRequestsLabels(
     t,
     errors,
@@ -256,6 +266,7 @@ export default async function AdminTournamentPage({
           />
           <AdminRequestsSection
             requests={requestRows}
+            rejected={rejectedRows}
             locked={locked}
             full={full}
             labels={requestsLabels}

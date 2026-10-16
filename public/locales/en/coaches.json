@@ -259,11 +259,10 @@
     "cancelledNotice": "Session cancelled and the player has been notified."
   },
   "sessions": {
-    "meta": "My sessions",
-    "title": "My sessions",
+    "meta": "Coaching sessions",
+    "title": "Coaching sessions",
     "subtitle": "Your requests to coaches and your booked sessions.",
-    "back": "My bookings",
-    "link": "My sessions",
+    "back": "Field bookings",
     "tabAll": "All",
     "tabWaiting": "Waiting",
     "tabPay": "Payment",

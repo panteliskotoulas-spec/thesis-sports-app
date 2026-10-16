@@ -296,6 +296,12 @@
       "subtitle": "Create tournaments, add teams and set the match schedule.",
       "create": "New tournament",
       "tabsLabel": "Status filter",
+      "sortLabel": "Sort by",
+      "sort": {
+        "start": "Start date",
+        "name": "Name",
+        "status": "Status"
+      },
       "empty": {
         "title": "No tournaments yet",
         "description": "Create the first tournament to get started."
@@ -358,6 +364,8 @@
       "title": "Team requests",
       "empty": "There are no pending requests.",
       "pendingCount": "{n} pending",
+      "rejectedSummary": "Rejected ({n})",
+      "rejectedBadge": "Rejected",
       "meta": "Leader: {leader} · Members: {members} · {time}",
       "justNow": "just now",
       "accept": "Accept",

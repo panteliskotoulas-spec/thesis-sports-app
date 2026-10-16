@@ -192,10 +192,12 @@ export function BookingCard({
         </li>
       </ul>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t-[0.5px] border-border pt-3 text-sm text-muted-foreground">
-        <span>{fillTemplate(labels.paid, { amount: item.total })}</span>
-        <span>{paidBreakdown(item, labels)}</span>
-      </div>
+      {item.isOwn ? (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t-[0.5px] border-border pt-3 text-sm text-muted-foreground">
+          <span>{fillTemplate(labels.paid, { amount: item.total })}</span>
+          <span>{paidBreakdown(item, labels)}</span>
+        </div>
+      ) : null}
 
       {item.reviewable ? (
         item.review ? (
@@ -239,13 +241,13 @@ export function BookingCard({
         )
       ) : null}
 
-      {cancelled ? (
+      {cancelled && item.isOwn ? (
         <p className="mt-2 text-sm text-muted-foreground">
           {refundedText(item, labels)}
         </p>
       ) : null}
 
-      {upcomingConfirmed && !panelOpen ? (
+      {upcomingConfirmed && item.isOwn && !panelOpen ? (
         item.canCancel ? (
           <button
             type="button"

@@ -44,6 +44,8 @@ export function buildAdminRequestsLabels(
     lockedNote: t('admin.requests.lockedNote'),
     fullNote: t('admin.requests.fullNote'),
     pendingCount: t('admin.requests.pendingCount'),
+    rejectedSummary: t('admin.requests.rejectedSummary'),
+    rejectedBadge: t('admin.requests.rejectedBadge'),
     errors,
   };
 }

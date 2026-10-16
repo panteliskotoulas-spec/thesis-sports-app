@@ -39,6 +39,7 @@ export interface BookingRow {
   credit: number;
   teamName?: string | null;
   review?: SessionReview | null;
+  isOwn?: boolean;
 }
 
 function isUpcoming(row: BookingRow, now: Date): boolean {
@@ -68,6 +69,7 @@ export function toBookingItem(
 ): BookingItem {
   const card = Math.max(0, Math.round((row.total - row.credit) * 100) / 100);
   const upcoming = isUpcoming(row, now);
+  const isOwn = row.isOwn ?? true;
 
   return {
     id: row.id,
@@ -78,14 +80,15 @@ export function toBookingItem(
     time: formatTimeRange(row.startTime, row.endTime, lng),
     status: row.status,
     phase: upcoming ? 'upcoming' : 'past',
-    canCancel: upcoming && canCancelBooking(row.startTime, now),
+    canCancel: isOwn && upcoming && canCancelBooking(row.startTime, now),
     total: formatAmount(row.total, lng),
     card: card > 0 ? formatAmount(card, lng) : null,
     credit: row.credit > 0 ? formatAmount(row.credit, lng) : null,
     compensation: row.compensation,
     cancelledBy: row.cancelledBy,
     teamName: row.teamName ?? null,
-    reviewable: row.status === 'CONFIRMED' && !upcoming,
+    isOwn,
+    reviewable: isOwn && row.status === 'CONFIRMED' && !upcoming,
     review: row.review ?? null,
   };
 }

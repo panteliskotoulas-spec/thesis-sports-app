@@ -24,6 +24,7 @@ export interface BookingItem {
   compensation: CompensationValue | null;
   cancelledBy: CancelledByValue | null;
   teamName: string | null;
+  isOwn: boolean;
   reviewable: boolean;
   review: SessionReview | null;
 }

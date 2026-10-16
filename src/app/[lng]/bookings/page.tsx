@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
 import { AlertTriangle } from 'lucide-react';
@@ -27,7 +26,6 @@ export default async function BookingsPage({
 }) {
   const query = await searchParams;
   const { t } = await getT('fields');
-  const { t: tc } = await getT('coaches');
   const { t: tr } = await getT('reviews');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
@@ -99,12 +97,6 @@ export default async function BookingsPage({
         <p className="mt-2 text-muted-foreground">
           {t('booking.list.subtitle')}
         </p>
-        <Link
-          href={`/${lng}/coaching`}
-          className="mt-3 inline-flex h-11 items-center rounded-full border-[0.5px] border-border bg-card px-5 text-sm font-medium text-foreground hover:bg-secondary"
-        >
-          {tc('sessions.link')}
-        </Link>
 
         {query.payment === 'failed' ? (
           <div

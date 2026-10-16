@@ -26,6 +26,13 @@ export function joinRequestRejectedMessage(teamName: string): LocalizedText {
   };
 }
 
+export function memberRemovedMessage(teamName: string): LocalizedText {
+  return {
+    el: `Αφαιρέθηκες από την ομάδα «${teamName}».`,
+    en: `You were removed from the team "${teamName}".`,
+  };
+}
+
 export function leadershipTransferredMessage(teamName: string): LocalizedText {
   return {
     el: `Είσαι πλέον αρχηγός της ομάδας «${teamName}».`,

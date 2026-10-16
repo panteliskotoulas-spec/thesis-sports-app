@@ -341,9 +341,9 @@
       "errorGeneric": "Something went wrong. Please try again."
     },
     "list": {
-      "meta": "My bookings",
-      "title": "My bookings",
-      "subtitle": "See your upcoming bookings and their history.",
+      "meta": "Field bookings",
+      "title": "Field bookings",
+      "subtitle": "See your upcoming field bookings and their history.",
       "tabUpcoming": "Upcoming",
       "tabPast": "History",
       "emptyUpcomingTitle": "You have no upcoming bookings",

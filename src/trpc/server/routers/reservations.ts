@@ -106,10 +106,26 @@ export const reservationsRouter = router({
   ),
 
   listMine: protectedProcedure.query(async ({ ctx }): Promise<BookingRow[]> => {
+    const userId = ctx.session.user.id;
+
+    const memberships = await ctx.prisma.teamMembership.findMany({
+      where: { userId },
+      select: { teamId: true, joinedAt: true },
+    });
+
     const reservations = await ctx.prisma.reservation.findMany({
-      where: { userId: ctx.session.user.id },
+      where: {
+        OR: [
+          { userId },
+          ...memberships.map((membership) => ({
+            teamId: membership.teamId,
+            createdAt: { gte: membership.joinedAt },
+          })),
+        ],
+      },
       select: {
         id: true,
+        userId: true,
         status: true,
         compensationType: true,
         cancelledBy: true,
@@ -153,6 +169,7 @@ export const reservationsRouter = router({
           compensation: reservation.compensationType,
           cancelledBy: reservation.cancelledBy,
           teamName: reservation.team?.name ?? null,
+          isOwn: reservation.userId === userId,
           review: reservation.review ?? null,
           total: decimalToCents(payment.amount) / 100,
           credit: decimalToCents(payment.creditApplied) / 100,

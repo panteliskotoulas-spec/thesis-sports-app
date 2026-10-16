@@ -28,11 +28,14 @@ export interface AdminRequestsSectionLabels {
   lockedNote: string;
   fullNote: string;
   pendingCount: string;
+  rejectedSummary: string;
+  rejectedBadge: string;
   errors: AdminErrorLabels;
 }
 
 export interface AdminRequestsSectionProps {
   requests: AdminRequestRow[];
+  rejected: AdminRequestRow[];
   locked: boolean;
   full: boolean;
   labels: AdminRequestsSectionLabels;
@@ -46,6 +49,7 @@ const neutralButton = `${buttonBase} border-[0.5px] border-border bg-card text-f
 
 export function AdminRequestsSection({
   requests,
+  rejected,
   locked,
   full,
   labels,
@@ -210,6 +214,41 @@ export function AdminRequestsSection({
         <p role="alert" className="mt-3 text-sm text-destructive">
           {error}
         </p>
+      ) : null}
+
+      {rejected.length > 0 ? (
+        <details className="mt-4 border-t-[0.5px] border-border pt-3">
+          <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground">
+            {fillTemplate(labels.rejectedSummary, {
+              n: String(rejected.length),
+            })}
+          </summary>
+          <ul className="mt-3 flex flex-col">
+            {rejected.map((request) => (
+              <li
+                key={request.id}
+                className="flex items-center gap-3 border-t-[0.5px] border-border py-3 first:border-t-0 first:pt-0"
+              >
+                <TeamAvatar
+                  name={request.teamName}
+                  logoUrl={request.teamLogoUrl}
+                  size="sm"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="wrap-break-word font-medium">
+                    {request.teamName}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {request.metaText}
+                  </p>
+                </div>
+                <span className="shrink-0 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                  {labels.rejectedBadge}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </details>
       ) : null}
     </section>
   );

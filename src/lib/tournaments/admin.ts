@@ -2,6 +2,7 @@ import type { ResultErrorCode } from './result';
 import {
   isTournamentSport,
   isTournamentStatus,
+  type TournamentListItem,
   type TournamentMatch,
   type TournamentSport,
   type TournamentStatus,
@@ -160,6 +161,57 @@ export function parseAdminStatus(
 ): TournamentStatus | null {
   const first = Array.isArray(value) ? value[0] : value;
   return isTournamentStatus(first) ? first : null;
+}
+
+export const ADMIN_SORTS = ['start', 'name', 'status'] as const;
+export type AdminSort = (typeof ADMIN_SORTS)[number];
+export const DEFAULT_ADMIN_SORT: AdminSort = 'start';
+
+export function parseAdminSort(
+  value: string | string[] | undefined,
+): AdminSort {
+  const first = Array.isArray(value) ? value[0] : value;
+  return ADMIN_SORTS.find((sort) => sort === first) ?? DEFAULT_ADMIN_SORT;
+}
+
+const STATUS_ORDER: Record<TournamentStatus, number> = {
+  ONGOING: 0,
+  UPCOMING: 1,
+  COMPLETED: 2,
+};
+
+export function sortAdminTournaments(
+  items: TournamentListItem[],
+  sort: AdminSort,
+  lng: string,
+): TournamentListItem[] {
+  const byStart = (a: TournamentListItem, b: TournamentListItem) =>
+    b.startDate.localeCompare(a.startDate);
+
+  return [...items].sort((a, b) => {
+    if (sort === 'name') {
+      return (
+        a.name.localeCompare(b.name, lng, { sensitivity: 'base' }) ||
+        byStart(a, b)
+      );
+    }
+    if (sort === 'status') {
+      return STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || byStart(a, b);
+    }
+    return byStart(a, b);
+  });
+}
+
+export function countTournamentsByStatus(
+  items: TournamentListItem[],
+): Record<TournamentStatus, number> {
+  const counts: Record<TournamentStatus, number> = {
+    UPCOMING: 0,
+    ONGOING: 0,
+    COMPLETED: 0,
+  };
+  for (const item of items) counts[item.status] += 1;
+  return counts;
 }
 
 export interface RoundGroup {

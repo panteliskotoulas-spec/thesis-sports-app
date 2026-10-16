@@ -13,6 +13,7 @@ export type NotificationType =
   | 'COACHING_SESSION_ACCEPTED'
   | 'COACHING_SESSION_REJECTED'
   | 'LEADERSHIP_TRANSFERRED'
+  | 'TEAM_MEMBER_REMOVED'
   | 'TEAM_RESERVATION_CREATED'
   | 'TEAM_RESERVATION_CANCELLED'
   | 'TEAM_SPLIT_PAID'
@@ -72,6 +73,7 @@ const appearances: Record<NotificationType, NotificationAppearance> = {
   COACHING_SESSION_ACCEPTED: { icon: 'check', tone: 'default' },
   COACHING_SESSION_REJECTED: { icon: 'alert', tone: 'negative' },
   LEADERSHIP_TRANSFERRED: { icon: 'user', tone: 'default' },
+  TEAM_MEMBER_REMOVED: { icon: 'alert', tone: 'negative' },
   TEAM_RESERVATION_CREATED: { icon: 'check', tone: 'default' },
   TEAM_RESERVATION_CANCELLED: { icon: 'calendarX', tone: 'default' },
   TEAM_SPLIT_PAID: { icon: 'wallet', tone: 'default' },

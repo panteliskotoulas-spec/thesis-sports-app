@@ -29,6 +29,7 @@ import {
   joinRequestReceivedMessage,
   joinRequestRejectedMessage,
   leadershipTransferredMessage,
+  memberRemovedMessage,
 } from '@/lib/server/team-notifications';
 import {
   buildSplitSummaries,
@@ -668,6 +669,20 @@ export const teamsRouter = router({
         if (removed.count === 0) throw new TRPCError({ code: 'CONFLICT' });
 
         await cancelPendingSplitsForMember(tx, input.teamId, input.userId);
+
+        const team = await tx.team.findUnique({
+          where: { id: input.teamId },
+          select: { name: true },
+        });
+
+        await tx.notification.create({
+          data: {
+            userId: input.userId,
+            type: 'TEAM_MEMBER_REMOVED',
+            message: memberRemovedMessage(team?.name ?? ''),
+            linkUrl: '/teams/mine',
+          },
+        });
       });
 
       return { id: input.userId };

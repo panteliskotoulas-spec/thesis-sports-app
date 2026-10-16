@@ -78,7 +78,7 @@
       }
     },
     "bookings": {
-      "title": "Next booking",
+      "title": "Next field booking",
       "viewAll": "All bookings",
       "empty": "You have no upcoming bookings.",
       "cta": "Find a field",
@@ -104,7 +104,7 @@
       }
     },
     "coaching": {
-      "title": "My coaching sessions",
+      "title": "Coaching sessions",
       "viewAll": "All sessions",
       "empty": "You have no upcoming coaching sessions.",
       "onlyRequested": "No confirmed sessions yet. Requests awaiting a reply: {{count}}.",

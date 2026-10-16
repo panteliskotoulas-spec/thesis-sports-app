@@ -137,6 +137,42 @@ export const tournamentRequestsRouter = router({
       }));
     }),
 
+  listRejected: adminProcedure
+    .input(z.object({ tournamentId: z.string().min(1) }))
+    .query(async ({ ctx, input }): Promise<TeamRequestItem[]> => {
+      const rows = await ctx.prisma.tournamentTeamRequest.findMany({
+        where: { tournamentId: input.tournamentId, status: 'REJECTED' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+        select: {
+          id: true,
+          createdAt: true,
+          team: {
+            select: {
+              id: true,
+              name: true,
+              logoUrl: true,
+              _count: { select: { members: true } },
+              members: {
+                where: { role: 'LEADER' },
+                take: 1,
+                select: { user: { select: { name: true } } },
+              },
+            },
+          },
+        },
+      });
+
+      return rows.map((row) => ({
+        id: row.id,
+        teamId: row.team.id,
+        teamName: row.team.name,
+        teamLogoUrl: row.team.logoUrl,
+        leaderName: row.team.members[0]?.user.name ?? '',
+        memberCount: row.team._count.members,
+        createdAt: row.createdAt.toISOString(),
+      }));
+    }),
+
   submit: protectedProcedure
     .input(
       z.object({ tournamentId: z.string().min(1), teamId: z.string().min(1) }),

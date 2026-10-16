@@ -19,6 +19,18 @@ export async function loadTeamRequestViewer(
   }
 }
 
+export async function loadRejectedTournamentRequests(
+  tournamentId: string,
+): Promise<TeamRequestItem[]> {
+  try {
+    const caller = await getServerCaller();
+    return await caller.tournamentRequests.listRejected({ tournamentId });
+  } catch (error) {
+    console.error('[loadRejectedTournamentRequests]', error);
+    return EMPTY_TEAM_REQUESTS;
+  }
+}
+
 export async function loadTournamentRequests(
   tournamentId: string,
 ): Promise<TeamRequestItem[]> {
