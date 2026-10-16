@@ -31,10 +31,7 @@ export default async function AdminTournamentsPage({
   if (!user.isAdmin) notFound();
 
   const status = parseAdminStatus((await searchParams).status);
-  const tournaments = await loadTournamentList(
-    { sport: null, status, mine: false },
-    lng,
-  );
+  const tournaments = await loadTournamentList({ sport: null, status }, lng);
   const basePath = `/${lng}/admin/tournaments`;
 
   return (

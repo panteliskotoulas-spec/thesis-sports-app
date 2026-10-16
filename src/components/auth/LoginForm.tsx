@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import { FormField } from '@/components/shared/FormField';
@@ -11,7 +10,6 @@ export interface LoginFormProps {
   labels: {
     email: string;
     password: string;
-    forgot: string;
     submit: string;
     submitting: string;
     errorInvalid: string;
@@ -72,14 +70,6 @@ export function LoginForm({ lng, labels }: LoginFormProps) {
         label={labels.password}
         autoComplete="current-password"
         required
-        labelAction={
-          <Link
-            href={`/${lng}/forgot-password`}
-            className="text-xs text-terracotta hover:text-terracotta-strong hover:underline"
-          >
-            {labels.forgot}
-          </Link>
-        }
       />
 
       {formError && (

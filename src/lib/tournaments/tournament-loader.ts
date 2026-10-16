@@ -18,9 +18,7 @@ export async function loadTournamentList(
       sport: filters.sport,
       status: filters.status,
     };
-    return filters.mine
-      ? await caller.tournaments.listMine(input)
-      : await caller.tournaments.list(input);
+    return await caller.tournaments.list(input);
   } catch (error) {
     console.error('[loadTournamentList]', error);
     return [];

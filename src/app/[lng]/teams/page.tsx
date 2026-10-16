@@ -29,9 +29,12 @@ export default async function TeamsPage({
   const { t: tf } = await getT('fields');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
-  const parsed = parseTeamFilters(await searchParams);
-  if (parsed.mine) redirect(`/${lng}/${user ? 'teams/mine' : 'login'}`);
-  const filters = { ...parsed, mine: false };
+  const params = await searchParams;
+  const legacyMine = Array.isArray(params.mine) ? params.mine[0] : params.mine;
+  if (legacyMine === '1') {
+    redirect(`/${lng}/${user ? 'teams/mine' : 'login'}`);
+  }
+  const filters = parseTeamFilters(params);
 
   return (
     <>

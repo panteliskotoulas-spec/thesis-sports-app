@@ -30,7 +30,6 @@ export default async function LoginPage() {
         labels={{
           email: t('login.email'),
           password: t('login.password'),
-          forgot: t('login.forgot'),
           submit: t('login.submit'),
           submitting: t('login.submitting'),
           errorInvalid: t('login.errorInvalid'),

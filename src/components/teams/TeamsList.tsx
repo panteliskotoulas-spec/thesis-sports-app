@@ -18,16 +18,10 @@ export async function TeamsList({ filters }: { filters: TeamFilters }) {
   let teams: TeamListItem[];
   try {
     const caller = await getServerCaller();
-    const rows = filters.mine
-      ? (await caller.teams.myTeams()).filter(
-          (row) =>
-            (!filters.sport || row.sportType === filters.sport) &&
-            (!filters.recruiting || row.isRecruiting),
-        )
-      : await caller.teams.list({
-          sport: filters.sport,
-          recruiting: filters.recruiting,
-        });
+    const rows = await caller.teams.list({
+      sport: filters.sport,
+      recruiting: filters.recruiting,
+    });
     teams = rows.map((row) => toTeamListItem(row, lng));
   } catch (error) {
     console.error('[TeamsList]', error);

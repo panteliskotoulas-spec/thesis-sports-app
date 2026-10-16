@@ -35,11 +35,12 @@ export default async function TournamentsPage({
   const { t: tf } = await getT('fields');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
-  const parsed = parseTournamentFilters(await searchParams);
-  if (parsed.mine) {
+  const params = await searchParams;
+  const legacyMine = Array.isArray(params.mine) ? params.mine[0] : params.mine;
+  if (legacyMine === '1') {
     redirect(`/${lng}/${user ? 'tournaments/mine' : 'login'}`);
   }
-  const filters = { ...parsed, mine: false };
+  const filters = parseTournamentFilters(params);
   const tournaments = await loadTournamentList(filters, lng);
 
   return (
