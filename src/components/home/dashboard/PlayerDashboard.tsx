@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { getT } from '@/i18n.server';
 import type { PlayerDashboardData } from '@/lib/home/dashboard';
 import { ActionNeededCard } from './ActionNeededCard';
@@ -10,9 +11,14 @@ import { TournamentsCard } from './TournamentsCard';
 export interface PlayerDashboardProps {
   name: string;
   data: PlayerDashboardData;
+  roles?: ReactNode;
 }
 
-export async function PlayerDashboard({ name, data }: PlayerDashboardProps) {
+export async function PlayerDashboard({
+  name,
+  data,
+  roles,
+}: PlayerDashboardProps) {
   const { t } = await getT('home');
   const firstName = name.trim().split(/\s+/)[0] || name;
 
@@ -26,6 +32,8 @@ export async function PlayerDashboard({ name, data }: PlayerDashboardProps) {
           <ActionNeededCard actions={data.actions} />
         </div>
       ) : null}
+
+      {roles}
 
       <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <NextBookingCard bookings={data.bookings} />

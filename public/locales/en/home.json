@@ -120,6 +120,39 @@
       "empty": "Your stats will show up once you play in a tournament.",
       "matches": "Matches",
       "tournaments": "Tournaments"
+    },
+    "coach": {
+      "title": "As a coach",
+      "pending": {
+        "title": "Your application is awaiting approval",
+        "description": "Once it is approved, you can add availability and receive session requests.",
+        "cta": "My application"
+      },
+      "rejected": {
+        "title": "Your application was rejected",
+        "description": "You can fix it and submit it again.",
+        "reason": "Reason: {{reason}}",
+        "cta": "Fix your application"
+      },
+      "requests": {
+        "title": "Incoming requests",
+        "viewAll": "All requests",
+        "empty": "You have no requests waiting for a reply.",
+        "more": "And {{count}} more"
+      },
+      "sessions": {
+        "title": "Upcoming sessions",
+        "viewAll": "All sessions",
+        "empty": "You have no confirmed sessions.",
+        "more": "And {{count}} more",
+        "awaitingPayment": "Awaiting payment: {{count}}"
+      },
+      "availability": {
+        "title": "Availability",
+        "open": "Open slots: {{count}}",
+        "none": "You have no open slots, so nobody can book you.",
+        "cta": "Add availability"
+      }
     }
   }
 }

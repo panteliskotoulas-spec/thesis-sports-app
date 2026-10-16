@@ -3,6 +3,17 @@ import { asLocalized } from '@/lib/server/booking-shared';
 import type { PendingSplitRow } from '@/lib/home/dashboard';
 
 export const dashboardRouter = router({
+  coachOpenSlots: protectedProcedure.query(
+    ({ ctx }): Promise<number> =>
+      ctx.prisma.coachAvailabilitySlot.count({
+        where: {
+          coach: { userId: ctx.session.user.id },
+          status: 'OPEN',
+          startTime: { gt: new Date() },
+        },
+      }),
+  ),
+
   pendingSplits: protectedProcedure.query(
     async ({ ctx }): Promise<PendingSplitRow[]> => {
       const userId = ctx.session.user.id;

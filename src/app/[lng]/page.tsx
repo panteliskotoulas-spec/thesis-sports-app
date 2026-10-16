@@ -9,7 +9,9 @@ import { HomeFeaturedFields } from '@/components/home/HomeFeaturedFields';
 import { HomeSteps } from '@/components/home/HomeSteps';
 import { HomeAudiences } from '@/components/home/HomeAudiences';
 import { HomeCta } from '@/components/home/HomeCta';
+import { CoachSection } from '@/components/home/dashboard/CoachSection';
 import { PlayerDashboard } from '@/components/home/dashboard/PlayerDashboard';
+import { loadCoachDashboard } from '@/lib/home/coach-dashboard-loader';
 import { loadPlayerDashboard } from '@/lib/home/dashboard-loader';
 import { loadFeaturedFields } from '@/lib/home/featured-fields';
 import { getCurrentUser } from '@/lib/session';
@@ -25,7 +27,7 @@ export default async function LandingPage() {
   const user = await getCurrentUser();
   const loggedIn = user !== null;
 
-  const [featuredFields, dashboard] = await Promise.all([
+  const [featuredFields, dashboard, coach] = await Promise.all([
     loadFeaturedFields(lng),
     user
       ? loadPlayerDashboard({
@@ -33,6 +35,7 @@ export default async function LandingPage() {
           sportLabel: (sport) => tf(`sports.${sport}`),
         })
       : Promise.resolve(null),
+    user ? loadCoachDashboard(lng) : Promise.resolve(null),
   ]);
 
   return (
@@ -41,7 +44,11 @@ export default async function LandingPage() {
       <main className="flex-1">
         {user && dashboard ? (
           <>
-            <PlayerDashboard name={user.name} data={dashboard} />
+            <PlayerDashboard
+              name={user.name}
+              data={dashboard}
+              roles={coach ? <CoachSection data={coach} /> : null}
+            />
             <HomeFeaturedFields fields={featuredFields} />
           </>
         ) : (
