@@ -1,8 +1,29 @@
 import { protectedProcedure, router } from '../init';
 import { asLocalized } from '@/lib/server/booking-shared';
 import type { PendingSplitRow } from '@/lib/home/dashboard';
+import type { OwnerFieldWithoutSlotsRow } from '@/lib/home/owner-dashboard';
 
 export const dashboardRouter = router({
+  ownerFieldsWithoutSlots: protectedProcedure.query(
+    async ({ ctx }): Promise<OwnerFieldWithoutSlotsRow[]> => {
+      const fields = await ctx.prisma.field.findMany({
+        where: {
+          ownerId: ctx.session.user.id,
+          status: 'APPROVED',
+          archivedAt: null,
+          slots: { none: { startTime: { gt: new Date() } } },
+        },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, name: true },
+      });
+
+      return fields.map((field) => ({
+        id: field.id,
+        name: asLocalized(field.name),
+      }));
+    },
+  ),
+
   coachOpenSlots: protectedProcedure.query(
     ({ ctx }): Promise<number> =>
       ctx.prisma.coachAvailabilitySlot.count({

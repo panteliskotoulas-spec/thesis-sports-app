@@ -153,6 +153,32 @@
         "none": "You have no open slots, so nobody can book you.",
         "cta": "Add availability"
       }
+    },
+    "owner": {
+      "title": "As an owner",
+      "fields": {
+        "title": "My fields",
+        "viewAll": "All fields",
+        "empty": "You have not submitted a field yet.",
+        "approved": "Approved",
+        "pending": "Awaiting approval",
+        "rejected": "Rejected",
+        "cta": "New field"
+      },
+      "bookings": {
+        "title": "Upcoming bookings",
+        "viewAll": "All bookings",
+        "empty": "There are no upcoming bookings on your fields.",
+        "more": "And {{count}} more"
+      },
+      "noSlots": {
+        "title": "No availability",
+        "description": "These fields have no upcoming slots, so they cannot be booked.",
+        "allGood": "All your approved fields have upcoming slots.",
+        "noApproved": "You do not have an approved field yet.",
+        "cta": "Add slots",
+        "more": "And {{count}} more"
+      }
     }
   }
 }

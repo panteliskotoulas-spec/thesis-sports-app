@@ -10,10 +10,12 @@ import { HomeSteps } from '@/components/home/HomeSteps';
 import { HomeAudiences } from '@/components/home/HomeAudiences';
 import { HomeCta } from '@/components/home/HomeCta';
 import { CoachSection } from '@/components/home/dashboard/CoachSection';
+import { OwnerSection } from '@/components/home/dashboard/OwnerSection';
 import { PlayerDashboard } from '@/components/home/dashboard/PlayerDashboard';
 import { loadCoachDashboard } from '@/lib/home/coach-dashboard-loader';
 import { loadPlayerDashboard } from '@/lib/home/dashboard-loader';
 import { loadFeaturedFields } from '@/lib/home/featured-fields';
+import { loadOwnerDashboard } from '@/lib/home/owner-dashboard-loader';
 import { getCurrentUser } from '@/lib/session';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -27,7 +29,7 @@ export default async function LandingPage() {
   const user = await getCurrentUser();
   const loggedIn = user !== null;
 
-  const [featuredFields, dashboard, coach] = await Promise.all([
+  const [featuredFields, dashboard, coach, owner] = await Promise.all([
     loadFeaturedFields(lng),
     user
       ? loadPlayerDashboard({
@@ -36,6 +38,12 @@ export default async function LandingPage() {
         })
       : Promise.resolve(null),
     user ? loadCoachDashboard(lng) : Promise.resolve(null),
+    user?.accountType === 'BUSINESS'
+      ? loadOwnerDashboard({
+          lng,
+          sportLabel: (sport) => tf(`sports.${sport}`),
+        })
+      : Promise.resolve(null),
   ]);
 
   return (
@@ -47,7 +55,12 @@ export default async function LandingPage() {
             <PlayerDashboard
               name={user.name}
               data={dashboard}
-              roles={coach ? <CoachSection data={coach} /> : null}
+              roles={
+                <>
+                  {coach ? <CoachSection data={coach} /> : null}
+                  {owner ? <OwnerSection data={owner} /> : null}
+                </>
+              }
             />
             <HomeFeaturedFields fields={featuredFields} />
           </>
