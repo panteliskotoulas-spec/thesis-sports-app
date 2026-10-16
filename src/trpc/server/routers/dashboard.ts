@@ -1,9 +1,59 @@
-import { protectedProcedure, router } from '../init';
+import { adminProcedure, protectedProcedure, router } from '../init';
 import { asLocalized } from '@/lib/server/booking-shared';
+import type { AdminPendingRow } from '@/lib/home/admin-dashboard';
 import type { PendingSplitRow } from '@/lib/home/dashboard';
 import type { OwnerFieldWithoutSlotsRow } from '@/lib/home/owner-dashboard';
 
 export const dashboardRouter = router({
+  adminPending: adminProcedure.query(
+    async ({ ctx }): Promise<AdminPendingRow> => {
+      const [fields, coaches, grouped] = await Promise.all([
+        ctx.prisma.field.count({
+          where: { status: 'PENDING', archivedAt: null },
+        }),
+        ctx.prisma.coach.count({ where: { status: 'PENDING' } }),
+        ctx.prisma.tournamentTeamRequest.groupBy({
+          by: ['tournamentId'],
+          where: {
+            status: 'PENDING',
+            tournament: { status: { not: 'COMPLETED' } },
+          },
+          _count: { _all: true },
+        }),
+      ]);
+
+      const names =
+        grouped.length === 0
+          ? []
+          : await ctx.prisma.tournament.findMany({
+              where: { id: { in: grouped.map((entry) => entry.tournamentId) } },
+              select: { id: true, name: true },
+            });
+
+      const nameById = new Map(
+        names.map((tournament) => [tournament.id, tournament.name] as const),
+      );
+
+      const tournaments = grouped
+        .map((entry) => ({
+          id: entry.tournamentId,
+          name: nameById.get(entry.tournamentId) ?? '',
+          count: entry._count._all,
+        }))
+        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+      return {
+        fields,
+        coaches,
+        tournamentRequests: tournaments.reduce(
+          (sum, tournament) => sum + tournament.count,
+          0,
+        ),
+        tournaments,
+      };
+    },
+  ),
+
   ownerFieldsWithoutSlots: protectedProcedure.query(
     async ({ ctx }): Promise<OwnerFieldWithoutSlotsRow[]> => {
       const fields = await ctx.prisma.field.findMany({

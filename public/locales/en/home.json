@@ -179,6 +179,23 @@
         "cta": "Add slots",
         "more": "And {{count}} more"
       }
+    },
+    "admin": {
+      "title": "As an admin",
+      "pending": {
+        "title": "Pending approvals",
+        "empty": "Nothing is awaiting approval.",
+        "fields": "Fields",
+        "coaches": "Coaches",
+        "tournamentRequests": "Tournament requests",
+        "more": "And {{count}} more tournaments"
+      },
+      "ongoing": {
+        "title": "Tournaments in progress",
+        "viewAll": "All tournaments",
+        "empty": "No tournaments in progress right now.",
+        "more": "And {{count}} more"
+      }
     }
   }
 }

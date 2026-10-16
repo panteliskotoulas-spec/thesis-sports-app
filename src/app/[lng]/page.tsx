@@ -9,9 +9,11 @@ import { HomeFeaturedFields } from '@/components/home/HomeFeaturedFields';
 import { HomeSteps } from '@/components/home/HomeSteps';
 import { HomeAudiences } from '@/components/home/HomeAudiences';
 import { HomeCta } from '@/components/home/HomeCta';
+import { AdminSection } from '@/components/home/dashboard/AdminSection';
 import { CoachSection } from '@/components/home/dashboard/CoachSection';
 import { OwnerSection } from '@/components/home/dashboard/OwnerSection';
 import { PlayerDashboard } from '@/components/home/dashboard/PlayerDashboard';
+import { loadAdminDashboard } from '@/lib/home/admin-dashboard-loader';
 import { loadCoachDashboard } from '@/lib/home/coach-dashboard-loader';
 import { loadPlayerDashboard } from '@/lib/home/dashboard-loader';
 import { loadFeaturedFields } from '@/lib/home/featured-fields';
@@ -29,7 +31,7 @@ export default async function LandingPage() {
   const user = await getCurrentUser();
   const loggedIn = user !== null;
 
-  const [featuredFields, dashboard, coach, owner] = await Promise.all([
+  const [featuredFields, dashboard, coach, owner, admin] = await Promise.all([
     loadFeaturedFields(lng),
     user
       ? loadPlayerDashboard({
@@ -40,6 +42,12 @@ export default async function LandingPage() {
     user ? loadCoachDashboard(lng) : Promise.resolve(null),
     user?.accountType === 'BUSINESS'
       ? loadOwnerDashboard({
+          lng,
+          sportLabel: (sport) => tf(`sports.${sport}`),
+        })
+      : Promise.resolve(null),
+    user?.isAdmin
+      ? loadAdminDashboard({
           lng,
           sportLabel: (sport) => tf(`sports.${sport}`),
         })
@@ -59,6 +67,7 @@ export default async function LandingPage() {
                 <>
                   {coach ? <CoachSection data={coach} /> : null}
                   {owner ? <OwnerSection data={owner} /> : null}
+                  {admin ? <AdminSection data={admin} /> : null}
                 </>
               }
             />
