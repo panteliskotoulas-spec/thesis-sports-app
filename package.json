@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate --config prisma7.config.ts && next build",
+    "vercel-build": "prisma migrate deploy --config prisma7.config.ts && yarn build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -43,6 +44,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^18.0.8",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "prisma": "7",

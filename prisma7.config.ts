@@ -7,6 +7,8 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    url: process.env['DATABASE_URL'],
+    // Τα migrations θέλουν direct σύνδεση (όχι pooled). Η εφαρμογή
+    // συνεχίζει να χρησιμοποιεί το DATABASE_URL (pooled) στο runtime.
+    url: process.env['DIRECT_URL'] ?? process.env['DATABASE_URL'],
   },
 });
