@@ -43,3 +43,16 @@ export async function loadTeamOptions(): Promise<TeamOption[]> {
     return [];
   }
 }
+
+export async function loadEditValues(id: string, lng: string) {
+  try {
+    const caller = await getServerCaller();
+    return await caller.tournaments.editValues({
+      id,
+      lng: lng === 'en' ? 'en' : 'el',
+    });
+  } catch (error) {
+    console.error('[loadEditValues]', error);
+    return null;
+  }
+}

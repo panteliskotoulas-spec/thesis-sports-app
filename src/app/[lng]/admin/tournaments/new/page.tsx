@@ -11,6 +11,7 @@ import {
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
 import { DESCRIPTION_MAX, MAX_TEAMS, MIN_TEAMS } from '@/lib/tournaments/admin';
+import { buildAdminErrorLabels } from '@/lib/tournaments/admin-labels';
 import { loadFieldOptions } from '@/lib/tournaments/admin-loader';
 import { getCurrentUser } from '@/lib/session';
 import { TOURNAMENT_SPORTS } from '@/lib/tournaments/tournament';
@@ -34,6 +35,7 @@ export default async function NewTournamentPage() {
   const labels: TournamentFormLabels = {
     name: t('admin.form.name'),
     sport: t('admin.form.sport'),
+    sportLocked: t('admin.form.sportLocked'),
     field: t('admin.form.field'),
     fieldPlaceholder: t('admin.form.fieldPlaceholder'),
     fieldPickSport: t('admin.form.fieldPickSport'),
@@ -48,6 +50,7 @@ export default async function NewTournamentPage() {
     description: t('admin.form.description'),
     descriptionHint: t('admin.form.descriptionHint', { max: DESCRIPTION_MAX }),
     submit: t('admin.form.submitCreate'),
+    submitting: t('admin.form.submitting'),
     errorName: t('admin.form.errorName'),
     errorSport: t('admin.form.errorSport'),
     errorField: t('admin.form.errorField'),
@@ -59,6 +62,7 @@ export default async function NewTournamentPage() {
     errorDescription: t('admin.form.errorDescription', {
       max: DESCRIPTION_MAX,
     }),
+    errors: buildAdminErrorLabels(t),
   };
 
   return (
@@ -80,6 +84,7 @@ export default async function NewTournamentPage() {
 
         <div className="mt-6 md:mt-8">
           <TournamentForm
+            lng={lng}
             sports={TOURNAMENT_SPORTS.map((value) => ({
               value,
               label: tf(`sports.${value}`),

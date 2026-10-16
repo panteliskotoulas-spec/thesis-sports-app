@@ -7,6 +7,7 @@ import { asLocalized } from '@/lib/server/booking-shared';
 import { athensDateTime, athensDayStart } from '@/lib/server/athens-time';
 import { matchResultMessage } from '@/lib/server/tournament-notifications';
 import { toLocalized } from '@/lib/server/translate';
+import { toAthensParts } from '@/lib/tournaments/admin';
 import { buildDetail, type RawTournament } from '@/lib/tournaments/aggregate';
 import { generateRoundRobin } from '@/lib/tournaments/fixtures';
 import { checkResult, type ResultErrorCode } from '@/lib/tournaments/result';
@@ -231,6 +232,47 @@ export const tournamentsRouter = router({
       if (!row) return null;
       const raw = toRaw(row, input.lng);
       return raw ? buildDetail(raw) : null;
+    }),
+
+  editValues: adminProcedure
+    .input(z.object({ id: z.string().min(1), lng: languageInput }))
+    .query(async ({ ctx, input }) => {
+      const row = await ctx.prisma.tournament.findUnique({
+        where: { id: input.id },
+        select: {
+          id: true,
+          name: true,
+          sportType: true,
+          status: true,
+          hostFieldId: true,
+          startDate: true,
+          endDate: true,
+          maxTeams: true,
+          description: true,
+        },
+      });
+      if (
+        !row ||
+        !isTournamentSport(row.sportType) ||
+        !isTournamentStatus(row.status)
+      ) {
+        return null;
+      }
+
+      return {
+        id: row.id,
+        status: row.status,
+        sport: row.sportType,
+        values: {
+          name: row.name,
+          sport: row.sportType,
+          hostFieldId: row.hostFieldId,
+          startDay: toAthensParts(row.startDate.toISOString()).day,
+          endDay: toAthensParts(row.endDate.toISOString()).day,
+          maxTeams: String(row.maxTeams),
+          description: localized(asLocalized(row.description), input.lng),
+        },
+      };
     }),
 
   create: adminProcedure.input(createInput).mutation(async ({ ctx, input }) => {

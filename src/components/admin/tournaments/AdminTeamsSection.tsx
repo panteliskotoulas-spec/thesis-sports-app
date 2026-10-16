@@ -1,9 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Lock, Plus, X } from 'lucide-react';
 import { fillTemplate } from '@/lib/bookings/booking';
-import type { TeamOption } from '@/lib/tournaments/admin';
+import {
+  errorLabel,
+  type AdminErrorLabels,
+  type TeamOption,
+} from '@/lib/tournaments/admin';
+import {
+  addTournamentTeam,
+  removeTournamentTeam,
+  type AdminActionResult,
+} from '@/lib/tournaments/admin-api';
 
 export interface AdminTeamsSectionLabels {
   title: string;
@@ -15,10 +25,14 @@ export interface AdminTeamsSectionLabels {
   addPlaceholder: string;
   noOptions: string;
   add: string;
+  adding: string;
+  pickFirst: string;
   removeAria: string;
+  errors: AdminErrorLabels;
 }
 
 export interface AdminTeamsSectionProps {
+  tournamentId: string;
   teams: { id: string; name: string }[];
   options: TeamOption[];
   locked: boolean;
@@ -30,13 +44,44 @@ const selectClass =
   'h-11 min-w-0 flex-1 rounded-md border-[0.5px] border-input bg-background px-4 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-60';
 
 export function AdminTeamsSection({
+  tournamentId,
   teams,
   options,
   locked,
   full,
   labels,
 }: AdminTeamsSectionProps) {
+  const router = useRouter();
   const [selected, setSelected] = useState('');
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function run(key: string, action: () => Promise<AdminActionResult>) {
+    if (busy) return;
+    setBusy(key);
+    setError(null);
+
+    const result = await action();
+
+    if (!result.ok) {
+      setError(errorLabel(labels.errors, result.code));
+      setBusy(null);
+      if (result.code === 'CONFLICT') router.refresh();
+      return;
+    }
+
+    setSelected('');
+    setBusy(null);
+    router.refresh();
+  }
+
+  function handleAdd() {
+    if (!selected) {
+      setError(labels.pickFirst);
+      return;
+    }
+    void run('add', () => addTournamentTeam(tournamentId, selected));
+  }
 
   return (
     <section
@@ -66,7 +111,13 @@ export function AdminTeamsSection({
                   aria-label={fillTemplate(labels.removeAria, {
                     name: team.name,
                   })}
-                  className="-mr-2 inline-flex size-7 items-center justify-center rounded-full text-muted-foreground hover:bg-card hover:text-destructive"
+                  aria-busy={busy === team.id}
+                  onClick={() =>
+                    void run(team.id, () =>
+                      removeTournamentTeam(tournamentId, team.id),
+                    )
+                  }
+                  className="-mr-2 inline-flex size-7 items-center justify-center rounded-full text-muted-foreground hover:bg-card hover:text-destructive aria-busy:opacity-50"
                 >
                   <X className="size-4" aria-hidden="true" />
                 </button>
@@ -91,7 +142,10 @@ export function AdminTeamsSection({
               id="admin-team-select"
               value={selected}
               disabled={options.length === 0}
-              onChange={(event) => setSelected(event.target.value)}
+              onChange={(event) => {
+                setSelected(event.target.value);
+                setError(null);
+              }}
               className={selectClass}
             >
               <option value="">
@@ -107,14 +161,22 @@ export function AdminTeamsSection({
             </select>
             <button
               type="button"
-              className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:opacity-90"
+              aria-busy={busy === 'add'}
+              onClick={handleAdd}
+              className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:opacity-90 aria-busy:cursor-not-allowed aria-busy:opacity-60"
             >
               <Plus className="size-4" aria-hidden="true" />
-              {labels.add}
+              {busy === 'add' ? labels.adding : labels.add}
             </button>
           </div>
         </div>
       )}
+
+      {error ? (
+        <p role="alert" className="mt-3 text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
     </section>
   );
 }

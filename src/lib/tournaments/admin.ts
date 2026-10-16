@@ -12,6 +12,35 @@ export const MIN_TEAMS = 2;
 export const MAX_TEAMS = 16;
 export const DEFAULT_MAX_TEAMS = 8;
 
+export const SERVER_MESSAGE_CODES = [
+  'FIELD_INVALID',
+  'DATES_INVALID',
+  'MAX_TEAMS_BELOW_COUNT',
+  'TOURNAMENT_FULL',
+  'SPORT_MISMATCH',
+  'NOT_ENOUGH_TEAMS',
+  'DATETIME_INVALID',
+] as const;
+
+export const ADMIN_ERROR_KEYS = [
+  ...SERVER_MESSAGE_CODES,
+  'CONFLICT',
+  'NOT_FOUND',
+  'ERROR',
+] as const;
+export type AdminErrorKey = (typeof ADMIN_ERROR_KEYS)[number];
+export type AdminErrorLabels = Record<AdminErrorKey, string>;
+
+export function isServerMessageCode(
+  value: string,
+): value is (typeof SERVER_MESSAGE_CODES)[number] {
+  return SERVER_MESSAGE_CODES.some((code) => code === value);
+}
+
+export function errorLabel(labels: AdminErrorLabels, code: string): string {
+  return code in labels ? labels[code as AdminErrorKey] : labels.ERROR;
+}
+
 export interface FieldOption {
   id: string;
   name: string;

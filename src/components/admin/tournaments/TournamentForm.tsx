@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { chipBase, chipOff, chipOn } from '@/components/fields/chipStyles';
 import { FormField } from '@/components/shared/FormField';
 import { FormTextArea } from '@/components/shared/FormTextArea';
@@ -10,18 +11,25 @@ import {
   MAX_TEAMS,
   MIN_TEAMS,
   NAME_MAX,
+  errorLabel,
   fieldsForSport,
   validateTournamentForm,
+  type AdminErrorLabels,
   type FieldOption,
   type TournamentFormErrorKey,
   type TournamentFormErrors,
   type TournamentFormValues,
 } from '@/lib/tournaments/admin';
+import {
+  createTournament,
+  updateTournament,
+} from '@/lib/tournaments/admin-api';
 import type { TournamentSport } from '@/lib/tournaments/tournament';
 
 export interface TournamentFormLabels {
   name: string;
   sport: string;
+  sportLocked: string;
   field: string;
   fieldPlaceholder: string;
   fieldPickSport: string;
@@ -33,15 +41,20 @@ export interface TournamentFormLabels {
   description: string;
   descriptionHint: string;
   submit: string;
+  submitting: string;
   errorName: string;
   errorSport: string;
   errorField: string;
   errorDates: string;
   errorMaxTeams: string;
   errorDescription: string;
+  errors: AdminErrorLabels;
 }
 
 export interface TournamentFormProps {
+  lng: string;
+  tournamentId?: string;
+  initial?: TournamentFormValues;
   sports: { value: TournamentSport; label: string }[];
   fields: FieldOption[];
   labels: TournamentFormLabels;
@@ -51,12 +64,22 @@ const selectClass =
   'h-11 w-full rounded-md border-[0.5px] border-input bg-background px-4 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30 disabled:cursor-not-allowed disabled:opacity-60';
 
 export function TournamentForm({
+  lng,
+  tournamentId,
+  initial,
   sports,
   fields,
   labels,
 }: TournamentFormProps) {
-  const [values, setValues] = useState<TournamentFormValues>(EMPTY_FORM_VALUES);
+  const router = useRouter();
+  const editing = tournamentId !== undefined;
+
+  const [values, setValues] = useState<TournamentFormValues>(
+    initial ?? EMPTY_FORM_VALUES,
+  );
   const [errors, setErrors] = useState<TournamentFormErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
   const availableFields = fieldsForSport(fields, values.sport);
 
@@ -74,6 +97,7 @@ export function TournamentForm({
     value: TournamentFormValues[K],
   ) {
     setValues((previous) => ({ ...previous, [key]: value }));
+    setFormError(null);
   }
 
   function selectSport(sport: TournamentSport) {
@@ -85,12 +109,34 @@ export function TournamentForm({
       sport,
       hostFieldId: stillValid ? previous.hostFieldId : '',
     }));
+    setFormError(null);
     clearError('sport', 'hostFieldId');
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setErrors(validateTournamentForm(values));
+    if (pending) return;
+
+    const found = validateTournamentForm(values);
+    setErrors(found);
+    if (Object.keys(found).length > 0 || values.sport === null) return;
+
+    setPending(true);
+    setFormError(null);
+
+    const result =
+      tournamentId !== undefined
+        ? await updateTournament(tournamentId, values, lng)
+        : await createTournament(values, values.sport, lng);
+
+    if (!result.ok) {
+      setFormError(errorLabel(labels.errors, result.code));
+      setPending(false);
+      return;
+    }
+
+    router.push(`/${lng}/admin/tournaments/${tournamentId ?? result.id ?? ''}`);
+    router.refresh();
   }
 
   const fieldPlaceholder =
@@ -133,14 +179,20 @@ export function TournamentForm({
                 key={option.value}
                 type="button"
                 aria-pressed={active}
+                disabled={editing}
                 onClick={() => selectSport(option.value)}
-                className={`${chipBase} ${active ? chipOn : chipOff}`}
+                className={`${chipBase} ${active ? chipOn : chipOff} disabled:cursor-not-allowed ${
+                  editing && !active ? 'opacity-50' : ''
+                }`}
               >
                 {option.label}
               </button>
             );
           })}
         </div>
+        {editing ? (
+          <p className="text-xs text-muted-foreground">{labels.sportLocked}</p>
+        ) : null}
         {errors.sport ? (
           <p className="text-xs text-destructive">{labels.errorSport}</p>
         ) : null}
@@ -226,12 +278,19 @@ export function TournamentForm({
         }}
       />
 
+      {formError ? (
+        <p role="alert" className="text-sm text-destructive">
+          {formError}
+        </p>
+      ) : null}
+
       <div className="flex justify-end">
         <button
           type="submit"
-          className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:opacity-90"
+          aria-busy={pending}
+          className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:opacity-90 aria-busy:cursor-not-allowed aria-busy:opacity-60"
         >
-          {labels.submit}
+          {pending ? labels.submitting : labels.submit}
         </button>
       </div>
     </form>

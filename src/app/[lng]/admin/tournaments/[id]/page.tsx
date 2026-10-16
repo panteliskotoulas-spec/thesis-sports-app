@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { cache } from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Pencil } from 'lucide-react';
 import { getT } from '@/i18n.server';
 import {
   AdminFixturesSection,
@@ -14,6 +14,7 @@ import {
   AdminTeamsSection,
   type AdminTeamsSectionLabels,
 } from '@/components/admin/tournaments/AdminTeamsSection';
+import { DeleteTournamentButton } from '@/components/admin/tournaments/DeleteTournamentButton';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
 import { TournamentHeader } from '@/components/tournaments/TournamentHeader';
@@ -25,6 +26,7 @@ import {
   teamsLocked,
   toAthensParts,
 } from '@/lib/tournaments/admin';
+import { buildAdminErrorLabels } from '@/lib/tournaments/admin-labels';
 import { loadTeamOptions } from '@/lib/tournaments/admin-loader';
 import { getCurrentUser } from '@/lib/session';
 import { formatMatchDate } from '@/lib/tournaments/tournament-format';
@@ -112,6 +114,8 @@ export default async function AdminTournamentPage({
     }),
   );
 
+  const errors = buildAdminErrorLabels(t);
+
   const teamsLabels: AdminTeamsSectionLabels = {
     title: t('admin.teams.title'),
     count: t('detail.teams', {
@@ -125,7 +129,10 @@ export default async function AdminTournamentPage({
     addPlaceholder: t('admin.teams.addPlaceholder'),
     noOptions: t('admin.teams.noOptions'),
     add: t('admin.teams.add'),
+    adding: t('admin.teams.adding'),
+    pickFirst: t('admin.teams.pickFirst'),
     removeAria: t('admin.teams.removeAria'),
+    errors,
   };
 
   const fixturesLabels: AdminFixturesSectionLabels = {
@@ -137,18 +144,22 @@ export default async function AdminTournamentPage({
     legsOne: t('admin.fixtures.legsOne'),
     legsTwo: t('admin.fixtures.legsTwo'),
     generate: t('admin.fixtures.generate'),
+    generating: t('admin.fixtures.generating'),
     clear: t('admin.fixtures.clear'),
     clearConfirm: t('admin.fixtures.clearConfirm'),
     clearYes: t('admin.fixtures.clearYes'),
     clearNo: t('admin.fixtures.clearNo'),
+    working: t('admin.working'),
     schedule: t('admin.fixtures.schedule'),
     tbd: t('matches.tbd'),
     completed: t('matches.completed'),
     dayLabel: t('admin.fixtures.dayLabel'),
     timeLabel: t('admin.fixtures.timeLabel'),
     save: t('admin.fixtures.save'),
+    saving: t('admin.fixtures.saving'),
     cancel: t('admin.fixtures.cancel'),
     versus: t('admin.fixtures.versus'),
+    errors,
   };
 
   return (
@@ -176,8 +187,35 @@ export default async function AdminTournamentPage({
           <TournamentHeader tournament={tournament} />
         </div>
 
+        <div className="mt-4 flex flex-wrap items-start gap-2">
+          {tournament.status === 'COMPLETED' ? null : (
+            <Link
+              href={`/${lng}/admin/tournaments/${tournament.id}/edit`}
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full border-[0.5px] border-border bg-card px-4 text-sm font-medium text-foreground hover:bg-secondary"
+            >
+              <Pencil className="size-4" aria-hidden="true" />
+              {t('admin.manage.edit')}
+            </Link>
+          )}
+          {hasCompleted ? null : (
+            <DeleteTournamentButton
+              lng={lng}
+              tournamentId={tournament.id}
+              labels={{
+                delete: t('admin.manage.delete'),
+                confirm: t('admin.manage.deleteConfirm'),
+                yes: t('admin.manage.deleteYes'),
+                no: t('admin.manage.deleteNo'),
+                working: t('admin.working'),
+                errors,
+              }}
+            />
+          )}
+        </div>
+
         <div className="mt-6 flex flex-col gap-4 md:mt-8 md:gap-6">
           <AdminTeamsSection
+            tournamentId={tournament.id}
             teams={tournament.teams}
             options={options}
             locked={locked}
@@ -185,6 +223,7 @@ export default async function AdminTournamentPage({
             labels={teamsLabels}
           />
           <AdminFixturesSection
+            tournamentId={tournament.id}
             groups={groups}
             canGenerate={canGenerate}
             canClear={canClear}

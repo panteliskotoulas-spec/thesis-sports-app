@@ -255,10 +255,22 @@
       "errorField": "Choose a field.",
       "errorDates": "Enter both dates, with the end date on or after the start date.",
       "errorMaxTeams": "Enter a number from {{min}} to {{max}}.",
-      "errorDescription": "The description can't be longer than {{max}} characters."
+      "errorDescription": "The description can't be longer than {{max}} characters.",
+      "metaEdit": "Edit tournament",
+      "titleEdit": "Edit tournament",
+      "subtitleEdit": "Change the tournament details. The sport can't be changed.",
+      "submitEdit": "Save changes",
+      "submitting": "Saving…",
+      "sportLocked": "The sport can't be changed after creation.",
+      "backToManage": "Back to tournament"
     },
     "manage": {
-      "publicPage": "Public page"
+      "publicPage": "Public page",
+      "edit": "Edit",
+      "delete": "Delete tournament",
+      "deleteConfirm": "The tournament, its teams and its schedule will be deleted for good. Continue?",
+      "deleteYes": "Delete",
+      "deleteNo": "Cancel"
     },
     "teams": {
       "title": "Teams",
@@ -269,7 +281,9 @@
       "addPlaceholder": "Choose a team",
       "noOptions": "No teams available for this sport",
       "add": "Add",
-      "removeAria": "Remove team {name}"
+      "removeAria": "Remove team {name}",
+      "adding": "Adding…",
+      "pickFirst": "Choose a team first."
     },
     "fixtures": {
       "title": "Schedule",
@@ -289,7 +303,22 @@
       "timeLabel": "Start time",
       "save": "Save",
       "cancel": "Cancel",
-      "versus": "–"
+      "versus": "–",
+      "generating": "Creating…",
+      "saving": "Saving…"
+    },
+    "working": "Working…",
+    "errors": {
+      "FIELD_INVALID": "That field isn't available for this sport. Choose another one.",
+      "DATES_INVALID": "The dates aren't valid. The end date can't be before the start date.",
+      "MAX_TEAMS_BELOW_COUNT": "The maximum can't be lower than the number of teams already added.",
+      "TOURNAMENT_FULL": "The tournament already has its maximum number of teams.",
+      "SPORT_MISMATCH": "That team plays a different sport from the tournament.",
+      "NOT_ENOUGH_TEAMS": "More teams are needed to create a schedule.",
+      "DATETIME_INVALID": "Fill in both the day and the time, or leave both empty.",
+      "CONFLICT": "That's no longer possible. The page was refreshed with the current state.",
+      "NOT_FOUND": "That item wasn't found. Refresh the page and try again.",
+      "ERROR": "Something went wrong. Try again."
     }
   }
 }

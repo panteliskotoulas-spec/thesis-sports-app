@@ -1,8 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CalendarClock, Trash2 } from 'lucide-react';
 import { chipBase, chipOff, chipOn } from '@/components/fields/chipStyles';
+import { errorLabel, type AdminErrorLabels } from '@/lib/tournaments/admin';
+import {
+  clearTournamentFixtures,
+  generateTournamentFixtures,
+  scheduleTournamentMatch,
+  type AdminActionResult,
+} from '@/lib/tournaments/admin-api';
 
 export interface AdminMatchRow {
   id: string;
@@ -30,21 +38,26 @@ export interface AdminFixturesSectionLabels {
   legsOne: string;
   legsTwo: string;
   generate: string;
+  generating: string;
   clear: string;
   clearConfirm: string;
   clearYes: string;
   clearNo: string;
+  working: string;
   schedule: string;
   tbd: string;
   completed: string;
   dayLabel: string;
   timeLabel: string;
   save: string;
+  saving: string;
   cancel: string;
   versus: string;
+  errors: AdminErrorLabels;
 }
 
 export interface AdminFixturesSectionProps {
+  tournamentId: string;
   groups: AdminRoundGroup[];
   canGenerate: boolean;
   canClear: boolean;
@@ -60,13 +73,17 @@ const primaryButton =
   'inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90';
 
 export function AdminFixturesSection({
+  tournamentId,
   groups,
   canGenerate,
   canClear,
   enoughTeams,
   labels,
 }: AdminFixturesSectionProps) {
+  const router = useRouter();
   const [legs, setLegs] = useState<1 | 2>(1);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [day, setDay] = useState('');
@@ -76,6 +93,29 @@ export function AdminFixturesSection({
     setEditingId(match.id);
     setDay(match.day);
     setTime(match.time);
+    setError(null);
+  }
+
+  async function run(
+    key: string,
+    action: () => Promise<AdminActionResult>,
+    onDone: () => void,
+  ) {
+    if (busy) return;
+    setBusy(key);
+    setError(null);
+
+    const result = await action();
+    setBusy(null);
+
+    if (!result.ok) {
+      setError(errorLabel(labels.errors, result.code));
+      if (result.code === 'CONFLICT') router.refresh();
+      return;
+    }
+
+    onDone();
+    router.refresh();
   }
 
   const hasMatches = groups.length > 0;
@@ -118,9 +158,17 @@ export function AdminFixturesSection({
             </button>
             <button
               type="button"
-              className="inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-destructive px-4 text-sm font-medium text-destructive-foreground hover:opacity-90"
+              aria-busy={busy === 'clear'}
+              onClick={() =>
+                void run(
+                  'clear',
+                  () => clearTournamentFixtures(tournamentId),
+                  () => setConfirmClear(false),
+                )
+              }
+              className="inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-destructive px-4 text-sm font-medium text-destructive-foreground hover:opacity-90 aria-busy:cursor-not-allowed aria-busy:opacity-60"
             >
-              {labels.clearYes}
+              {busy === 'clear' ? labels.working : labels.clearYes}
             </button>
           </div>
         </div>
@@ -153,9 +201,17 @@ export function AdminFixturesSection({
             <div>
               <button
                 type="button"
-                className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:opacity-90"
+                aria-busy={busy === 'generate'}
+                onClick={() =>
+                  void run(
+                    'generate',
+                    () => generateTournamentFixtures(tournamentId, legs),
+                    () => undefined,
+                  )
+                }
+                className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:opacity-90 aria-busy:cursor-not-allowed aria-busy:opacity-60"
               >
-                {labels.generate}
+                {busy === 'generate' ? labels.generating : labels.generate}
               </button>
             </div>
           </div>
@@ -258,8 +314,24 @@ export function AdminFixturesSection({
                             />
                           </div>
                           <div className="flex gap-2">
-                            <button type="button" className={primaryButton}>
-                              {labels.save}
+                            <button
+                              type="button"
+                              aria-busy={busy === match.id}
+                              onClick={() =>
+                                void run(
+                                  match.id,
+                                  () =>
+                                    scheduleTournamentMatch(
+                                      match.id,
+                                      day,
+                                      time,
+                                    ),
+                                  () => setEditingId(null),
+                                )
+                              }
+                              className={`${primaryButton} aria-busy:cursor-not-allowed aria-busy:opacity-60`}
+                            >
+                              {busy === match.id ? labels.saving : labels.save}
                             </button>
                             <button
                               type="button"
@@ -279,6 +351,12 @@ export function AdminFixturesSection({
           ))}
         </div>
       )}
+
+      {error ? (
+        <p role="alert" className="mt-3 text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
     </section>
   );
 }
