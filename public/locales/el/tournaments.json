@@ -11,7 +11,10 @@
     "sportLabel": "Άθλημα",
     "sportAll": "Όλα τα αθλήματα",
     "statusLabel": "Κατάσταση",
-    "statusAll": "Όλες οι καταστάσεις"
+    "statusAll": "Όλες οι καταστάσεις",
+    "scopeLabel": "Εμφάνιση",
+    "scopeAll": "Όλα",
+    "scopeMine": "Δικά μου"
   },
   "empty": {
     "title": "Δεν βρέθηκαν τουρνουά",

@@ -1,7 +1,12 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { adminProcedure, publicProcedure, router } from '../init';
-import { Prisma } from '@/generated/prisma/client';
+import {
+  adminProcedure,
+  protectedProcedure,
+  publicProcedure,
+  router,
+} from '../init';
+import { Prisma, type PrismaClient } from '@/generated/prisma/client';
 import { localized } from '@/lib/i18n-content';
 import { asLocalized } from '@/lib/server/booking-shared';
 import { athensDateTime, athensDayStart } from '@/lib/server/athens-time';
@@ -77,7 +82,7 @@ function resultError(code: ResultErrorCode): TRPCError {
 }
 
 async function assertHostField(
-  prisma: Prisma.TransactionClient,
+  prisma: PrismaClient | Prisma.TransactionClient,
   fieldId: string,
   sport: (typeof TOURNAMENT_SPORTS)[number],
 ) {
@@ -170,6 +175,57 @@ function toRaw(row: TournamentRow, lng: string): RawTournament | null {
   };
 }
 
+type ListFilters = {
+  lng: 'el' | 'en';
+  sport: (typeof TOURNAMENT_SPORTS)[number] | null;
+  status: (typeof TOURNAMENT_STATUSES)[number] | null;
+};
+
+async function listTournaments(
+  prisma: Prisma.TransactionClient,
+  extraWhere: Prisma.TournamentWhereInput,
+  input: ListFilters,
+): Promise<TournamentListItem[]> {
+  const rows = await prisma.tournament.findMany({
+    where: {
+      ...extraWhere,
+      sportType: input.sport ?? { in: [...TOURNAMENT_SPORTS] },
+      ...(input.status && { status: input.status }),
+    },
+    orderBy: [{ startDate: 'desc' }, { id: 'asc' }],
+    select: {
+      id: true,
+      name: true,
+      sportType: true,
+      status: true,
+      startDate: true,
+      endDate: true,
+      maxTeams: true,
+      hostField: { select: { name: true } },
+      _count: { select: { teams: true } },
+    },
+  });
+
+  const items: TournamentListItem[] = [];
+  for (const row of rows) {
+    if (!isTournamentSport(row.sportType) || !isTournamentStatus(row.status)) {
+      continue;
+    }
+    items.push({
+      id: row.id,
+      name: row.name,
+      sport: row.sportType,
+      status: row.status,
+      startDate: row.startDate.toISOString(),
+      endDate: row.endDate.toISOString(),
+      fieldName: localized(asLocalized(row.hostField.name), input.lng),
+      teamCount: row._count.teams,
+      maxTeams: row.maxTeams,
+    });
+  }
+  return items;
+}
+
 export const tournamentsRouter = router({
   list: publicProcedure
     .input(
@@ -179,47 +235,36 @@ export const tournamentsRouter = router({
         status: z.enum(TOURNAMENT_STATUSES).nullable(),
       }),
     )
-    .query(async ({ ctx, input }): Promise<TournamentListItem[]> => {
-      const rows = await ctx.prisma.tournament.findMany({
-        where: {
-          sportType: input.sport ?? { in: [...TOURNAMENT_SPORTS] },
-          ...(input.status && { status: input.status }),
-        },
-        orderBy: [{ startDate: 'desc' }, { id: 'asc' }],
-        select: {
-          id: true,
-          name: true,
-          sportType: true,
-          status: true,
-          startDate: true,
-          endDate: true,
-          maxTeams: true,
-          hostField: { select: { name: true } },
-          _count: { select: { teams: true } },
-        },
-      });
+    .query(
+      async ({ ctx, input }): Promise<TournamentListItem[]> =>
+        listTournaments(ctx.prisma, {}, input),
+    ),
 
-      const items: TournamentListItem[] = [];
-      for (const row of rows) {
-        if (
-          !isTournamentSport(row.sportType) ||
-          !isTournamentStatus(row.status)
-        ) {
-          continue;
-        }
-        items.push({
-          id: row.id,
-          name: row.name,
-          sport: row.sportType,
-          status: row.status,
-          startDate: row.startDate.toISOString(),
-          endDate: row.endDate.toISOString(),
-          fieldName: localized(asLocalized(row.hostField.name), input.lng),
-          teamCount: row._count.teams,
-          maxTeams: row.maxTeams,
-        });
-      }
-      return items;
+  listMine: protectedProcedure
+    .input(
+      z.object({
+        lng: languageInput,
+        sport: z.enum(TOURNAMENT_SPORTS).nullable(),
+        status: z.enum(TOURNAMENT_STATUSES).nullable(),
+      }),
+    )
+    .query(async ({ ctx, input }): Promise<TournamentListItem[]> => {
+      const userId = ctx.session.user.id;
+      const ownTeam = { members: { some: { userId } } };
+      return listTournaments(
+        ctx.prisma,
+        {
+          OR: [
+            { teams: { some: { team: ownTeam } } },
+            {
+              teamRequests: {
+                some: { status: 'PENDING', team: ownTeam },
+              },
+            },
+          ],
+        },
+        input,
+      );
     }),
 
   detail: publicProcedure

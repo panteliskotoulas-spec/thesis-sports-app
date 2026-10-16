@@ -32,7 +32,8 @@ export default async function TournamentsPage({
   const { t: tf } = await getT('fields');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
-  const filters = parseTournamentFilters(await searchParams);
+  const parsed = parseTournamentFilters(await searchParams);
+  const filters = { ...parsed, mine: parsed.mine && user !== null };
   const tournaments = await loadTournamentList(filters, lng);
 
   return (
@@ -47,6 +48,7 @@ export default async function TournamentsPage({
         <div className="mt-6 md:mt-8">
           <TournamentsFilters
             filters={filters}
+            showMine={user !== null}
             sports={TOURNAMENT_SPORTS.map((value) => ({
               value,
               label: tf(`sports.${value}`),
@@ -60,6 +62,9 @@ export default async function TournamentsPage({
               sportAll: t('filters.sportAll'),
               statusLabel: t('filters.statusLabel'),
               statusAll: t('filters.statusAll'),
+              scopeLabel: t('filters.scopeLabel'),
+              scopeAll: t('filters.scopeAll'),
+              scopeMine: t('filters.scopeMine'),
             }}
           />
         </div>

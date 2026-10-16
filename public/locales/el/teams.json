@@ -16,7 +16,10 @@
   "filters": {
     "sportLabel": "Άθλημα",
     "sportAll": "Όλα",
-    "recruiting": "Ψάχνουν παίκτες"
+    "recruiting": "Ψάχνουν παίκτες",
+    "scopeLabel": "Εμφάνιση",
+    "scopeAll": "Όλες",
+    "scopeMine": "Δικές μου"
   },
   "levels": {
     "BEGINNER": "Αρχάριο",

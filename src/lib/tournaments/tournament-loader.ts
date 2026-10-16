@@ -13,11 +13,14 @@ export async function loadTournamentList(
 ): Promise<TournamentListItem[]> {
   try {
     const caller = await getServerCaller();
-    return await caller.tournaments.list({
+    const input = {
       lng: toLanguage(lng),
       sport: filters.sport,
       status: filters.status,
-    });
+    };
+    return filters.mine
+      ? await caller.tournaments.listMine(input)
+      : await caller.tournaments.list(input);
   } catch (error) {
     console.error('[loadTournamentList]', error);
     return [];

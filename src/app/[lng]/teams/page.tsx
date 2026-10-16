@@ -28,7 +28,8 @@ export default async function TeamsPage({
   const { t: tf } = await getT('fields');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
-  const filters = parseTeamFilters(await searchParams);
+  const parsed = parseTeamFilters(await searchParams);
+  const filters = { ...parsed, mine: parsed.mine && user !== null };
 
   return (
     <>
@@ -53,6 +54,7 @@ export default async function TeamsPage({
         <div className="mt-6 md:mt-8">
           <TeamsFilters
             filters={filters}
+            showMine={user !== null}
             sports={SPORT_TYPES.map((value) => ({
               value,
               label: tf(`sports.${value}`),
@@ -61,6 +63,9 @@ export default async function TeamsPage({
               sportLabel: t('filters.sportLabel'),
               sportAll: t('filters.sportAll'),
               recruiting: t('filters.recruiting'),
+              scopeLabel: t('filters.scopeLabel'),
+              scopeAll: t('filters.scopeAll'),
+              scopeMine: t('filters.scopeMine'),
             }}
           />
         </div>

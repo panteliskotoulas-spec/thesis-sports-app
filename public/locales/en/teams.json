@@ -16,7 +16,10 @@
   "filters": {
     "sportLabel": "Sport",
     "sportAll": "All",
-    "recruiting": "Looking for players"
+    "recruiting": "Looking for players",
+    "scopeLabel": "Show",
+    "scopeAll": "All",
+    "scopeMine": "Mine"
   },
   "levels": {
     "BEGINNER": "Beginner",

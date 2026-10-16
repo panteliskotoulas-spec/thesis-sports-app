@@ -62,5 +62,64 @@
     "subtitleUser": "Find your next field and book your time.",
     "register": "Create an account",
     "fields": "Find a field"
+  },
+  "dashboard": {
+    "greeting": "Hi, {{name}}",
+    "subtitle": "See what's going on with your bookings, teams and coaching sessions.",
+    "error": "We couldn't load this section. Please try again in a moment.",
+    "actions": {
+      "title": "Needs your attention",
+      "deadline": "Pay by: {{when}}",
+      "more": "And {{count}} more",
+      "kind": {
+        "RESERVATION_SPLIT": "Booking share",
+        "SESSION_SPLIT": "Coaching share",
+        "SESSION_PAYMENT": "Coaching payment"
+      }
+    },
+    "bookings": {
+      "title": "Next booking",
+      "viewAll": "All bookings",
+      "empty": "You have no upcoming bookings.",
+      "cta": "Find a field",
+      "more": "{{count}} more upcoming"
+    },
+    "teams": {
+      "title": "My teams",
+      "viewAll": "My teams",
+      "empty": "You're not in a team yet.",
+      "find": "Find a team",
+      "create": "Create a team",
+      "members": "{{count}}/{{max}} members",
+      "requests": "Requests: {{count}}",
+      "more": "And {{count}} more",
+      "role": {
+        "LEADER": "Leader",
+        "MEMBER": "Member"
+      }
+    },
+    "coaching": {
+      "title": "My coaching sessions",
+      "viewAll": "All sessions",
+      "empty": "You have no upcoming coaching sessions.",
+      "onlyRequested": "No confirmed sessions yet. Requests awaiting a reply: {{count}}.",
+      "cta": "Find a coach",
+      "more": "{{count}} more upcoming",
+      "requested": "Requests awaiting a reply: {{count}}"
+    },
+    "tournaments": {
+      "title": "My tournaments",
+      "viewAll": "All my tournaments",
+      "empty": "None of your teams is in a tournament right now.",
+      "cta": "Browse tournaments",
+      "teams": "{{count}}/{{max}} teams"
+    },
+    "stats": {
+      "title": "My stats",
+      "viewAll": "Details",
+      "empty": "Your stats will show up once you play in a tournament.",
+      "matches": "Matches",
+      "tournaments": "Tournaments"
+    }
   }
 }

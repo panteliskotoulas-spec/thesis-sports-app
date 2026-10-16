@@ -11,7 +11,10 @@
     "sportLabel": "Sport",
     "sportAll": "All sports",
     "statusLabel": "Status",
-    "statusAll": "All statuses"
+    "statusAll": "All statuses",
+    "scopeLabel": "Show",
+    "scopeAll": "All",
+    "scopeMine": "Mine"
   },
   "empty": {
     "title": "No tournaments found",
