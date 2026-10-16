@@ -11,3 +11,15 @@ export async function loadPlayerStats(): Promise<PlayerStatsData> {
     return EMPTY_PLAYER_STATS;
   }
 }
+
+export async function loadApplicantStats(
+  requestId: string,
+): Promise<PlayerStatsData> {
+  try {
+    const caller = await getServerCaller();
+    return await caller.stats.forApplicant({ requestId });
+  } catch (error) {
+    console.error('[loadApplicantStats]', error);
+    return EMPTY_PLAYER_STATS;
+  }
+}

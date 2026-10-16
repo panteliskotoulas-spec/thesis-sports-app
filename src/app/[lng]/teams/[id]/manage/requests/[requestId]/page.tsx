@@ -13,8 +13,8 @@ import { TeamAvatar } from '@/components/teams/TeamAvatar';
 import { fillTemplate } from '@/lib/bookings/booking';
 import { formatRelativeTime } from '@/lib/notifications/notification';
 import { getCurrentUser } from '@/lib/session';
-import { EMPTY_PLAYER_STATS } from '@/lib/stats/player-stats';
 import { buildStatsLabels } from '@/lib/stats/stats-labels';
+import { loadApplicantStats } from '@/lib/stats/stats-loader';
 import { toJoinRequestItem } from '@/lib/teams/team';
 import { isTournamentSport } from '@/lib/tournaments/tournament';
 import { getServerCaller } from '@/trpc/server/caller';
@@ -55,6 +55,8 @@ export default async function ApplicantStatsPage({
   const row = requests.find((item) => item.id === requestId);
   if (!row) notFound();
   const request = toJoinRequestItem(row);
+
+  const applicantStats = await loadApplicantStats(request.id);
 
   const backHref = `/${lng}/teams/${team.id}/manage`;
   const statsLabels = buildStatsLabels(tt);
@@ -120,7 +122,7 @@ export default async function ApplicantStatsPage({
             sport: tf(`sports.${team.sportType}`),
           })}
         </h2>
-        <PlayerStatsView data={EMPTY_PLAYER_STATS} labels={labels} lng={lng} />
+        <PlayerStatsView data={applicantStats} labels={labels} lng={lng} />
       </main>
       <BottomNav user={user} />
     </>
