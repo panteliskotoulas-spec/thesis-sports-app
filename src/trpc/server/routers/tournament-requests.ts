@@ -137,7 +137,7 @@ export const tournamentRequestsRouter = router({
       }));
     }),
 
-  apply: protectedProcedure
+  submit: protectedProcedure
     .input(
       z.object({ tournamentId: z.string().min(1), teamId: z.string().min(1) }),
     )

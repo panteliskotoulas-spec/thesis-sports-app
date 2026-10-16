@@ -5,7 +5,7 @@ export function applyToTournament(
   teamId: string,
 ): Promise<AdminActionResult> {
   return run(() =>
-    client.tournamentRequests.apply.mutate({ tournamentId, teamId }),
+    client.tournamentRequests.submit.mutate({ tournamentId, teamId }),
   );
 }
 
