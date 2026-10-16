@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
 import { SignOutButton } from '@/components/shared/SignOutButton';
-import { MenuPreferences } from '@/components/layout/MenuPreferences';
 import type { AccountMenuGroup } from '@/lib/layout/account-menu';
 import { accountMenuIcons } from './account-menu-icons';
 
@@ -135,10 +134,6 @@ export function UserMenu({
               </ul>
             </div>
           ))}
-
-          <div className="mt-1 border-t-[0.5px] border-border pt-1">
-            <MenuPreferences />
-          </div>
 
           <div className="mt-1 border-t-[0.5px] border-border pt-1">
             <SignOutButton lng={lng} label={signOutLabel} variant="menu" />
