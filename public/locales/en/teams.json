@@ -112,7 +112,8 @@
     "full": "The team is full",
     "sportTaken": "You already have a team in this sport",
     "errorConflict": "Something changed in the team. Refresh the page and try again.",
-    "errorGeneric": "Something went wrong. Try again."
+    "errorGeneric": "Something went wrong. Try again.",
+    "statsNote": "The team leader will be able to see your tournament stats ({{sport}})."
   },
   "manage": {
     "title": "Team management",
@@ -149,7 +150,16 @@
     "deleteAction": "Delete team",
     "justNow": "Just now",
     "errorConflict": "Something changed in the team. Refresh the page and try again.",
-    "errorGeneric": "Something went wrong. Try again."
+    "errorGeneric": "Something went wrong. Try again.",
+    "requestStats": "Stats",
+    "applicant": {
+      "meta": "Applicant stats",
+      "back": "Join requests",
+      "subtitle": "Request to join {team} · {time}",
+      "statsTitle": "Tournament stats ({{sport}})",
+      "emptyTitle": "No stats yet",
+      "emptyDescription": "This player has no tournament games in this sport."
+    }
   },
   "booking": {
     "title": "Book as",

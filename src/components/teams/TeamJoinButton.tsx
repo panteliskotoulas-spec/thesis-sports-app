@@ -35,6 +35,7 @@ export interface TeamJoinButtonProps {
   lng: string;
   viewer: TeamViewerState;
   labels: TeamJoinLabels;
+  statsNote: string | null;
 }
 
 const base =
@@ -48,6 +49,7 @@ export function TeamJoinButton({
   lng,
   viewer,
   labels,
+  statsNote,
 }: TeamJoinButtonProps) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -141,6 +143,10 @@ export function TeamJoinButton({
   return (
     <div className="flex w-full flex-col gap-3 sm:w-64">
       {renderAction()}
+
+      {viewer.kind === 'open' && statsNote ? (
+        <p className="text-center text-xs text-muted-foreground">{statsNote}</p>
+      ) : null}
 
       {viewer.kind === 'member' && leaveOpen ? (
         <div className="rounded-xl border-[0.5px] border-border bg-card p-3">

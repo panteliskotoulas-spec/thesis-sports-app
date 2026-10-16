@@ -81,6 +81,7 @@ export function buildTeamManageLabels(t: Translate): TeamManageLabels {
     requestsFull: t('manage.requestsFull'),
     accept: t('manage.accept'),
     reject: t('manage.reject'),
+    requestStats: t('manage.requestStats'),
     membersTitle: t('manage.membersTitle'),
     leader: t('manage.leader'),
     leaderYou: t('manage.leaderYou'),

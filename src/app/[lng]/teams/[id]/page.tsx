@@ -21,6 +21,7 @@ import {
   buildTeamJoinLabels,
   buildTeamReservationsLabels,
 } from '@/lib/teams/team-labels';
+import { isTournamentSport } from '@/lib/tournaments/tournament';
 import { getServerCaller } from '@/trpc/server/caller';
 
 interface TeamPageProps {
@@ -73,6 +74,10 @@ export default async function TeamPage({
           })
         ).map((row) => toTeamReservationItem(row, lng))
       : [];
+
+  const statsNote = isTournamentSport(team.sportType)
+    ? t('join.statsNote', { sport: tf(`sports.${team.sportType}`) })
+    : null;
 
   return (
     <>
@@ -139,6 +144,7 @@ export default async function TeamPage({
               lng={lng}
               viewer={viewer}
               labels={buildTeamJoinLabels(t)}
+              statsNote={statsNote}
             />
           </div>
 

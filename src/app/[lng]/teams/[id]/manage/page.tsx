@@ -11,6 +11,7 @@ import { TeamManage } from '@/components/teams/TeamManage';
 import { getCurrentUser } from '@/lib/session';
 import { toJoinRequestItem } from '@/lib/teams/team';
 import { buildTeamManageLabels } from '@/lib/teams/team-labels';
+import { isTournamentSport } from '@/lib/tournaments/tournament';
 import { getServerCaller } from '@/trpc/server/caller';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -66,6 +67,7 @@ export default async function ManageTeamPage({
             maxMembers={row.maxMembers}
             currentUserId={user.id}
             requests={requests.map(toJoinRequestItem)}
+            statsEnabled={isTournamentSport(row.sportType)}
             members={row.members.map((member) => ({
               userId: member.userId,
               name: member.name,

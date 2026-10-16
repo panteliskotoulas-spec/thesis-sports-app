@@ -45,7 +45,7 @@ export interface StatsLabels {
   empty: {
     title: string;
     description: string;
-    cta: string;
+    cta: string | null;
   };
 }
 

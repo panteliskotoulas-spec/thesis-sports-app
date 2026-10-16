@@ -3,7 +3,15 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Check, Crown, Ellipsis, Settings, UserMinus, X } from 'lucide-react';
+import {
+  ChartColumn,
+  Check,
+  Crown,
+  Ellipsis,
+  Settings,
+  UserMinus,
+  X,
+} from 'lucide-react';
 import { fillTemplate } from '@/lib/bookings/booking';
 import { formatRelativeTime } from '@/lib/notifications/notification';
 import {
@@ -32,6 +40,7 @@ export interface TeamManageLabels {
   requestsFull: string;
   accept: string;
   reject: string;
+  requestStats: string;
   membersTitle: string;
   leader: string;
   leaderYou: string;
@@ -68,6 +77,7 @@ export interface TeamManageProps {
   currentUserId: string;
   requests: JoinRequestItem[];
   members: TeamManageMember[];
+  statsEnabled: boolean;
   labels: TeamManageLabels;
 }
 
@@ -91,6 +101,7 @@ export function TeamManage({
   currentUserId,
   requests,
   members,
+  statsEnabled,
   labels,
 }: TeamManageProps) {
   const router = useRouter();
@@ -316,7 +327,16 @@ export function TeamManage({
                     )}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
+                  {statsEnabled ? (
+                    <Link
+                      href={`/${lng}/teams/${teamId}/manage/requests/${request.id}`}
+                      className={`${smallButton} border-[0.5px] border-primary text-primary hover:bg-secondary`}
+                    >
+                      <ChartColumn className="size-4" aria-hidden="true" />
+                      {labels.requestStats}
+                    </Link>
+                  ) : null}
                   <button
                     type="button"
                     disabled={full || busyKey !== null}

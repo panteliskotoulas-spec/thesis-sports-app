@@ -47,12 +47,14 @@ export function PlayerStatsView({
         <p className="mx-auto mt-2 max-w-md text-muted-foreground">
           {labels.empty.description}
         </p>
-        <Link
-          href={`/${lng}/tournaments`}
-          className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          {labels.empty.cta}
-        </Link>
+        {labels.empty.cta ? (
+          <Link
+            href={`/${lng}/tournaments`}
+            className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            {labels.empty.cta}
+          </Link>
+        ) : null}
       </div>
     );
   }
