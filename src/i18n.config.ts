@@ -13,6 +13,7 @@ const i18nConfig: I18nConfig = {
     'chat',
     'profile',
     'home',
+    'tournaments',
   ],
   defaultNS: 'common',
   persistCookie: false,

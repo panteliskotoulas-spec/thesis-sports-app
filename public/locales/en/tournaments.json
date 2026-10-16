@@ -219,5 +219,77 @@
       "name": "Digs",
       "short": "Dig"
     }
+  },
+  "admin": {
+    "list": {
+      "meta": "Manage tournaments",
+      "title": "Manage tournaments",
+      "subtitle": "Create tournaments, add teams and set the match schedule.",
+      "create": "New tournament",
+      "tabsLabel": "Status filter",
+      "empty": {
+        "title": "No tournaments yet",
+        "description": "Create the first tournament to get started."
+      }
+    },
+    "back": "All tournaments",
+    "form": {
+      "metaNew": "New tournament",
+      "titleNew": "New tournament",
+      "subtitleNew": "Pick a sport and a field, set the dates and the maximum number of teams.",
+      "name": "Tournament name",
+      "sport": "Sport",
+      "field": "Host field",
+      "fieldPlaceholder": "Choose a field",
+      "fieldPickSport": "Choose a sport first",
+      "fieldNone": "No approved field for this sport",
+      "startDay": "Start date",
+      "endDay": "End date",
+      "maxTeams": "Maximum teams",
+      "maxTeamsHint": "Between {{min}} and {{max}} teams.",
+      "description": "Description",
+      "descriptionHint": "Optional, up to {{max}} characters. It's translated automatically into the other language.",
+      "submitCreate": "Create tournament",
+      "errorName": "Enter a name for the tournament.",
+      "errorSport": "Choose a sport.",
+      "errorField": "Choose a field.",
+      "errorDates": "Enter both dates, with the end date on or after the start date.",
+      "errorMaxTeams": "Enter a number from {{min}} to {{max}}.",
+      "errorDescription": "The description can't be longer than {{max}} characters."
+    },
+    "manage": {
+      "publicPage": "Public page"
+    },
+    "teams": {
+      "title": "Teams",
+      "empty": "No teams have been added yet.",
+      "lockedNote": "Teams can't change once the schedule is created or the tournament has started.",
+      "fullNote": "The tournament has reached its maximum number of teams.",
+      "addLabel": "Add a team",
+      "addPlaceholder": "Choose a team",
+      "noOptions": "No teams available for this sport",
+      "add": "Add",
+      "removeAria": "Remove team {name}"
+    },
+    "fixtures": {
+      "title": "Schedule",
+      "empty": "No schedule yet. Choose how many rounds the teams will play.",
+      "needTeams": "At least {{min}} teams are needed to create a schedule.",
+      "locked": "This tournament can't take a new schedule.",
+      "legsLabel": "Rounds",
+      "legsOne": "1 round",
+      "legsTwo": "2 rounds",
+      "generate": "Create schedule",
+      "clear": "Clear schedule",
+      "clearConfirm": "All matches in the schedule will be deleted. Continue?",
+      "clearYes": "Delete matches",
+      "clearNo": "Cancel",
+      "schedule": "Time",
+      "dayLabel": "Day",
+      "timeLabel": "Start time",
+      "save": "Save",
+      "cancel": "Cancel",
+      "versus": "–"
+    }
   }
 }
