@@ -1,8 +1,10 @@
+import type { SportType } from '@/lib/fields/types';
 import type { LocalizedText } from '@/lib/i18n-content';
 import type { TournamentStatus } from '@/lib/tournaments/tournament';
 
 export const DASHBOARD_ACTIONS_LIMIT = 5;
 export const DASHBOARD_TEAMS_LIMIT = 3;
+export const DASHBOARD_JOIN_REQUESTS_LIMIT = 2;
 export const DASHBOARD_SESSIONS_LIMIT = 2;
 export const DASHBOARD_TOURNAMENTS_LIMIT = 3;
 
@@ -65,9 +67,28 @@ export interface DashboardTeam {
   pendingRequests: number;
 }
 
+export interface MyJoinRequestRow {
+  id: string;
+  teamId: string;
+  teamName: string;
+  logoUrl: string | null;
+  sportType: SportType;
+  createdAt: Date;
+}
+
+export interface DashboardJoinRequest {
+  id: string;
+  teamId: string;
+  name: string;
+  logoUrl: string | null;
+  sport: string;
+}
+
 export interface DashboardTeams {
   items: DashboardTeam[];
   total: number;
+  joinRequests: DashboardJoinRequest[];
+  joinRequestsTotal: number;
 }
 
 export interface DashboardSession {
@@ -86,6 +107,21 @@ export interface DashboardCoaching {
   requestedCount: number;
 }
 
+export type TournamentEntryState = 'PARTICIPATING' | 'PENDING';
+
+export interface MyTournamentEntryRow {
+  tournamentId: string;
+  teamId: string;
+  teamName: string;
+  state: TournamentEntryState;
+}
+
+export interface DashboardTournamentEntry {
+  teamId: string;
+  teamName: string;
+  state: TournamentEntryState;
+}
+
 export interface DashboardTournament {
   id: string;
   name: string;
@@ -94,6 +130,7 @@ export interface DashboardTournament {
   dates: string;
   teamCount: number;
   maxTeams: number;
+  entries: DashboardTournamentEntry[];
 }
 
 export interface DashboardStats {

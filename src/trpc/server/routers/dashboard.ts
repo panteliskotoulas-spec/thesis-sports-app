@@ -1,7 +1,11 @@
 import { adminProcedure, protectedProcedure, router } from '../init';
 import { asLocalized } from '@/lib/server/booking-shared';
 import type { AdminPendingRow } from '@/lib/home/admin-dashboard';
-import type { PendingSplitRow } from '@/lib/home/dashboard';
+import type {
+  MyJoinRequestRow,
+  MyTournamentEntryRow,
+  PendingSplitRow,
+} from '@/lib/home/dashboard';
 import type { OwnerFieldWithoutSlotsRow } from '@/lib/home/owner-dashboard';
 
 export const dashboardRouter = router({
@@ -71,6 +75,80 @@ export const dashboardRouter = router({
         id: field.id,
         name: asLocalized(field.name),
       }));
+    },
+  ),
+
+  myJoinRequests: protectedProcedure.query(
+    async ({ ctx }): Promise<MyJoinRequestRow[]> => {
+      const requests = await ctx.prisma.joinRequest.findMany({
+        where: { userId: ctx.session.user.id, status: 'PENDING' },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          createdAt: true,
+          team: {
+            select: { id: true, name: true, logoUrl: true, sportType: true },
+          },
+        },
+      });
+
+      return requests.map((request) => ({
+        id: request.id,
+        teamId: request.team.id,
+        teamName: request.team.name,
+        logoUrl: request.team.logoUrl,
+        sportType: request.team.sportType,
+        createdAt: request.createdAt,
+      }));
+    },
+  ),
+
+  myTournamentEntries: protectedProcedure.query(
+    async ({ ctx }): Promise<MyTournamentEntryRow[]> => {
+      const ownTeam = { members: { some: { userId: ctx.session.user.id } } };
+
+      const [participating, requested] = await Promise.all([
+        ctx.prisma.tournamentTeam.findMany({
+          where: {
+            team: ownTeam,
+            tournament: { status: { not: 'COMPLETED' } },
+          },
+          select: {
+            tournamentId: true,
+            team: { select: { id: true, name: true } },
+          },
+        }),
+        ctx.prisma.tournamentTeamRequest.findMany({
+          where: {
+            status: 'PENDING',
+            team: ownTeam,
+            tournament: { status: { not: 'COMPLETED' } },
+          },
+          select: {
+            tournamentId: true,
+            team: { select: { id: true, name: true } },
+          },
+        }),
+      ]);
+
+      return [
+        ...participating.map(
+          (row): MyTournamentEntryRow => ({
+            tournamentId: row.tournamentId,
+            teamId: row.team.id,
+            teamName: row.team.name,
+            state: 'PARTICIPATING',
+          }),
+        ),
+        ...requested.map(
+          (row): MyTournamentEntryRow => ({
+            tournamentId: row.tournamentId,
+            teamId: row.team.id,
+            teamName: row.team.name,
+            state: 'PENDING',
+          }),
+        ),
+      ];
     },
   ),
 

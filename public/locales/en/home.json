@@ -96,6 +96,11 @@
       "role": {
         "LEADER": "Leader",
         "MEMBER": "Member"
+      },
+      "myRequests": {
+        "title": "Join requests you sent",
+        "pending": "Pending",
+        "more": "And {{count}} more"
       }
     },
     "coaching": {
@@ -112,7 +117,11 @@
       "viewAll": "All my tournaments",
       "empty": "None of your teams is in a tournament right now.",
       "cta": "Browse tournaments",
-      "teams": "{{count}}/{{max}} teams"
+      "teams": "{{count}}/{{max}} teams",
+      "entry": {
+        "PARTICIPATING": "{{team}} · Participating",
+        "PENDING": "{{team}} · Awaiting approval"
+      }
     },
     "stats": {
       "title": "My stats",

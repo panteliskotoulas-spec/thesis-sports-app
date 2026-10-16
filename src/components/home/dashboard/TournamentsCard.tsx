@@ -74,6 +74,24 @@ export async function TournamentsCard({
                   max: tournament.maxTeams,
                 })}
               </p>
+              {tournament.entries.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {tournament.entries.map((entry) => (
+                    <span
+                      key={entry.teamId}
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        entry.state === 'PARTICIPATING'
+                          ? 'bg-accent text-accent-foreground'
+                          : 'bg-secondary text-muted-foreground'
+                      }`}
+                    >
+                      {t(`dashboard.tournaments.entry.${entry.state}`, {
+                        team: entry.teamName,
+                      })}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </div>
             <span
               className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${

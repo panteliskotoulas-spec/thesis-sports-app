@@ -8,6 +8,7 @@ import { todayInAthens } from '@/lib/fields/filters';
 import { localized } from '@/lib/i18n-content';
 import {
   DASHBOARD_ACTIONS_LIMIT,
+  DASHBOARD_JOIN_REQUESTS_LIMIT,
   DASHBOARD_SESSIONS_LIMIT,
   DASHBOARD_TEAMS_LIMIT,
   DASHBOARD_TOURNAMENTS_LIMIT,
@@ -16,6 +17,7 @@ import {
   type DashboardBookings,
   type DashboardCoaching,
   type DashboardTeams,
+  type DashboardTournamentEntry,
   type PlayerDashboardData,
 } from '@/lib/home/dashboard';
 import type { TournamentStatus } from '@/lib/tournaments/tournament';
@@ -52,21 +54,31 @@ export async function loadPlayerDashboard({
   const caller = await getServerCaller();
   const now = new Date();
 
-  const [reservations, myTeams, sessions, tournaments, stats, pendingSplits] =
-    await Promise.all([
-      safe('reservations', () => caller.reservations.listMine()),
-      safe('teams', () => caller.teams.myTeams()),
-      safe('coaching', () => caller.coachSessions.listMine()),
-      safe('tournaments', () =>
-        caller.tournaments.listMine({
-          lng: lng === 'en' ? 'en' : 'el',
-          sport: null,
-          status: null,
-        }),
-      ),
-      safe('stats', () => caller.stats.mine()),
-      safe('pendingSplits', () => caller.dashboard.pendingSplits()),
-    ]);
+  const [
+    reservations,
+    myTeams,
+    sessions,
+    tournaments,
+    stats,
+    pendingSplits,
+    myJoinRequests,
+    tournamentEntries,
+  ] = await Promise.all([
+    safe('reservations', () => caller.reservations.listMine()),
+    safe('teams', () => caller.teams.myTeams()),
+    safe('coaching', () => caller.coachSessions.listMine()),
+    safe('tournaments', () =>
+      caller.tournaments.listMine({
+        lng: lng === 'en' ? 'en' : 'el',
+        sport: null,
+        status: null,
+      }),
+    ),
+    safe('stats', () => caller.stats.mine()),
+    safe('pendingSplits', () => caller.dashboard.pendingSplits()),
+    safe('myJoinRequests', () => caller.dashboard.myJoinRequests()),
+    safe('tournamentEntries', () => caller.dashboard.myTournamentEntries()),
+  ]);
 
   let bookings: DashboardBookings | null = null;
   if (reservations) {
@@ -108,7 +120,19 @@ export async function loadPlayerDashboard({
       }),
     );
 
+    const requestRows = myJoinRequests ?? [];
+
     teams = {
+      joinRequests: requestRows
+        .slice(0, DASHBOARD_JOIN_REQUESTS_LIMIT)
+        .map((request) => ({
+          id: request.id,
+          teamId: request.teamId,
+          name: request.teamName,
+          logoUrl: request.logoUrl,
+          sport: sportLabel(request.sportType),
+        })),
+      joinRequestsTotal: requestRows.length,
       total: myTeams.length,
       items: visible.map((team, index) => ({
         id: team.id,
@@ -153,6 +177,17 @@ export async function loadPlayerDashboard({
     };
   }
 
+  const entriesByTournament = new Map<string, DashboardTournamentEntry[]>();
+  for (const row of tournamentEntries ?? []) {
+    const list = entriesByTournament.get(row.tournamentId) ?? [];
+    list.push({
+      teamId: row.teamId,
+      teamName: row.teamName,
+      state: row.state,
+    });
+    entriesByTournament.set(row.tournamentId, list);
+  }
+
   const tournamentItems = tournaments
     ? tournaments
         .filter((tournament) => tournament.status !== 'COMPLETED')
@@ -174,6 +209,11 @@ export async function loadPlayerDashboard({
           ),
           teamCount: tournament.teamCount,
           maxTeams: tournament.maxTeams,
+          entries: [...(entriesByTournament.get(tournament.id) ?? [])].sort(
+            (a, b) =>
+              Number(a.state === 'PENDING') - Number(b.state === 'PENDING') ||
+              a.teamName.localeCompare(b.teamName),
+          ),
         }))
     : null;
 
