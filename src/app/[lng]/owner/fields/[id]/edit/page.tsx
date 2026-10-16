@@ -5,6 +5,7 @@ import { TRPCError } from '@trpc/server';
 import { getT } from '@/i18n.server';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
+import { BackButton } from '@/components/shared/BackButton';
 import { NewFieldForm } from '@/components/fields/new/NewFieldForm';
 import { buildFieldFormLabels } from '@/lib/fields/form-labels';
 import type { OwnerFieldEditRow } from '@/lib/fields/owner';
@@ -53,7 +54,12 @@ export default async function EditFieldPage({
     <>
       <Header user={user} />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 md:py-10">
-        <h1>
+        <BackButton
+          href={`/${lng}/owner/fields`}
+          label={t('owner.edit.back')}
+        />
+
+        <h1 className="mt-2">
           {rejected ? t('owner.edit.titleRejected') : t('owner.edit.title')}
         </h1>
         <p className="mt-2 text-muted-foreground">{t('owner.edit.subtitle')}</p>

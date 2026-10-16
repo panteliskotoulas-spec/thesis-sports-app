@@ -1,133 +1,127 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
-import { AlertTriangle } from 'lucide-react';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
+import { BackButton } from '@/components/shared/BackButton';
 import {
-  BookingsList,
-  type BookingsListLabels,
-} from '@/components/bookings/BookingsList';
-import { splitBookingRows, toBookingItem } from '@/lib/bookings/booking-rows';
-import { buildFieldReviewFormLabels } from '@/lib/reviews/review-labels';
+  OwnerBookingsList,
+  type OwnerBookingsListLabels,
+} from '@/components/owner/bookings/OwnerBookingsList';
+import {
+  listOwnerFields,
+  splitOwnerBookingRows,
+  toOwnerBookingItem,
+  type OwnerBookingRow,
+} from '@/lib/bookings/owner-booking';
 import { getCurrentUser } from '@/lib/session';
 import { getServerCaller } from '@/trpc/server/caller';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT('fields');
-  return { title: t('booking.list.meta') };
+  return { title: t('ownerBookings.meta') };
 }
 
-export default async function BookingsPage({
+export default async function OwnerBookingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ booked?: string; payment?: string; focus?: string }>;
+  searchParams: Promise<{ field?: string }>;
 }) {
   const query = await searchParams;
   const { t } = await getT('fields');
-  const { t: tc } = await getT('coaches');
-  const { t: tr } = await getT('reviews');
   const lng = await routeLanguage();
   const user = await getCurrentUser();
 
   if (!user) redirect(`/${lng}/login`);
 
-  const caller = await getServerCaller();
-  const rows = await caller.reservations.listMine();
+  let rows: OwnerBookingRow[] | null = null;
+  try {
+    const caller = await getServerCaller();
+    rows = await caller.ownerBookings.list();
+  } catch (error) {
+    console.error('[OwnerBookingsPage]', error);
+  }
 
-  const now = new Date();
-  const { upcoming, past } = splitBookingRows(rows, now);
-
-  const toItem = (row: (typeof rows)[number]) =>
-    toBookingItem(row, lng, t(`sports.${row.sportType}`), now);
-
-  const labels: BookingsListLabels = {
-    tabUpcoming: t('booking.list.tabUpcoming'),
-    tabPast: t('booking.list.tabPast'),
-    emptyUpcomingTitle: t('booking.list.emptyUpcomingTitle'),
-    emptyUpcomingDescription: t('booking.list.emptyUpcomingDescription'),
-    emptyUpcomingAction: t('booking.list.emptyUpcomingAction'),
-    emptyPastTitle: t('booking.list.emptyPastTitle'),
-    emptyPastDescription: t('booking.list.emptyPastDescription'),
-    bookedNotice: t('booking.list.bookedNotice'),
-    cancelledNotice: t('booking.list.cancelledNotice'),
-    reviewedNotice: tr('field.reviewedNotice'),
+  const labels: OwnerBookingsListLabels = {
+    filterAll: t('ownerBookings.filterAll'),
+    filterLabel: t('ownerBookings.filterLabel'),
+    tabUpcoming: t('ownerBookings.tabUpcoming'),
+    tabPast: t('ownerBookings.tabPast'),
+    emptyUpcomingTitle: t('ownerBookings.emptyUpcomingTitle'),
+    emptyUpcomingDescription: t('ownerBookings.emptyUpcomingDescription'),
+    emptyPastTitle: t('ownerBookings.emptyPastTitle'),
+    emptyPastDescription: t('ownerBookings.emptyPastDescription'),
+    cancelledNotice: t('ownerBookings.cancelledNotice'),
     card: {
-      statusConfirmed: t('booking.card.statusConfirmed'),
-      statusCompleted: t('booking.card.statusCompleted'),
-      statusCancelled: t('booking.card.statusCancelled'),
-      statusCancelledByOwner: t('booking.card.statusCancelledByOwner'),
-      paid: t('booking.card.paid'),
-      paidCard: t('booking.card.paidCard'),
-      paidCredit: t('booking.card.paidCredit'),
-      cancel: t('booking.card.cancel'),
-      cancelLocked: t('booking.card.cancelLocked'),
-      refundedCard: t('booking.card.refundedCard'),
-      refundedMixed: t('booking.card.refundedMixed'),
-      refundedCredit: t('booking.card.refundedCredit'),
-      errorTooLate: t('booking.card.errorTooLate'),
-      errorConflict: t('booking.card.errorConflict'),
-      errorGeneric: t('booking.card.errorGeneric'),
-      review: {
-        write: tr('field.write'),
-        yourReview: tr('field.yourReview'),
-        stars: tr('stars'),
-        form: buildFieldReviewFormLabels(tr),
-      },
-      panel: {
-        title: t('booking.cancel.title'),
-        optionRefundTitle: t('booking.cancel.optionRefundTitle'),
-        optionRefundCard: t('booking.cancel.optionRefundCard'),
-        optionRefundMixed: t('booking.cancel.optionRefundMixed'),
-        optionCredit: t('booking.cancel.optionCredit'),
-        optionCreditTitle: t('booking.cancel.optionCreditTitle'),
-        warning: t('booking.cancel.warning'),
-        back: t('booking.cancel.back'),
-        confirm: t('booking.cancel.confirm'),
-        working: t('booking.cancel.working'),
-      },
+      statusConfirmed: t('ownerBookings.card.statusConfirmed'),
+      statusCompleted: t('ownerBookings.card.statusCompleted'),
+      statusCancelledByOwner: t('ownerBookings.card.statusCancelledByOwner'),
+      statusCancelledByPlayer: t('ownerBookings.card.statusCancelledByPlayer'),
+      paid: t('ownerBookings.card.paid'),
+      paidCard: t('ownerBookings.card.paidCard'),
+      paidCredit: t('ownerBookings.card.paidCredit'),
+      cancel: t('ownerBookings.card.cancel'),
+      refundedCard: t('ownerBookings.card.refundedCard'),
+      refundedMixed: t('ownerBookings.card.refundedMixed'),
+      refundedCredit: t('ownerBookings.card.refundedCredit'),
+      errorConflict: t('ownerBookings.card.errorConflict'),
+      errorGeneric: t('ownerBookings.card.errorGeneric'),
+      panelTitle: t('ownerBookings.cancel.title'),
+      panelBodyCard: t('ownerBookings.cancel.bodyCard'),
+      panelBodyMixed: t('ownerBookings.cancel.bodyMixed'),
+      panelBodyCredit: t('ownerBookings.cancel.bodyCredit'),
+      panelBack: t('ownerBookings.cancel.back'),
+      panelConfirm: t('ownerBookings.cancel.confirm'),
+      panelWorking: t('ownerBookings.cancel.working'),
     },
   };
+
+  const now = new Date();
+  const fields = rows ? listOwnerFields(rows, lng) : [];
+  const initialFieldId =
+    query.field && fields.some((field) => field.id === query.field)
+      ? query.field
+      : null;
+
+  const { upcoming, past } = rows
+    ? splitOwnerBookingRows(rows, now)
+    : { upcoming: [], past: [] };
+
+  const toItem = (row: OwnerBookingRow) =>
+    toOwnerBookingItem(row, lng, t(`sports.${row.sportType}`), now);
 
   return (
     <>
       <Header user={user} />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 md:py-10">
-        <h1>{t('booking.list.title')}</h1>
-        <p className="mt-2 text-muted-foreground">
-          {t('booking.list.subtitle')}
-        </p>
-        <Link
-          href={`/${lng}/coaching`}
-          className="mt-3 inline-flex h-11 items-center rounded-full border-[0.5px] border-border bg-card px-5 text-sm font-medium text-foreground hover:bg-secondary"
-        >
-          {tc('sessions.link')}
-        </Link>
+        <BackButton
+          href={`/${lng}/owner/fields`}
+          label={t('ownerBookings.back')}
+        />
 
-        {query.payment === 'failed' ? (
-          <div
-            role="alert"
-            className="mt-6 flex items-start gap-2 rounded-xl border-[0.5px] border-terracotta bg-card p-4 text-sm text-foreground"
-          >
-            <AlertTriangle
-              className="mt-0.5 size-4 shrink-0 text-terracotta"
-              aria-hidden="true"
-            />
-            {t('booking.list.paymentFailed')}
-          </div>
-        ) : null}
+        <h1 className="mt-2">{t('ownerBookings.title')}</h1>
+        <p className="mt-2 text-muted-foreground">
+          {t('ownerBookings.subtitle')}
+        </p>
 
         <div className="mt-6">
-          <BookingsList
-            upcoming={upcoming.map(toItem)}
-            past={past.map(toItem)}
-            browseHref={`/${lng}/fields`}
-            justBooked={query.booked === '1'}
-            focusId={query.focus ?? null}
-            labels={labels}
-          />
+          {rows === null ? (
+            <div className="rounded-xl border-[0.5px] border-border bg-card p-6 text-center">
+              <h2 className="text-lg">{t('ownerBookings.error.title')}</h2>
+              <p className="mt-1 text-muted-foreground">
+                {t('ownerBookings.error.description')}
+              </p>
+            </div>
+          ) : (
+            <OwnerBookingsList
+              upcoming={upcoming.map(toItem)}
+              past={past.map(toItem)}
+              fields={fields}
+              initialFieldId={initialFieldId}
+              labels={labels}
+            />
+          )}
         </div>
       </main>
       <BottomNav user={user} />

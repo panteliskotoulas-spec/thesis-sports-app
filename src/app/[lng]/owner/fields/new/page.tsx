@@ -4,6 +4,7 @@ import { lng as routeLanguage } from 'next/root-params';
 import { getT } from '@/i18n.server';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
+import { BackButton } from '@/components/shared/BackButton';
 import { NewFieldForm } from '@/components/fields/new/NewFieldForm';
 import { buildFieldFormLabels } from '@/lib/fields/form-labels';
 import { SPORT_TYPES } from '@/lib/fields/types';
@@ -25,7 +26,9 @@ export default async function NewFieldPage() {
     <>
       <Header user={user} />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 md:py-10">
-        <h1>{t('new.title')}</h1>
+        <BackButton href={`/${lng}/owner/fields`} label={t('new.back')} />
+
+        <h1 className="mt-2">{t('new.title')}</h1>
         <p className="mt-2 text-muted-foreground">{t('new.subtitle')}</p>
 
         <div className="mt-6 md:mt-8">

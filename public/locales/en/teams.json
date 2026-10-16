@@ -51,6 +51,7 @@
   },
   "new": {
     "title": "Create your team",
+    "back": "All teams",
     "subtitle": "Fill in the basics and open the team to new players whenever you like."
   },
   "edit": {

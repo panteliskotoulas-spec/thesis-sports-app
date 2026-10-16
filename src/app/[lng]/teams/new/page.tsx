@@ -4,6 +4,7 @@ import { lng as routeLanguage } from 'next/root-params';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
+import { BackButton } from '@/components/shared/BackButton';
 import { NewTeamForm } from '@/components/teams/NewTeamForm';
 import { SPORT_TYPES } from '@/lib/fields/types';
 import { getCurrentUser } from '@/lib/session';
@@ -31,7 +32,9 @@ export default async function NewTeamPage() {
     <>
       <Header user={user} />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 sm:px-6 md:py-10">
-        <h1>{t('new.title')}</h1>
+        <BackButton href={`/${lng}/teams`} label={t('new.back')} />
+
+        <h1 className="mt-2">{t('new.title')}</h1>
         <p className="mt-2 text-muted-foreground">{t('new.subtitle')}</p>
 
         <div className="mt-6">

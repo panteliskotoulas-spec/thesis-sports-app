@@ -1,10 +1,12 @@
 import { lng as routeLanguage } from 'next/root-params';
 import { getT } from '@/i18n.server';
+import { buildAccountMenu } from '@/lib/layout/account-menu';
+import { loadCoachMenuStatus } from '@/lib/layout/account-menu-loader';
 import { getServerCaller } from '@/trpc/server/caller';
 import { BottomNavItem, BottomNavLinks } from './BottomNavLinks';
 
 export interface BottomNavProps {
-  user: { name: string; isAdmin?: boolean } | null;
+  user: { name: string; isAdmin?: boolean; accountType?: string | null } | null;
 }
 
 async function loadMessagesUnread(): Promise<number> {
@@ -23,34 +25,41 @@ export async function BottomNav({ user }: BottomNavProps) {
   const { t } = await getT('common');
   const { t: tc } = await getT('chat');
   const lng = await routeLanguage();
-  const messagesUnread = await loadMessagesUnread();
+  const [messagesUnread, coachStatus] = await Promise.all([
+    loadMessagesUnread(),
+    loadCoachMenuStatus(),
+  ]);
 
   const items: BottomNavItem[] = [
     { icon: 'home', href: `/${lng}`, label: t('nav.home'), exact: true },
     { icon: 'fields', href: `/${lng}/fields`, label: t('nav.fields') },
-    { icon: 'bookings', href: `/${lng}/bookings`, label: t('nav.bookings') },
-    {
-      icon: 'messages',
-      href: `/${lng}/messages`,
-      label: tc('nav.messages'),
-      unreadLabel: tc('nav.messagesUnread'),
-    },
-    { icon: 'profile', href: `/${lng}/profile`, label: t('nav.profile') },
+    { icon: 'teams', href: `/${lng}/teams`, label: t('nav.teams') },
+    { icon: 'coaches', href: `/${lng}/coaches`, label: t('nav.coaches') },
   ];
 
-  if (user.isAdmin) {
-    items.push({
-      icon: 'admin',
-      href: `/${lng}/admin/fields`,
-      label: t('nav.admin'),
-    });
-  }
+  const groups = buildAccountMenu({
+    lng,
+    t,
+    tc,
+    isAdmin: Boolean(user.isAdmin),
+    isBusiness: user.accountType === 'BUSINESS',
+    coachStatus,
+  });
 
   return (
     <BottomNavLinks
       label={t('nav.mobileLabel')}
       items={items}
       messagesUnread={messagesUnread}
+      menu={{
+        label: t('nav.menu'),
+        title: t('nav.menuTitle'),
+        closeLabel: t('nav.closeMenu'),
+        unreadLabel: tc('nav.messagesUnread'),
+        signOutLabel: t('auth.logout'),
+        lng,
+        groups,
+      }}
     />
   );
 }

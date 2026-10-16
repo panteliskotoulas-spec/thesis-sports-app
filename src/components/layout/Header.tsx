@@ -3,10 +3,10 @@ import { lng as routeLanguage } from 'next/root-params';
 import { getT } from '@/i18n.server';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
-import { SignOutButton } from '@/components/shared/SignOutButton';
 import { NavLink } from '@/components/shared/NavLink';
 import { ChatDock } from '@/components/chat/ChatDock';
 import { CreditChip } from '@/components/layout/CreditChip';
+import { UserMenu } from '@/components/layout/UserMenu';
 import {
   NotificationBell,
   type NotificationBellLabels,
@@ -16,10 +16,17 @@ import {
   buildChatInboxLabels,
   buildChatThreadLabels,
 } from '@/lib/chat/chat-labels';
+import { buildAccountMenu } from '@/lib/layout/account-menu';
+import { loadCoachMenuStatus } from '@/lib/layout/account-menu-loader';
 import { getServerCaller } from '@/trpc/server/caller';
 
 export interface HeaderProps {
-  user: { name: string; avatarUrl?: string; isAdmin?: boolean } | null;
+  user: {
+    name: string;
+    avatarUrl?: string;
+    isAdmin?: boolean;
+    accountType?: string | null;
+  } | null;
 }
 
 function getInitials(name: string) {
@@ -66,14 +73,26 @@ export async function Header({ user }: HeaderProps) {
   const { t: tc } = await getT('chat');
   const lng = await routeLanguage();
   const language = lng === 'en' ? 'en' : 'el';
-  const [unread, messagesUnread, creditBalance] = user
+  const [unread, messagesUnread, creditBalance, coachStatus] = user
     ? await Promise.all([
         loadUnreadCount(),
         loadMessagesUnread(),
         loadCreditBalance(),
+        loadCoachMenuStatus(),
       ])
-    : [0, 0, 0];
+    : ([0, 0, 0, null] as const);
   const creditText = formatAmount(creditBalance, lng);
+
+  const accountGroups = user
+    ? buildAccountMenu({
+        lng,
+        t,
+        tc,
+        isAdmin: Boolean(user.isAdmin),
+        isBusiness: user.accountType === 'BUSINESS',
+        coachStatus,
+      })
+    : [];
 
   const bellLabels: NotificationBellLabels = {
     bell: tn('notifications.bell'),
@@ -96,6 +115,7 @@ export async function Header({ user }: HeaderProps) {
     { slug: 'fields', label: t('nav.fields') },
     { slug: 'teams', label: t('nav.teams') },
     { slug: 'coaches', label: t('nav.coaches') },
+    { slug: 'tournaments', label: t('nav.tournaments') },
   ];
 
   if (user?.isAdmin) {
@@ -152,7 +172,7 @@ export async function Header({ user }: HeaderProps) {
               <Link
                 href={`/${lng}/profile`}
                 aria-label={t('nav.profile')}
-                className="flex items-center gap-2 rounded-full p-1 hover:bg-secondary md:pr-3"
+                className="flex items-center rounded-full p-1 hover:bg-secondary md:hidden"
               >
                 <span
                   aria-hidden="true"
@@ -160,12 +180,18 @@ export async function Header({ user }: HeaderProps) {
                 >
                   {getInitials(user.name)}
                 </span>
-                <span className="hidden max-w-40 truncate text-foreground md:inline">
-                  {user.name}
-                </span>
               </Link>
 
-              <SignOutButton lng={lng} label={t('auth.logout')} />
+              <div className="hidden md:block">
+                <UserMenu
+                  name={user.name}
+                  initials={getInitials(user.name)}
+                  lng={lng}
+                  groups={accountGroups}
+                  menuLabel={t('nav.accountMenu')}
+                  signOutLabel={t('auth.logout')}
+                />
+              </div>
             </div>
           ) : (
             <div className="flex items-center gap-2">

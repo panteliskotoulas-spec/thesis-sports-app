@@ -94,6 +94,7 @@
     "meta": "Add a field",
     "cta": "Add a field",
     "title": "Add a field",
+    "back": "My fields",
     "subtitle": "Write the details in the language you're reading the page in. The translation into the other language is automatic.",
     "basic": {
       "title": "Basics",
@@ -248,6 +249,7 @@
       "meta": "Edit field",
       "title": "Edit field",
       "titleRejected": "Fix field",
+      "back": "My fields",
       "subtitle": "Write the details in the language you're reading the page in. If you change a text, it's translated again automatically.",
       "save": "Save",
       "saving": "Saving…",
@@ -404,6 +406,7 @@
   "ownerBookings": {
     "meta": "Field bookings",
     "title": "Bookings",
+    "back": "My fields",
     "subtitle": "Bookings at your fields.",
     "filterAll": "All fields",
     "filterLabel": "Field filter",

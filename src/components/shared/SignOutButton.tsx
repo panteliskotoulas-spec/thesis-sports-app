@@ -8,9 +8,14 @@ import { authClient } from '@/lib/auth-client';
 export interface SignOutButtonProps {
   lng: string;
   label: string;
+  variant?: 'icon' | 'menu';
 }
 
-export function SignOutButton({ lng, label }: SignOutButtonProps) {
+export function SignOutButton({
+  lng,
+  label,
+  variant = 'icon',
+}: SignOutButtonProps) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
@@ -23,6 +28,20 @@ export function SignOutButton({ lng, label }: SignOutButtonProps) {
     } finally {
       setPending(false);
     }
+  }
+
+  if (variant === 'menu') {
+    return (
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={pending}
+        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-foreground hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <LogOut className="size-4 text-muted-foreground" aria-hidden="true" />
+        {label}
+      </button>
+    );
   }
 
   return (
