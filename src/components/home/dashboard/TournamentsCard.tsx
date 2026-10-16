@@ -22,7 +22,7 @@ export async function TournamentsCard({
 
   const cardProps = {
     title: t('dashboard.tournaments.title'),
-    href: `/${lng}/tournaments`,
+    href: `/${lng}/tournaments/mine`,
     linkLabel: t('dashboard.tournaments.viewAll'),
     className,
   };

@@ -9,7 +9,7 @@ import { HomeFeaturedFields } from '@/components/home/HomeFeaturedFields';
 import { HomeSteps } from '@/components/home/HomeSteps';
 import { HomeAudiences } from '@/components/home/HomeAudiences';
 import { HomeCta } from '@/components/home/HomeCta';
-import { AdminSection } from '@/components/home/dashboard/AdminSection';
+import { AdminDashboard } from '@/components/home/dashboard/AdminDashboard';
 import { CoachSection } from '@/components/home/dashboard/CoachSection';
 import { OwnerSection } from '@/components/home/dashboard/OwnerSection';
 import { PlayerDashboard } from '@/components/home/dashboard/PlayerDashboard';
@@ -30,23 +30,25 @@ export default async function LandingPage() {
   const { t: tf } = await getT('fields');
   const user = await getCurrentUser();
   const loggedIn = user !== null;
+  const isAdmin = Boolean(user?.isAdmin);
+  const isPlayer = user !== null && !isAdmin;
 
   const [featuredFields, dashboard, coach, owner, admin] = await Promise.all([
     user ? Promise.resolve([]) : loadFeaturedFields(lng),
-    user
+    isPlayer
       ? loadPlayerDashboard({
           lng,
           sportLabel: (sport) => tf(`sports.${sport}`),
         })
       : Promise.resolve(null),
-    user ? loadCoachDashboard(lng) : Promise.resolve(null),
-    user?.accountType === 'BUSINESS'
+    isPlayer ? loadCoachDashboard(lng) : Promise.resolve(null),
+    isPlayer && user?.accountType === 'BUSINESS'
       ? loadOwnerDashboard({
           lng,
           sportLabel: (sport) => tf(`sports.${sport}`),
         })
       : Promise.resolve(null),
-    user?.isAdmin
+    isAdmin
       ? loadAdminDashboard({
           lng,
           sportLabel: (sport) => tf(`sports.${sport}`),
@@ -58,7 +60,9 @@ export default async function LandingPage() {
     <>
       <Header user={user} />
       <main className="flex-1">
-        {user && dashboard ? (
+        {user && isAdmin ? (
+          <AdminDashboard name={user.name} data={admin} />
+        ) : user && dashboard ? (
           <PlayerDashboard
             name={user.name}
             data={dashboard}
@@ -66,7 +70,6 @@ export default async function LandingPage() {
               <>
                 {coach ? <CoachSection data={coach} /> : null}
                 {owner ? <OwnerSection data={owner} /> : null}
-                {admin ? <AdminSection data={admin} /> : null}
               </>
             }
           />

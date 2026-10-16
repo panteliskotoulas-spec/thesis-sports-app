@@ -73,14 +73,17 @@ export async function Header({ user }: HeaderProps) {
   const { t: tc } = await getT('chat');
   const lng = await routeLanguage();
   const language = lng === 'en' ? 'en' : 'el';
-  const [unread, messagesUnread, creditBalance, coachStatus] = user
-    ? await Promise.all([
-        loadUnreadCount(),
-        loadMessagesUnread(),
-        loadCreditBalance(),
-        loadCoachMenuStatus(),
-      ])
-    : ([0, 0, 0, null] as const);
+  const isAdmin = Boolean(user?.isAdmin);
+  const [unread, messagesUnread, creditBalance, coachStatus] = !user
+    ? ([0, 0, 0, null] as const)
+    : isAdmin
+      ? ([await loadUnreadCount(), 0, 0, null] as const)
+      : await Promise.all([
+          loadUnreadCount(),
+          loadMessagesUnread(),
+          loadCreditBalance(),
+          loadCoachMenuStatus(),
+        ]);
   const creditText = formatAmount(creditBalance, lng);
 
   const accountGroups = user
@@ -88,7 +91,7 @@ export async function Header({ user }: HeaderProps) {
         lng,
         t,
         tc,
-        isAdmin: Boolean(user.isAdmin),
+        isAdmin,
         isBusiness: user.accountType === 'BUSINESS',
         coachStatus,
       })
@@ -111,16 +114,18 @@ export async function Header({ user }: HeaderProps) {
     },
   };
 
-  const navItems = [
-    { slug: 'fields', label: t('nav.fields') },
-    { slug: 'teams', label: t('nav.teams') },
-    { slug: 'coaches', label: t('nav.coaches') },
-    { slug: 'tournaments', label: t('nav.tournaments') },
-  ];
-
-  if (user?.isAdmin) {
-    navItems.push({ slug: 'admin/fields', label: t('nav.admin') });
-  }
+  const navItems = isAdmin
+    ? [
+        { slug: 'admin/fields', label: t('nav.adminFields') },
+        { slug: 'admin/coaches', label: t('nav.adminCoaches') },
+        { slug: 'admin/tournaments', label: t('nav.adminTournaments') },
+      ]
+    : [
+        { slug: 'fields', label: t('nav.fields') },
+        { slug: 'teams', label: t('nav.teams') },
+        { slug: 'coaches', label: t('nav.coaches') },
+        { slug: 'tournaments', label: t('nav.tournaments') },
+      ];
 
   return (
     <header className="border-b-[0.5px] border-border bg-background">
@@ -149,11 +154,13 @@ export async function Header({ user }: HeaderProps) {
         <div className="flex items-center md:justify-self-end">
           {user ? (
             <div className="flex items-center gap-1">
-              <CreditChip
-                href={`/${lng}/profile?tab=credit`}
-                amountText={creditText}
-                ariaLabel={t('nav.creditAria', { amount: creditText })}
-              />
+              {isAdmin ? null : (
+                <CreditChip
+                  href={`/${lng}/profile?tab=credit`}
+                  amountText={creditText}
+                  ariaLabel={t('nav.creditAria', { amount: creditText })}
+                />
+              )}
               <NotificationBell
                 key={unread}
                 lng={language}
@@ -208,7 +215,7 @@ export async function Header({ user }: HeaderProps) {
           )}
         </div>
       </div>
-      {user ? (
+      {user && !isAdmin ? (
         <ChatDock
           lng={language}
           initialUnread={messagesUnread}

@@ -11,7 +11,8 @@
     "subtitle": "Find a team that needs players, or start your own.",
     "create": "Create a team",
     "count_one": "{{count}} team",
-    "count_other": "{{count}} teams"
+    "count_other": "{{count}} teams",
+    "mine": "My teams"
   },
   "filters": {
     "sportLabel": "Sport",
@@ -203,5 +204,22 @@
   "sessionSplitPay": {
     "refundNote": "If the session is cancelled, your share is returned to you.",
     "errorUnavailable": "This share is no longer available. The session may have been cancelled, or you've already paid."
+  },
+  "mine": {
+    "title": "My teams",
+    "subtitle": "Your teams and the join requests you've sent.",
+    "back": "Browse teams",
+    "leader": "Leader",
+    "member": "Member",
+    "requests": "Pending requests",
+    "sent": "Sent {{date}}",
+    "pending": "Pending",
+    "cancel": "Cancel",
+    "cancelAsk": "Cancel this join request?",
+    "cancelConfirm": "Cancel request",
+    "cancelBack": "Back",
+    "emptyTitle": "You're not in a team yet",
+    "emptyDescription": "Find a team that needs players, or start your own.",
+    "find": "Find a team"
   }
 }

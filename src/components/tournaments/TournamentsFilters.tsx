@@ -13,7 +13,6 @@ import {
 
 export interface TournamentsFiltersProps {
   filters: TournamentFilters;
-  showMine: boolean;
   sports: { value: TournamentSport; label: string }[];
   statuses: { value: TournamentStatus; label: string }[];
   labels: {
@@ -21,15 +20,11 @@ export interface TournamentsFiltersProps {
     sportAll: string;
     statusLabel: string;
     statusAll: string;
-    scopeLabel: string;
-    scopeAll: string;
-    scopeMine: string;
   };
 }
 
 export function TournamentsFilters({
   filters,
-  showMine,
   sports,
   statuses,
   labels,
@@ -44,27 +39,6 @@ export function TournamentsFilters({
 
   return (
     <div className="flex flex-col gap-3">
-      {showMine ? (
-        <div role="group" aria-label={labels.scopeLabel} className="flex gap-2">
-          <button
-            type="button"
-            aria-pressed={!filters.mine}
-            onClick={() => apply({ mine: false })}
-            className={`${chipBase} ${!filters.mine ? chipOn : chipOff}`}
-          >
-            {labels.scopeAll}
-          </button>
-          <button
-            type="button"
-            aria-pressed={filters.mine}
-            onClick={() => apply({ mine: true })}
-            className={`${chipBase} ${filters.mine ? chipOn : chipOff}`}
-          >
-            {labels.scopeMine}
-          </button>
-        </div>
-      ) : null}
-
       <div
         role="group"
         aria-label={labels.sportLabel}

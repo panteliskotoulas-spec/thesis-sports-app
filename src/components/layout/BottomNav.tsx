@@ -25,23 +25,49 @@ export async function BottomNav({ user }: BottomNavProps) {
   const { t } = await getT('common');
   const { t: tc } = await getT('chat');
   const lng = await routeLanguage();
-  const [messagesUnread, coachStatus] = await Promise.all([
-    loadMessagesUnread(),
-    loadCoachMenuStatus(),
-  ]);
+  const isAdmin = Boolean(user.isAdmin);
+  const [messagesUnread, coachStatus] = isAdmin
+    ? ([0, null] as const)
+    : await Promise.all([loadMessagesUnread(), loadCoachMenuStatus()]);
 
-  const items: BottomNavItem[] = [
-    { icon: 'home', href: `/${lng}`, label: t('nav.home'), exact: true },
-    { icon: 'fields', href: `/${lng}/fields`, label: t('nav.fields') },
-    { icon: 'teams', href: `/${lng}/teams`, label: t('nav.teams') },
-    { icon: 'coaches', href: `/${lng}/coaches`, label: t('nav.coaches') },
-  ];
+  const home: BottomNavItem = {
+    icon: 'home',
+    href: `/${lng}`,
+    label: t('nav.home'),
+    exact: true,
+  };
+
+  const items: BottomNavItem[] = isAdmin
+    ? [
+        home,
+        {
+          icon: 'fields',
+          href: `/${lng}/admin/fields`,
+          label: t('nav.adminFields'),
+        },
+        {
+          icon: 'coaches',
+          href: `/${lng}/admin/coaches`,
+          label: t('nav.adminCoaches'),
+        },
+        {
+          icon: 'tournaments',
+          href: `/${lng}/admin/tournaments`,
+          label: t('nav.adminTournaments'),
+        },
+      ]
+    : [
+        home,
+        { icon: 'fields', href: `/${lng}/fields`, label: t('nav.fields') },
+        { icon: 'teams', href: `/${lng}/teams`, label: t('nav.teams') },
+        { icon: 'coaches', href: `/${lng}/coaches`, label: t('nav.coaches') },
+      ];
 
   const groups = buildAccountMenu({
     lng,
     t,
     tc,
-    isAdmin: Boolean(user.isAdmin),
+    isAdmin,
     isBusiness: user.accountType === 'BUSINESS',
     coachStatus,
   });

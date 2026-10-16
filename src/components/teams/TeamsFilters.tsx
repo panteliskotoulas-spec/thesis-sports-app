@@ -8,24 +8,15 @@ import { buildTeamsQuery, type TeamFilters } from '@/lib/teams/team-filters';
 
 export interface TeamsFiltersProps {
   filters: TeamFilters;
-  showMine: boolean;
   sports: { value: SportType; label: string }[];
   labels: {
     sportLabel: string;
     sportAll: string;
     recruiting: string;
-    scopeLabel: string;
-    scopeAll: string;
-    scopeMine: string;
   };
 }
 
-export function TeamsFilters({
-  filters,
-  showMine,
-  sports,
-  labels,
-}: TeamsFiltersProps) {
+export function TeamsFilters({ filters, sports, labels }: TeamsFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -36,31 +27,6 @@ export function TeamsFilters({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {showMine ? (
-        <div
-          role="group"
-          aria-label={labels.scopeLabel}
-          className="flex gap-2 sm:mr-2"
-        >
-          <button
-            type="button"
-            aria-pressed={!filters.mine}
-            onClick={() => apply({ mine: false })}
-            className={`${chipBase} ${!filters.mine ? chipOn : chipOff}`}
-          >
-            {labels.scopeAll}
-          </button>
-          <button
-            type="button"
-            aria-pressed={filters.mine}
-            onClick={() => apply({ mine: true })}
-            className={`${chipBase} ${filters.mine ? chipOn : chipOff}`}
-          >
-            {labels.scopeMine}
-          </button>
-        </div>
-      ) : null}
-
       <div
         role="group"
         aria-label={labels.sportLabel}

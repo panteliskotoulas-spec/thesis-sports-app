@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
+import { Award } from 'lucide-react';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
@@ -33,22 +36,35 @@ export default async function TournamentsPage({
   const lng = await routeLanguage();
   const user = await getCurrentUser();
   const parsed = parseTournamentFilters(await searchParams);
-  const filters = { ...parsed, mine: parsed.mine && user !== null };
+  if (parsed.mine) {
+    redirect(`/${lng}/${user ? 'tournaments/mine' : 'login'}`);
+  }
+  const filters = { ...parsed, mine: false };
   const tournaments = await loadTournamentList(filters, lng);
 
   return (
     <>
       <Header user={user} />
       <main className="mx-auto w-full max-w-360 flex-1 px-4 py-6 sm:px-6 md:py-10 lg:px-8">
-        <div className="min-w-0">
-          <h1>{t('page.title')}</h1>
-          <p className="mt-2 text-muted-foreground">{t('page.subtitle')}</p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h1>{t('page.title')}</h1>
+            <p className="mt-2 text-muted-foreground">{t('page.subtitle')}</p>
+          </div>
+          {user ? (
+            <Link
+              href={`/${lng}/tournaments/mine`}
+              className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border-[0.5px] border-border bg-card px-4 text-sm font-medium text-foreground hover:bg-secondary sm:px-5"
+            >
+              <Award className="size-4" aria-hidden="true" />
+              {t('page.mine')}
+            </Link>
+          ) : null}
         </div>
 
         <div className="mt-6 md:mt-8">
           <TournamentsFilters
             filters={filters}
-            showMine={user !== null}
             sports={TOURNAMENT_SPORTS.map((value) => ({
               value,
               label: tf(`sports.${value}`),
@@ -62,9 +78,6 @@ export default async function TournamentsPage({
               sportAll: t('filters.sportAll'),
               statusLabel: t('filters.statusLabel'),
               statusAll: t('filters.statusAll'),
-              scopeLabel: t('filters.scopeLabel'),
-              scopeAll: t('filters.scopeAll'),
-              scopeMine: t('filters.scopeMine'),
             }}
           />
         </div>

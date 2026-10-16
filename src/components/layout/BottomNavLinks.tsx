@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, MapPin, Menu, UserRound, Users } from 'lucide-react';
+import { Home, MapPin, Menu, Trophy, UserRound, Users } from 'lucide-react';
 import { useChatUnread } from '@/components/chat/useChatUnread';
 import {
   Sheet,
@@ -25,6 +25,7 @@ const icons = {
   fields: MapPin,
   teams: Users,
   coaches: UserRound,
+  tournaments: Trophy,
 } as const;
 
 export interface BottomNavItem {

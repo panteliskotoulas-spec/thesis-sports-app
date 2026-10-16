@@ -1,5 +1,15 @@
+import { z } from 'zod';
 import { adminProcedure, protectedProcedure, router } from '../init';
+import { localized } from '@/lib/i18n-content';
 import { asLocalized } from '@/lib/server/booking-shared';
+import type {
+  MyTournamentEntry,
+  MyTournamentItem,
+} from '@/lib/tournaments/my-tournaments';
+import {
+  isTournamentSport,
+  isTournamentStatus,
+} from '@/lib/tournaments/tournament';
 import type { AdminPendingRow } from '@/lib/home/admin-dashboard';
 import type {
   MyJoinRequestRow,
@@ -151,6 +161,107 @@ export const dashboardRouter = router({
       ];
     },
   ),
+
+  myTournaments: protectedProcedure
+    .input(z.object({ lng: z.enum(['el', 'en']) }))
+    .query(async ({ ctx, input }): Promise<MyTournamentItem[]> => {
+      const userId = ctx.session.user.id;
+      const ownTeam = { members: { some: { userId } } };
+
+      const [participating, requested] = await Promise.all([
+        ctx.prisma.tournamentTeam.findMany({
+          where: { team: ownTeam },
+          select: {
+            tournamentId: true,
+            team: { select: { id: true, name: true } },
+          },
+        }),
+        ctx.prisma.tournamentTeamRequest.findMany({
+          where: { status: 'PENDING', team: ownTeam },
+          select: {
+            id: true,
+            tournamentId: true,
+            team: {
+              select: {
+                id: true,
+                name: true,
+                members: {
+                  where: { userId, role: 'LEADER' },
+                  select: { id: true },
+                },
+              },
+            },
+          },
+        }),
+      ]);
+
+      const entriesByTournament = new Map<string, MyTournamentEntry[]>();
+      const push = (tournamentId: string, entry: MyTournamentEntry) => {
+        const list = entriesByTournament.get(tournamentId) ?? [];
+        list.push(entry);
+        entriesByTournament.set(tournamentId, list);
+      };
+
+      for (const row of participating) {
+        push(row.tournamentId, {
+          teamId: row.team.id,
+          teamName: row.team.name,
+          state: 'PARTICIPATING',
+          requestId: null,
+          canCancel: false,
+        });
+      }
+      for (const row of requested) {
+        push(row.tournamentId, {
+          teamId: row.team.id,
+          teamName: row.team.name,
+          state: 'PENDING',
+          requestId: row.id,
+          canCancel: row.team.members.length > 0,
+        });
+      }
+
+      if (entriesByTournament.size === 0) return [];
+
+      const rows = await ctx.prisma.tournament.findMany({
+        where: { id: { in: [...entriesByTournament.keys()] } },
+        orderBy: [{ startDate: 'desc' }, { id: 'asc' }],
+        select: {
+          id: true,
+          name: true,
+          sportType: true,
+          status: true,
+          startDate: true,
+          endDate: true,
+          maxTeams: true,
+          hostField: { select: { name: true } },
+          _count: { select: { teams: true } },
+        },
+      });
+
+      const items: MyTournamentItem[] = [];
+      for (const row of rows) {
+        if (
+          !isTournamentSport(row.sportType) ||
+          !isTournamentStatus(row.status)
+        ) {
+          continue;
+        }
+        items.push({
+          id: row.id,
+          name: row.name,
+          sport: row.sportType,
+          status: row.status,
+          startDate: row.startDate.toISOString(),
+          endDate: row.endDate.toISOString(),
+          fieldName: localized(asLocalized(row.hostField.name), input.lng),
+          teamCount: row._count.teams,
+          maxTeams: row.maxTeams,
+          entries: entriesByTournament.get(row.id) ?? [],
+        });
+      }
+      return items;
+    }),
 
   coachOpenSlots: protectedProcedure.query(
     ({ ctx }): Promise<number> =>

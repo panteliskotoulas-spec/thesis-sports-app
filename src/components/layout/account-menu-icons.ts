@@ -12,6 +12,7 @@ import {
   Trophy,
   User,
   UserRound,
+  Users,
 } from 'lucide-react';
 import type { AccountMenuLinkKey } from '@/lib/layout/account-menu';
 
@@ -19,6 +20,8 @@ export const accountMenuIcons = {
   messages: MessageCircle,
   bookings: CalendarDays,
   coaching: CalendarClock,
+  myTeams: Users,
+  myTournaments: Trophy,
   tournaments: Trophy,
   stats: ClipboardList,
   profile: User,

@@ -17,7 +17,7 @@ export async function MyTeamsCard({ teams }: { teams: DashboardTeams | null }) {
 
   const cardProps = {
     title: t('dashboard.teams.title'),
-    href: `/${lng}/teams?mine=1`,
+    href: `/${lng}/teams/mine`,
     linkLabel: t('dashboard.teams.viewAll'),
   };
 

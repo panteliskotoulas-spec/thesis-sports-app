@@ -26,7 +26,9 @@
     "adminCoaches": "Coaches",
     "adminTournaments": "Tournaments",
     "mobileLabel": "Main navigation",
-    "creditAria": "Credit: {{amount}}"
+    "creditAria": "Credit: {{amount}}",
+    "myTeams": "My teams",
+    "myTournaments": "My tournaments"
   },
   "auth": {
     "login": "Log in",

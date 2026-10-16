@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { lng as routeLanguage } from 'next/root-params';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import { getT } from '@/i18n.server';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
@@ -29,7 +30,8 @@ export default async function TeamsPage({
   const lng = await routeLanguage();
   const user = await getCurrentUser();
   const parsed = parseTeamFilters(await searchParams);
-  const filters = { ...parsed, mine: parsed.mine && user !== null };
+  if (parsed.mine) redirect(`/${lng}/${user ? 'teams/mine' : 'login'}`);
+  const filters = { ...parsed, mine: false };
 
   return (
     <>
@@ -41,20 +43,28 @@ export default async function TeamsPage({
             <p className="mt-2 text-muted-foreground">{t('page.subtitle')}</p>
           </div>
           {user ? (
-            <Link
-              href={`/${lng}/teams/new`}
-              className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90 sm:px-5"
-            >
-              <Plus className="size-4" aria-hidden="true" />
-              {t('page.create')}
-            </Link>
+            <div className="flex shrink-0 flex-wrap justify-end gap-2">
+              <Link
+                href={`/${lng}/teams/mine`}
+                className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border-[0.5px] border-border bg-card px-4 text-sm font-medium text-foreground hover:bg-secondary sm:px-5"
+              >
+                <Users className="size-4" aria-hidden="true" />
+                {t('page.mine')}
+              </Link>
+              <Link
+                href={`/${lng}/teams/new`}
+                className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90 sm:px-5"
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                {t('page.create')}
+              </Link>
+            </div>
           ) : null}
         </div>
 
         <div className="mt-6 md:mt-8">
           <TeamsFilters
             filters={filters}
-            showMine={user !== null}
             sports={SPORT_TYPES.map((value) => ({
               value,
               label: tf(`sports.${value}`),
@@ -63,9 +73,6 @@ export default async function TeamsPage({
               sportLabel: t('filters.sportLabel'),
               sportAll: t('filters.sportAll'),
               recruiting: t('filters.recruiting'),
-              scopeLabel: t('filters.scopeLabel'),
-              scopeAll: t('filters.scopeAll'),
-              scopeMine: t('filters.scopeMine'),
             }}
           />
         </div>

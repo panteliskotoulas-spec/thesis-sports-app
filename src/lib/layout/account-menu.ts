@@ -8,6 +8,8 @@ export type AccountMenuLinkKey =
   | 'messages'
   | 'bookings'
   | 'coaching'
+  | 'myTeams'
+  | 'myTournaments'
   | 'tournaments'
   | 'stats'
   | 'profile'
@@ -50,6 +52,38 @@ export function buildAccountMenu({
   isBusiness,
   coachStatus,
 }: BuildAccountMenuInput): AccountMenuGroup[] {
+  if (isAdmin) {
+    return [
+      {
+        key: 'admin',
+        label: t('nav.groupAdmin'),
+        links: [
+          {
+            key: 'adminFields',
+            href: `/${lng}/admin/fields`,
+            label: t('nav.adminFields'),
+          },
+          {
+            key: 'adminCoaches',
+            href: `/${lng}/admin/coaches`,
+            label: t('nav.adminCoaches'),
+          },
+          {
+            key: 'adminTournaments',
+            href: `/${lng}/admin/tournaments`,
+            label: t('nav.adminTournaments'),
+          },
+        ],
+      },
+      {
+        key: 'account',
+        links: [
+          { key: 'profile', href: `/${lng}/profile`, label: t('nav.profile') },
+        ],
+      },
+    ];
+  }
+
   const groups: AccountMenuGroup[] = [
     {
       key: 'account',
@@ -69,6 +103,16 @@ export function buildAccountMenu({
           key: 'coaching',
           href: `/${lng}/coaching`,
           label: t('nav.coaching'),
+        },
+        {
+          key: 'myTeams',
+          href: `/${lng}/teams/mine`,
+          label: t('nav.myTeams'),
+        },
+        {
+          key: 'myTournaments',
+          href: `/${lng}/tournaments/mine`,
+          label: t('nav.myTournaments'),
         },
         {
           key: 'tournaments',
@@ -127,30 +171,6 @@ export function buildAccountMenu({
           key: 'ownerBookings',
           href: `/${lng}/owner/bookings`,
           label: t('nav.ownerBookings'),
-        },
-      ],
-    });
-  }
-
-  if (isAdmin) {
-    groups.push({
-      key: 'admin',
-      label: t('nav.groupAdmin'),
-      links: [
-        {
-          key: 'adminFields',
-          href: `/${lng}/admin/fields`,
-          label: t('nav.adminFields'),
-        },
-        {
-          key: 'adminCoaches',
-          href: `/${lng}/admin/coaches`,
-          label: t('nav.adminCoaches'),
-        },
-        {
-          key: 'adminTournaments',
-          href: `/${lng}/admin/tournaments`,
-          label: t('nav.adminTournaments'),
         },
       ],
     });

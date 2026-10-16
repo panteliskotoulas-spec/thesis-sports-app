@@ -5,7 +5,8 @@
   },
   "page": {
     "title": "Tournaments",
-    "subtitle": "Standings, matches and player stats for each tournament."
+    "subtitle": "Standings, matches and player stats for each tournament.",
+    "mine": "My tournaments"
   },
   "filters": {
     "sportLabel": "Sport",
@@ -466,5 +467,25 @@
       "POINTS_MISMATCH": "The players' points for each team must equal that team's score.",
       "GOALS_EXCEED_SCORE": "A team's player goals can't exceed its score."
     }
+  },
+  "mine": {
+    "title": "My tournaments",
+    "subtitle": "Tournaments your teams are in or have requested to join.",
+    "back": "Browse tournaments",
+    "sections": {
+      "ONGOING": "Ongoing",
+      "UPCOMING": "Upcoming",
+      "COMPLETED": "Completed"
+    },
+    "entryParticipating": "{{team}} · Participating",
+    "entryPending": "{{team}} · Awaiting approval",
+    "cancel": "Cancel request",
+    "cancelAsk": "Cancel the entry request?",
+    "cancelConfirm": "Cancel request",
+    "cancelBack": "Back",
+    "emptyTitle": "None of your teams are in a tournament",
+    "emptyDescription": "Browse the available tournaments and send a request with your team.",
+    "find": "Browse tournaments",
+    "error": "We couldn't load your tournaments. Try again in a moment."
   }
 }
