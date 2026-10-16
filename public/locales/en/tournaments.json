@@ -31,6 +31,23 @@
     "back": "All tournaments",
     "teams": "{{current}} of {{max}} teams"
   },
+  "requests": {
+    "title": "Team entry",
+    "teamLabel": "Your team",
+    "apply": "Request to join",
+    "applying": "Sending…",
+    "openNote": "The organizer will review your request.",
+    "fullNote": "The tournament has reached its maximum number of teams.",
+    "pendingBadge": "Pending",
+    "sent": "Request sent {{time}}.",
+    "justNow": "just now",
+    "cancel": "Cancel request",
+    "cancelling": "Cancelling…",
+    "rejectedBadge": "Rejected",
+    "rejectedNote": "The organizer rejected the request. You can't send another request for this tournament.",
+    "errorConflict": "The request status changed. The page is refreshing, try again.",
+    "errorGeneric": "Something went wrong. Try again."
+  },
   "standings": {
     "title": "Standings",
     "caption": "Teams are ranked by points.",
@@ -332,6 +349,24 @@
       "removeAria": "Remove team {name}",
       "adding": "Adding…",
       "pickFirst": "Choose a team first."
+    },
+    "requests": {
+      "title": "Team requests",
+      "empty": "There are no pending requests.",
+      "pendingCount": "{n} pending",
+      "meta": "Leader: {leader} · Members: {members} · {time}",
+      "justNow": "just now",
+      "accept": "Accept",
+      "accepting": "Accepting…",
+      "reject": "Reject",
+      "rejecting": "Rejecting…",
+      "rejectConfirm": "Rejecting is final and the team won't be able to request again. Continue?",
+      "rejectYes": "Reject",
+      "rejectNo": "Cancel",
+      "acceptAria": "Accept team {name}",
+      "rejectAria": "Reject team {name}",
+      "lockedNote": "You can't accept teams once the schedule is created or the tournament has started. You can only reject.",
+      "fullNote": "The tournament has reached its maximum number of teams, so you can't accept another one."
     },
     "fixtures": {
       "title": "Schedule",

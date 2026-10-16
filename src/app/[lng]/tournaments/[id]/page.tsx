@@ -11,8 +11,12 @@ import { MatchesSection } from '@/components/tournaments/MatchesSection';
 import { PlayerStatsSection } from '@/components/tournaments/PlayerStatsSection';
 import { PointsTrendChart } from '@/components/tournaments/PointsTrendChart';
 import { StandingsTable } from '@/components/tournaments/StandingsTable';
+import { TeamRequestCard } from '@/components/tournaments/TeamRequestCard';
 import { TournamentHeader } from '@/components/tournaments/TournamentHeader';
+import { formatRelativeTime } from '@/lib/notifications/notification';
 import { getCurrentUser } from '@/lib/session';
+import { buildTeamRequestCardLabels } from '@/lib/tournaments/team-request-labels';
+import { loadTeamRequestViewer } from '@/lib/tournaments/team-request-loader';
 import {
   computePointsTrend,
   computeStandings,
@@ -55,6 +59,19 @@ export default async function TournamentPage({
   const tournament = await loadTournament(id, lng);
   if (!tournament) notFound();
 
+  const requestViewer = await loadTeamRequestViewer(id);
+  const sentText =
+    requestViewer.kind === 'pending'
+      ? t('requests.sent', {
+          time: formatRelativeTime(
+            requestViewer.createdAt,
+            new Date(),
+            lng,
+            t('requests.justNow'),
+          ),
+        })
+      : null;
+
   const labels = buildTournamentLabels(t);
   const standings = computeStandings(
     tournament.sport,
@@ -90,6 +107,17 @@ export default async function TournamentPage({
         </Link>
 
         <TournamentHeader tournament={tournament} />
+
+        {requestViewer.kind === 'hidden' ? null : (
+          <div className="mt-6 max-w-md">
+            <TeamRequestCard
+              tournamentId={tournament.id}
+              viewer={requestViewer}
+              sentText={sentText}
+              labels={buildTeamRequestCardLabels(t)}
+            />
+          </div>
+        )}
 
         <div
           className={`mt-8 grid grid-cols-1 gap-x-8 gap-y-8 ${

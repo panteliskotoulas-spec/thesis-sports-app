@@ -14,11 +14,16 @@ import {
   AdminTeamsSection,
   type AdminTeamsSectionLabels,
 } from '@/components/admin/tournaments/AdminTeamsSection';
+import {
+  AdminRequestsSection,
+  type AdminRequestsSectionLabels,
+} from '@/components/admin/tournaments/AdminRequestsSection';
 import { DeleteTournamentButton } from '@/components/admin/tournaments/DeleteTournamentButton';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Header } from '@/components/layout/Header';
 import { TournamentHeader } from '@/components/tournaments/TournamentHeader';
 import { fillTemplate } from '@/lib/bookings/booking';
+import { formatRelativeTime } from '@/lib/notifications/notification';
 import {
   MIN_TEAMS,
   groupByRound,
@@ -29,6 +34,9 @@ import {
 import { buildAdminErrorLabels } from '@/lib/tournaments/admin-labels';
 import { loadTeamOptions } from '@/lib/tournaments/admin-loader';
 import { getCurrentUser } from '@/lib/session';
+import type { AdminRequestRow } from '@/lib/tournaments/team-request';
+import { buildAdminRequestsLabels } from '@/lib/tournaments/team-request-labels';
+import { loadTournamentRequests } from '@/lib/tournaments/team-request-loader';
 import { formatMatchDate } from '@/lib/tournaments/tournament-format';
 import { loadTournamentDetail } from '@/lib/tournaments/tournament-loader';
 
@@ -116,6 +124,27 @@ export default async function AdminTournamentPage({
   );
 
   const errors = buildAdminErrorLabels(t);
+
+  const requestItems = await loadTournamentRequests(tournament.id);
+  const requestRows: AdminRequestRow[] = requestItems.map((item) => ({
+    id: item.id,
+    teamName: item.teamName,
+    teamLogoUrl: item.teamLogoUrl,
+    metaText: fillTemplate(t('admin.requests.meta'), {
+      leader: item.leaderName,
+      members: String(item.memberCount),
+      time: formatRelativeTime(
+        item.createdAt,
+        new Date(),
+        lng,
+        t('admin.requests.justNow'),
+      ),
+    }),
+  }));
+  const requestsLabels: AdminRequestsSectionLabels = buildAdminRequestsLabels(
+    t,
+    errors,
+  );
 
   const teamsLabels: AdminTeamsSectionLabels = {
     title: t('admin.teams.title'),
@@ -224,6 +253,12 @@ export default async function AdminTournamentPage({
             locked={locked}
             full={full}
             labels={teamsLabels}
+          />
+          <AdminRequestsSection
+            requests={requestRows}
+            locked={locked}
+            full={full}
+            labels={requestsLabels}
           />
           <AdminFixturesSection
             tournamentId={tournament.id}
